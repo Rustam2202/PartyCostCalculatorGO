@@ -33,40 +33,31 @@ func (data *PartyData) CalculateBalances() {
 }
 
 func (data *PartyData) CalculateAll() {
-	temp_persons := MakeNoZeroBalance(data.persons)
-	if len(temp_persons) > 0 {
-		SortPersons(temp_persons)
-		PayDebt(temp_persons)
-		data.CalculateAll()
-	}
-}
-
-func MakeNoZeroBalance(person []Person) []Person {
-	var noZeroBal []Person
-	for _, p := range person {
-		if p.balance != 0 {
-			noZeroBal = append(noZeroBal, p)
+	SortPersons(data.persons)
+	i := 0
+	j := len(data.persons) - 1
+	for i < j {
+		left := &data.persons[i]
+		right := &data.persons[j]
+		absLeftBalance := math.Abs(float64(left.balance))
+		if absLeftBalance >= float64(right.balance) {
+			left.balance += right.balance
+			right.indeptedTo[left.name] = right.balance
+			right.balance = 0
+			j--
+		} else {
+			right.balance -= float32(absLeftBalance)
+			right.indeptedTo[left.name] = right.balance
+			left.balance = 0
+			i++
 		}
 	}
-	return noZeroBal
 }
 
 func SortPersons(person []Person) {
 	sort.SliceStable(person, func(i, j int) bool {
 		return person[i].balance < person[j].balance
 	})
-}
-
-func PayDebt(person []Person) {
-	debetor := &person[len(person)-1]
-	recipient := &person[0]
-	if math.Abs( float64(recipient.balance)) >= float64( debetor.balance) {
-		recipient.balance += debetor.balance
-		debetor.balance = 0
-	} else {
-		recipient.balance = 0
-		debetor.balance -= recipient.balance
-	}
 }
 
 func main() {
@@ -79,8 +70,8 @@ func main() {
 		{name: "Bob", spent: 0},
 		{name: "Jack", spent: 5},
 	}
-
-	data := PartyData{persons: persons}
+	m := map[string]float32{}
+	data := PartyData{persons: persons, indeptedTo: m}
 	data.CalculateTotalAndAverageAmount()
 	data.CalculateBalances()
 	data.CalculateAll()
