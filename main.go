@@ -32,6 +32,12 @@ func (data *PartyData) CalculateBalances() {
 	}
 }
 
+func SortPersons(person []Person) {
+	sort.SliceStable(person, func(i, j int) bool {
+		return person[i].balance < person[j].balance
+	})
+}
+
 func (data *PartyData) CalculateDebts(errorRate float32) {
 	SortPersons(data.persons)
 	i := 0
@@ -41,27 +47,25 @@ func (data *PartyData) CalculateDebts(errorRate float32) {
 		right := &data.persons[j]
 		absLeftBalance := math.Abs(float64(left.balance))
 		if absLeftBalance >= float64(right.balance) {
-			if absLeftBalance >= float64(errorRate) {
-				left.balance += right.balance
-				right.indeptedTo[left.name] = right.balance
+			if absLeftBalance < float64(errorRate) {
+				left.balance = 0
+				i++
+				continue
 			}
+			right.indeptedTo[left.name] = right.balance
+			left.balance += right.balance
 			right.balance = 0
 			j--
 		} else {
-			if absLeftBalance >= float64(errorRate) {
-				right.balance -= float32(absLeftBalance)
-				right.indeptedTo[left.name] = right.balance
+			right.indeptedTo[left.name] = float32(absLeftBalance)
+			right.balance -= float32(absLeftBalance)
+			if float64(right.balance) < float64(errorRate) {
+				right.balance = 0
 			}
 			left.balance = 0
 			i++
 		}
 	}
-}
-
-func SortPersons(person []Person) {
-	sort.SliceStable(person, func(i, j int) bool {
-		return person[i].balance < person[j].balance
-	})
 }
 
 func (data *PartyData) CheckCalculation() {
