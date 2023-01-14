@@ -82,21 +82,27 @@ func (data *PartyData) CheckCalculation() {
 		}
 	}
 	difference := math.Abs(sum_debts - sum_spents)
-	fmt.Println(fmt.Sprintf("Difference after calculation is %0.2f", difference))
+	fmt.Println("Sum of debts: ", sum_debts)
+	fmt.Println("Total spent: ", sum_spents)
+	fmt.Println("Difference after calculation is ", difference)
 }
 
 func (data *PartyData) ShowPayments() {
 	for _, p := range data.persons {
 		if len(p.indeptedTo) > 0 {
-			fmt.Println(fmt.Sprintf("%s owes to:", p.name))
+			fmt.Println(p.name, "owes to:")
 			for k, v := range p.indeptedTo {
-				fmt.Println(fmt.Sprintf("  %s %0.2f ", k, v))
+				fmt.Println("  ", k, v)
 			}
 		}
 	}
 }
 
 func main() {
+	Test2()
+}
+
+func Test1() {
 	persons := []Person{
 		{name: "Alex", spent: 90, indeptedTo: make(map[string]float32)},
 		{name: "Marry", spent: 55, indeptedTo: make(map[string]float32)},
@@ -105,6 +111,26 @@ func main() {
 		{name: "Suzan", spent: 30, indeptedTo: make(map[string]float32)},
 		{name: "Bob", spent: 0, indeptedTo: make(map[string]float32)},
 		{name: "Jack", spent: 5, indeptedTo: make(map[string]float32)},
+	}
+	data := PartyData{persons: persons}
+
+	data.CalculateTotalAndAverageAmount()
+	data.CalculateBalances()
+	data.CalculateDebts(1)
+	data.CheckCalculation()
+	data.ShowPayments()
+}
+
+func Test2() {
+	persons := []Person{
+		{name: "Alex", spent: 0, indeptedTo: make(map[string]float32)},
+		{name: "Marry", spent: 2000, indeptedTo: make(map[string]float32)},
+		{name: "Jhon", spent: 4900, indeptedTo: make(map[string]float32)},
+		{name: "Mike", spent: 0, indeptedTo: make(map[string]float32)},
+		{name: "Suzan", spent: 750, indeptedTo: make(map[string]float32)},
+		{name: "Bob", spent: 0, indeptedTo: make(map[string]float32)},
+		{name: "Jack", spent: 12000, indeptedTo: make(map[string]float32)},
+		{name: "Pite", spent: 49500, indeptedTo: make(map[string]float32)},
 	}
 	data := PartyData{persons: persons}
 
