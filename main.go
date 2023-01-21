@@ -1,16 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math"
+	"os"
 	"sort"
 )
 
 type Person struct {
-	name       string
-	spent      uint
-	balance    float32
-	indeptedTo map[string]float32
+	Name       string `json:"name"`
+	Spent      uint   `json:"spent"`
+	Balance    float32
+	IndeptedTo map[string]float32
+}
+
+type Persons struct {
+	Persons []Person `json:"persons"`
 }
 
 type PartyData struct {
@@ -21,20 +28,20 @@ type PartyData struct {
 
 func (data *PartyData) CalculateTotalAndAverageAmount() {
 	for _, p := range data.persons {
-		data.total_amount += p.spent
+		data.total_amount += p.Spent
 	}
 	data.average_amount = float32(data.total_amount) / float32(len(data.persons))
 }
 
 func (data *PartyData) CalculateBalances() {
 	for i := 0; i < len(data.persons); i++ {
-		data.persons[i].balance = data.average_amount - float32(data.persons[i].spent)
+		data.persons[i].Balance = data.average_amount - float32(data.persons[i].Spent)
 	}
 }
 
 func SortPersons(person []Person) {
 	sort.SliceStable(person, func(i, j int) bool {
-		return person[i].balance < person[j].balance
+		return person[i].Balance < person[j].Balance
 	})
 }
 
@@ -45,24 +52,24 @@ func (data *PartyData) CalculateDebts(errorRate float32) {
 	for i < j {
 		left := &data.persons[i]
 		right := &data.persons[j]
-		absLeftBalance := math.Abs(float64(left.balance))
-		if absLeftBalance >= float64(right.balance) {
+		absLeftBalance := math.Abs(float64(left.Balance))
+		if absLeftBalance >= float64(right.Balance) {
 			if absLeftBalance < float64(errorRate) {
-				left.balance = 0
+				left.Balance = 0
 				i++
 				continue
 			}
-			right.indeptedTo[left.name] = right.balance
-			left.balance += right.balance
-			right.balance = 0
+			right.IndeptedTo[left.Name] = right.Balance
+			left.Balance += right.Balance
+			right.Balance = 0
 			j--
 		} else {
-			right.indeptedTo[left.name] = float32(absLeftBalance)
-			right.balance -= float32(absLeftBalance)
-			if float64(right.balance) < float64(errorRate) {
-				right.balance = 0
+			right.IndeptedTo[left.Name] = float32(absLeftBalance)
+			right.Balance -= float32(absLeftBalance)
+			if float64(right.Balance) < float64(errorRate) {
+				right.Balance = 0
 			}
-			left.balance = 0
+			left.Balance = 0
 			i++
 		}
 	}
@@ -72,13 +79,13 @@ func (data *PartyData) CheckCalculation() {
 	var sum_debts float64
 	var sum_spents float64
 	for _, p := range data.persons {
-		if len(p.indeptedTo) > 0 {
-			for _, v := range p.indeptedTo {
+		if len(p.IndeptedTo) > 0 {
+			for _, v := range p.IndeptedTo {
 				sum_debts += float64(v)
 			}
 		}
-		if p.spent >= uint(data.average_amount) {
-			sum_spents += math.Abs((float64(p.spent) - float64(data.average_amount)))
+		if p.Spent >= uint(data.average_amount) {
+			sum_spents += math.Abs((float64(p.Spent) - float64(data.average_amount)))
 		}
 	}
 	difference := math.Abs(sum_debts - sum_spents)
@@ -89,9 +96,9 @@ func (data *PartyData) CheckCalculation() {
 
 func (data *PartyData) ShowPayments() {
 	for _, p := range data.persons {
-		if len(p.indeptedTo) > 0 {
-			fmt.Println(p.name, "owes to:")
-			for k, v := range p.indeptedTo {
+		if len(p.IndeptedTo) > 0 {
+			fmt.Println(p.Name, "owes to:")
+			for k, v := range p.IndeptedTo {
 				fmt.Println("  ", k, v)
 			}
 		}
@@ -99,19 +106,33 @@ func (data *PartyData) ShowPayments() {
 }
 
 func main() {
-	Test1()
-	Test2()
+	jsonInput, err := os.Open("persons1.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonInput.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonInput)
+	var personsFromJSON Persons
+	json.Unmarshal(byteValue, &personsFromJSON)
+
+	for _, p := range personsFromJSON.Persons {
+		fmt.Printf("%s spent: %d\n", p.Name, p.Spent)
+	}
+
+	//Test1()
+	//Test2()
 }
 
 func Test1() {
 	persons := []Person{
-		{name: "Alex", spent: 90, indeptedTo: make(map[string]float32)},
-		{name: "Marry", spent: 55, indeptedTo: make(map[string]float32)},
-		{name: "Jhon", spent: 0, indeptedTo: make(map[string]float32)},
-		{name: "Mike", spent: 25, indeptedTo: make(map[string]float32)},
-		{name: "Suzan", spent: 30, indeptedTo: make(map[string]float32)},
-		{name: "Bob", spent: 0, indeptedTo: make(map[string]float32)},
-		{name: "Jack", spent: 5, indeptedTo: make(map[string]float32)},
+		{Name: "Alex", Spent: 90, IndeptedTo: make(map[string]float32)},
+		{Name: "Marry", Spent: 55, IndeptedTo: make(map[string]float32)},
+		{Name: "Jhon", Spent: 0, IndeptedTo: make(map[string]float32)},
+		{Name: "Mike", Spent: 25, IndeptedTo: make(map[string]float32)},
+		{Name: "Suzan", Spent: 30, IndeptedTo: make(map[string]float32)},
+		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
+		{Name: "Jack", Spent: 5, IndeptedTo: make(map[string]float32)},
 	}
 	data := PartyData{persons: persons}
 
@@ -124,14 +145,14 @@ func Test1() {
 
 func Test2() {
 	persons := []Person{
-		{name: "Alex", spent: 0, indeptedTo: make(map[string]float32)},
-		{name: "Marry", spent: 2000, indeptedTo: make(map[string]float32)},
-		{name: "Jhon", spent: 4900, indeptedTo: make(map[string]float32)},
-		{name: "Mike", spent: 0, indeptedTo: make(map[string]float32)},
-		{name: "Suzan", spent: 750, indeptedTo: make(map[string]float32)},
-		{name: "Bob", spent: 0, indeptedTo: make(map[string]float32)},
-		{name: "Jack", spent: 12000, indeptedTo: make(map[string]float32)},
-		{name: "Pite", spent: 49500, indeptedTo: make(map[string]float32)},
+		{Name: "Alex", Spent: 0, IndeptedTo: make(map[string]float32)},
+		{Name: "Marry", Spent: 2000, IndeptedTo: make(map[string]float32)},
+		{Name: "Jhon", Spent: 4900, IndeptedTo: make(map[string]float32)},
+		{Name: "Mike", Spent: 0, IndeptedTo: make(map[string]float32)},
+		{Name: "Suzan", Spent: 750, IndeptedTo: make(map[string]float32)},
+		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
+		{Name: "Jack", Spent: 12000, IndeptedTo: make(map[string]float32)},
+		{Name: "Pite", Spent: 49500, IndeptedTo: make(map[string]float32)},
 	}
 	data := PartyData{persons: persons}
 
