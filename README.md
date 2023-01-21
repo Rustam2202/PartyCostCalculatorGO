@@ -1,4 +1,3 @@
-# PartyCostCalculatorGO
 <html>
 
 <head>
