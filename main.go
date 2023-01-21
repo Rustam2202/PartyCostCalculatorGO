@@ -39,19 +39,30 @@ func (data *PartyData) CalculateBalances() {
 	}
 }
 
-func SortPersons(person []Person) {
+func (data *PartyData) SortPersons(person []Person) {
 	sort.SliceStable(person, func(i, j int) bool {
 		return person[i].Balance < person[j].Balance
 	})
 }
 
-func (data *PartyData) CalculateDebts(errorRate float32) {
-	SortPersons(data.persons)
-	i := 0
-	j := len(data.persons) - 1
+func CalculateDebts(input Persons, errorRate float32) PartyData {
+	var result = PartyData{
+		persons: input.Persons,
+	}
+	for i := 0; i < len(result.persons); i++ {
+		result.persons[i].IndeptedTo = make(map[string]float32) // need not nil map to write Balance
+	}
+	result.CalculateTotalAndAverageAmount()
+	result.CalculateBalances()
+	sort.SliceStable(result.persons, func(i, j int) bool {
+		return result.persons[i].Balance < result.persons[j].Balance
+	})
+	// SortPersons(result.persons)
+	i := 0                       // left iterator
+	j := len(result.persons) - 1 // right iterator
 	for i < j {
-		left := &data.persons[i]
-		right := &data.persons[j]
+		left := &result.persons[i]
+		right := &result.persons[j]
 		absLeftBalance := math.Abs(float64(left.Balance))
 		if absLeftBalance >= float64(right.Balance) {
 			if absLeftBalance < float64(errorRate) {
@@ -73,6 +84,7 @@ func (data *PartyData) CalculateDebts(errorRate float32) {
 			i++
 		}
 	}
+	return result
 }
 
 func (data *PartyData) CheckCalculation() {
@@ -116,9 +128,13 @@ func main() {
 	var personsFromJSON Persons
 	json.Unmarshal(byteValue, &personsFromJSON)
 
+	fmt.Println("Input persons:")
 	for _, p := range personsFromJSON.Persons {
 		fmt.Printf("%s spent: %d\n", p.Name, p.Spent)
 	}
+
+	result := CalculateDebts(personsFromJSON, 1)
+	result.ShowPayments()
 
 	//Test1()
 	//Test2()
@@ -138,7 +154,7 @@ func Test1() {
 
 	data.CalculateTotalAndAverageAmount()
 	data.CalculateBalances()
-	data.CalculateDebts(1)
+	//	data.CalculateDebts(1)
 	data.CheckCalculation()
 	data.ShowPayments()
 }
@@ -158,7 +174,7 @@ func Test2() {
 
 	data.CalculateTotalAndAverageAmount()
 	data.CalculateBalances()
-	data.CalculateDebts(1)
+	//	data.CalculateDebts(1)
 	data.CheckCalculation()
 	data.ShowPayments()
 }
