@@ -99,6 +99,7 @@ func (data *PartyData) ShowPayments() {
 }
 
 func main() {
+	Test1()
 	Test2()
 }
 
