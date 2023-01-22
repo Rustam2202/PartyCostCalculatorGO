@@ -29,20 +29,18 @@ type Persons struct {
 }
 
 type PartyData struct {
-	persons        []Person
+	persons         []Person
 	AllPersonsCount uint
-	average_amount float32
-	total_amount   uint
+	average_amount  float32
+	total_amount    uint
 }
 
 func (data *PartyData) CalculateTotalAndAverageAmount() {
 	for _, p := range data.persons {
 		data.total_amount += p.Spent
 	}
-	//var allPersons uint
 	for _, p := range data.persons {
-		//allPersons += p.Participants
-		data.AllPersonsCount+=p.Participants
+		data.AllPersonsCount += p.Participants
 	}
 	data.average_amount = float32(data.total_amount) / float32(data.AllPersonsCount)
 }
@@ -98,26 +96,52 @@ func CalculateDebts(input Persons, errorRate float32) PartyData {
 	return result
 }
 
-func (data *PartyData) CheckCalculation() {
+func (data *PartyData) CheckCalculation(input Persons) {
 
-	
-	/*
-	var sum_debts float64
-	var sum_spents float64
-	for _, p := range data.persons {
-		if len(p.IndeptedTo) > 0 {
-			for _, v := range p.IndeptedTo {
-				sum_debts += float64(v)
-			}
-		}
-		if p.Spent >= uint(data.average_amount) {
-			sum_spents += math.Abs((float64(p.Spent) - float64(data.average_amount)))
+	var totalSpent uint
+	var averagePerPerson float32
+	var allPersonCount uint
+	var allPayments float32
+	var balances map[string]float32
+
+	for _, p := range input.Persons {
+		totalSpent += p.Spent
+		if p.Participants == 0 {
+			allPersonCount++
+		} else {
+			allPersonCount += p.Participants
 		}
 	}
-	difference := math.Abs(sum_debts - sum_spents)
-	fmt.Println("Sum of debts: ", sum_debts)
-	fmt.Println("Total spent: ", sum_spents)
-	fmt.Println("Difference after calculation is ", difference)
+	averagePerPerson = float32(totalSpent) / float32(allPersonCount)
+
+	for _, p := range data.persons {
+		for _, p2 := range p.IndeptedTo {
+			allPayments += p2
+		}
+	}
+
+	fmt.Printf("Average per person: %f\n", averagePerPerson)
+	for name, balance := range balances {
+		fmt.Printf("%s has %f balance",name,balance)
+	}
+
+	/*
+		var sum_debts float64
+		var sum_spents float64
+		for _, p := range data.persons {
+			if len(p.IndeptedTo) > 0 {
+				for _, v := range p.IndeptedTo {
+					sum_debts += float64(v)
+				}
+			}
+			if p.Spent >= uint(data.average_amount) {
+				sum_spents += math.Abs((float64(p.Spent) - float64(data.average_amount)))
+			}
+		}
+		difference := math.Abs(sum_debts - sum_spents)
+		fmt.Println("Sum of debts: ", sum_debts)
+		fmt.Println("Total spent: ", sum_spents)
+		fmt.Println("Difference after calculation is ", difference)
 	*/
 }
 
@@ -166,6 +190,11 @@ func (data *PartyData) PrintPayments(lang Language) string {
 			}
 		}
 	}
+	if lang == ENG {
+		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.average_amount)
+	} else if lang == RUS {
+		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.average_amount)
+	}
 	return result
 }
 
@@ -191,7 +220,7 @@ func main() {
 	json.Unmarshal(byteValue, &personsFromJSON)
 	result := CalculateDebts(personsFromJSON, 1)
 	result.ShowPayments(Language(ENG))
-	//result.CheckCalculation()
+	//result.CheckCalculation(personsFromJSON)
 
 	result.PrintToFile("result.txt", Language(RUS))
 
@@ -214,7 +243,7 @@ func Test1() {
 	data.CalculateTotalAndAverageAmount()
 	data.CalculateBalances()
 	//	data.CalculateDebts(1)
-	data.CheckCalculation()
+	//data.CheckCalculation()
 	//data.ShowPayments()
 }
 
@@ -234,6 +263,6 @@ func Test2() {
 	data.CalculateTotalAndAverageAmount()
 	data.CalculateBalances()
 	//	data.CalculateDebts(1)
-	data.CheckCalculation()
+	//	data.CheckCalculation()
 	//data.ShowPayments()
 }
