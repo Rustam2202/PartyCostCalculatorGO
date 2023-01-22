@@ -30,6 +30,17 @@
             rounding decimal places.
         </a>
     </div>
+    <div>
+        <h4>
+            To do
+        </h4>
+        <a>
+            <ul>
+                <li>Finish CheckCalculation()</li>
+                <li>Create tests in main_test.go</li>
+            </ul>
+        </a>
+    </div>
 </body>
 
 </html>
