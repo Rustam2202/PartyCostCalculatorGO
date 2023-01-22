@@ -21,7 +21,8 @@
             How its works
         </h4>
         <a>
-            As a input values used a JSON-database that contains participant names and spents.
+            As a input values used a JSON-database that contains participant names, spents and count of persons if you 
+            spent for youself or some group (like your family member).
             The data is sorted by the amount spent criteria, calculated balance sheet status (overpayment or debt) of
             each participant and using the two iterator method debtors are determined with the indication of the
             recipient and the amount of the debt. Thus, participants with the maximum overpayment and debt are

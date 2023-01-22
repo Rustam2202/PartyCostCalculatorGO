@@ -9,11 +9,19 @@ import (
 	"sort"
 )
 
+type Language string
+
+const (
+	ENG Language = "eng"
+	RUS          = "rus"
+)
+
 type Person struct {
-	Name       string `json:"name"`
-	Spent      uint   `json:"spent"`
-	Balance    float32
-	IndeptedTo map[string]float32
+	Name         string `json:"name"`
+	Spent        uint   `json:"spent"`
+	Participants uint   `json:"participants"`
+	Balance      float32
+	IndeptedTo   map[string]float32
 }
 
 type Persons struct {
@@ -22,6 +30,7 @@ type Persons struct {
 
 type PartyData struct {
 	persons        []Person
+	AllPersonsCount uint
 	average_amount float32
 	total_amount   uint
 }
@@ -30,19 +39,18 @@ func (data *PartyData) CalculateTotalAndAverageAmount() {
 	for _, p := range data.persons {
 		data.total_amount += p.Spent
 	}
-	data.average_amount = float32(data.total_amount) / float32(len(data.persons))
+	//var allPersons uint
+	for _, p := range data.persons {
+		//allPersons += p.Participants
+		data.AllPersonsCount+=p.Participants
+	}
+	data.average_amount = float32(data.total_amount) / float32(data.AllPersonsCount)
 }
 
 func (data *PartyData) CalculateBalances() {
 	for i := 0; i < len(data.persons); i++ {
-		data.persons[i].Balance = data.average_amount - float32(data.persons[i].Spent)
+		data.persons[i].Balance = data.average_amount*float32(data.persons[i].Participants) - float32(data.persons[i].Spent)
 	}
-}
-
-func (data *PartyData) SortPersons(person []Person) {
-	sort.SliceStable(person, func(i, j int) bool {
-		return person[i].Balance < person[j].Balance
-	})
 }
 
 func CalculateDebts(input Persons, errorRate float32) PartyData {
@@ -50,14 +58,17 @@ func CalculateDebts(input Persons, errorRate float32) PartyData {
 		persons: input.Persons,
 	}
 	for i := 0; i < len(result.persons); i++ {
-		result.persons[i].IndeptedTo = make(map[string]float32) // need not nil map to write Balance
+		result.persons[i].IndeptedTo = make(map[string]float32) // need `not nil` map to write Balance
+		if result.persons[i].Participants == 0 {                // if "participants" not declareted in json, then one person
+			result.persons[i].Participants = 1
+		}
 	}
 	result.CalculateTotalAndAverageAmount()
 	result.CalculateBalances()
 	sort.SliceStable(result.persons, func(i, j int) bool {
 		return result.persons[i].Balance < result.persons[j].Balance
 	})
-	// SortPersons(result.persons)
+
 	i := 0                       // left iterator
 	j := len(result.persons) - 1 // right iterator
 	for i < j {
@@ -88,6 +99,9 @@ func CalculateDebts(input Persons, errorRate float32) PartyData {
 }
 
 func (data *PartyData) CheckCalculation() {
+
+	
+	/*
 	var sum_debts float64
 	var sum_spents float64
 	for _, p := range data.persons {
@@ -104,21 +118,68 @@ func (data *PartyData) CheckCalculation() {
 	fmt.Println("Sum of debts: ", sum_debts)
 	fmt.Println("Total spent: ", sum_spents)
 	fmt.Println("Difference after calculation is ", difference)
+	*/
 }
 
-func (data *PartyData) ShowPayments() {
+func (data *PartyData) ShowPayments(lang Language) {
+	fmt.Println(data.PrintSpents(lang))
+	fmt.Println(data.PrintPayments(lang))
+}
+
+func (data *PartyData) PrintSpents(lang Language) string {
+	var result string
+	if lang == ENG {
+		result += "   Participants:\n"
+	} else if lang == RUS {
+		result += "   Участники:\n"
+	}
+	//result += "   Participants:\n"
+	for _, p := range data.persons {
+		if lang == ENG {
+			result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
+		} else if lang == RUS {
+			result += fmt.Sprintf("%s (x%d) потрачено: %d\n", p.Name, p.Participants, p.Spent)
+		}
+		// result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
+	}
+	return result
+}
+
+func (data *PartyData) PrintPayments(lang Language) string {
+	var result string
+	if lang == ENG {
+		result += "   Payments:\n"
+	} else if lang == RUS {
+		result += "   Выплаты:\n"
+	}
+	//result += "   Payments:\n"
 	for _, p := range data.persons {
 		if len(p.IndeptedTo) > 0 {
-			fmt.Println(p.Name, "owes to:")
-			for k, v := range p.IndeptedTo {
-				fmt.Println("  ", k, v)
+			if lang == ENG {
+				result += fmt.Sprintf("%s owes to:\n", p.Name)
+			} else if lang == RUS {
+				result += fmt.Sprintf("%s выплачивает:\n", p.Name)
+			}
+			//result += fmt.Sprintf("%s owes to:\n", p.Name)
+			for name, debt := range p.IndeptedTo {
+				result += fmt.Sprintf("  %s %.f\n", name, debt) // .f - format output of integer and decimal
 			}
 		}
 	}
+	return result
+}
+
+func (data *PartyData) PrintToFile(fileName string, lang Language) {
+	file, err := os.Create(fileName)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprintln(file, data.PrintSpents(lang))
+	fmt.Fprintln(file, data.PrintPayments(lang))
 }
 
 func main() {
-	jsonInput, err := os.Open("persons1.json")
+	jsonInput, err := os.Open("LastNewYear.json")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -126,15 +187,13 @@ func main() {
 
 	byteValue, _ := ioutil.ReadAll(jsonInput)
 	var personsFromJSON Persons
+
 	json.Unmarshal(byteValue, &personsFromJSON)
-
-	fmt.Println("Input persons:")
-	for _, p := range personsFromJSON.Persons {
-		fmt.Printf("%s spent: %d\n", p.Name, p.Spent)
-	}
-
 	result := CalculateDebts(personsFromJSON, 1)
-	result.ShowPayments()
+	result.ShowPayments(Language(ENG))
+	//result.CheckCalculation()
+
+	result.PrintToFile("result.txt", Language(RUS))
 
 	//Test1()
 	//Test2()
@@ -156,7 +215,7 @@ func Test1() {
 	data.CalculateBalances()
 	//	data.CalculateDebts(1)
 	data.CheckCalculation()
-	data.ShowPayments()
+	//data.ShowPayments()
 }
 
 func Test2() {
@@ -176,5 +235,5 @@ func Test2() {
 	data.CalculateBalances()
 	//	data.CalculateDebts(1)
 	data.CheckCalculation()
-	data.ShowPayments()
+	//data.ShowPayments()
 }

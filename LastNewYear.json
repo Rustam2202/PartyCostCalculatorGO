@@ -1,0 +1,29 @@
+{
+    "persons": [
+        {
+            "name": "Рустам",
+           
+            "spent": 4050
+        },
+        {
+            "name": "Мардалиевы",
+            "participants": 2,
+            "spent": 6600
+        },
+        {
+            "name": "Пономаревы",
+            "participants": 2,
+            "spent": 4300
+        },
+        {
+            "name": "Булыгины",
+            "participants": 2,
+            "spent": 7000
+        },
+        {
+            "name": "Карпачевы",
+            "participants": 2,
+            "spent": 400
+        }
+    ]
+}
