@@ -1,32 +1,11 @@
-package main
+package partycalc
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"sort"
 )
-
-type Language string
-
-const (
-	ENG Language = "eng"
-	RUS          = "rus"
-)
-
-type Person struct {
-	Name         string `json:"name"`
-	Spent        uint   `json:"spent"`
-	Participants uint   `json:"participants"`
-	Balance      float32
-	IndeptedTo   map[string]float32
-}
-
-type Persons struct {
-	Persons []Person `json:"persons"`
-}
 
 type PartyData struct {
 	persons         []Person
@@ -122,7 +101,7 @@ func (data *PartyData) CheckCalculation(input Persons) {
 
 	fmt.Printf("Average per person: %f\n", averagePerPerson)
 	for name, balance := range balances {
-		fmt.Printf("%s has %f balance",name,balance)
+		fmt.Printf("%s has %f balance", name, balance)
 	}
 }
 
@@ -186,64 +165,4 @@ func (data *PartyData) PrintToFile(fileName string, lang Language) {
 	}
 	fmt.Fprintln(file, data.PrintSpents(lang))
 	fmt.Fprintln(file, data.PrintPayments(lang))
-}
-
-func main() {
-	jsonInput, err := os.Open("LastNewYear.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer jsonInput.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonInput)
-	var personsFromJSON Persons
-
-	json.Unmarshal(byteValue, &personsFromJSON)
-	result := CalculateDebts(personsFromJSON, 1)
-	result.ShowPayments(Language(ENG))
-	//result.CheckCalculation(personsFromJSON)
-
-	result.PrintToFile("result.txt", Language(RUS))
-
-	//Test1()
-	//Test2()
-}
-
-func Test1() {
-	persons := []Person{
-		{Name: "Alex", Spent: 90, IndeptedTo: make(map[string]float32)},
-		{Name: "Marry", Spent: 55, IndeptedTo: make(map[string]float32)},
-		{Name: "Jhon", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Mike", Spent: 25, IndeptedTo: make(map[string]float32)},
-		{Name: "Suzan", Spent: 30, IndeptedTo: make(map[string]float32)},
-		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Jack", Spent: 5, IndeptedTo: make(map[string]float32)},
-	}
-	data := PartyData{persons: persons}
-
-	data.CalculateTotalAndAverageAmount()
-	data.CalculateBalances()
-	//	data.CalculateDebts(1)
-	//data.CheckCalculation()
-	//data.ShowPayments()
-}
-
-func Test2() {
-	persons := []Person{
-		{Name: "Alex", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Marry", Spent: 2000, IndeptedTo: make(map[string]float32)},
-		{Name: "Jhon", Spent: 4900, IndeptedTo: make(map[string]float32)},
-		{Name: "Mike", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Suzan", Spent: 750, IndeptedTo: make(map[string]float32)},
-		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Jack", Spent: 12000, IndeptedTo: make(map[string]float32)},
-		{Name: "Pite", Spent: 49500, IndeptedTo: make(map[string]float32)},
-	}
-	data := PartyData{persons: persons}
-
-	data.CalculateTotalAndAverageAmount()
-	data.CalculateBalances()
-	//	data.CalculateDebts(1)
-	//	data.CheckCalculation()
-	//data.ShowPayments()
 }
