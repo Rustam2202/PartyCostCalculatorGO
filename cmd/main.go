@@ -31,3 +31,6 @@ func main() {
 	//Test1()
 	//Test2()
 }
+
+	result.PrintToFile("result.txt", pc.Language(pc.RUS))
+}
