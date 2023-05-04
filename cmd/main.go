@@ -1,36 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
-	calc "github.com/Rustam2202/PartyCostCalculatorGO/internal"
-	person "github.com/Rustam2202/PartyCostCalculatorGO/internal/person"
+	c "github.com/Rustam2202/PartyCostCalculatorGO/internal"
 	l "github.com/Rustam2202/PartyCostCalculatorGO/internal/language"
+	j "github.com/Rustam2202/PartyCostCalculatorGO/json"
 )
 
 func main() {
-	jsonInput, err := os.Open("LastNewYear.json")
+	jsonInput, err := os.Open("../LastNewYear.json")
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer jsonInput.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonInput)
-	var personsFromJSON person.Persons
+	persons := j.ReadJSON(jsonInput)
 
-	json.Unmarshal(byteValue, &personsFromJSON)
-	result := calc.CalculateDebts(personsFromJSON, 1)
+	result := c.CalculateDebts(persons, 1)
 	result.ShowPayments(l.Language(l.ENG))
-	//result.CheckCalculation(personsFromJSON)
-
 	result.PrintToFile("result.txt", l.Language(l.RUS))
-
-	//Test1()
-	//Test2()
-}
-
-	result.PrintToFile("result.txt", pc.Language(pc.RUS))
 }
