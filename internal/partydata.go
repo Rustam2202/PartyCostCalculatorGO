@@ -1,35 +1,17 @@
-package main
+package internal
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"sort"
+
+	p "github.com/Rustam2202/PartyCostCalculatorGO/internal/person"
+	l "github.com/Rustam2202/PartyCostCalculatorGO/internal/language"
 )
-
-type Language string
-
-const (
-	ENG Language = "eng"
-	RUS          = "rus"
-)
-
-type Person struct {
-	Name         string `json:"name"`
-	Spent        uint   `json:"spent"`
-	Participants uint   `json:"participants"`
-	Balance      float32
-	IndeptedTo   map[string]float32
-}
-
-type Persons struct {
-	Persons []Person `json:"persons"`
-}
 
 type PartyData struct {
-	persons         []Person
+	persons         []p.Person
 	AllPersonsCount uint
 	average_amount  float32
 	total_amount    uint
@@ -51,7 +33,7 @@ func (data *PartyData) CalculateBalances() {
 	}
 }
 
-func CalculateDebts(input Persons, errorRate float32) PartyData {
+func CalculateDebts(input p.Persons, errorRate float32) PartyData {
 	var result = PartyData{
 		persons: input.Persons,
 	}
@@ -96,7 +78,7 @@ func CalculateDebts(input Persons, errorRate float32) PartyData {
 	return result
 }
 
-func (data *PartyData) CheckCalculation(input Persons) {
+func (data *PartyData) CheckCalculation(input p.Persons) {
 
 	var totalSpent uint
 	var averagePerPerson float32
@@ -122,27 +104,27 @@ func (data *PartyData) CheckCalculation(input Persons) {
 
 	fmt.Printf("Average per person: %f\n", averagePerPerson)
 	for name, balance := range balances {
-		fmt.Printf("%s has %f balance",name,balance)
+		fmt.Printf("%s has %f balance", name, balance)
 	}
 }
 
-func (data *PartyData) ShowPayments(lang Language) {
+func (data *PartyData) ShowPayments(lang l.Language) {
 	fmt.Println(data.PrintSpents(lang))
 	fmt.Println(data.PrintPayments(lang))
 }
 
-func (data *PartyData) PrintSpents(lang Language) string {
+func (data *PartyData) PrintSpents(lang l.Language) string {
 	var result string
-	if lang == ENG {
+	if lang == l.ENG {
 		result += "   Participants:\n"
-	} else if lang == RUS {
+	} else if lang == l.RUS {
 		result += "   Участники:\n"
 	}
 	//result += "   Participants:\n"
 	for _, p := range data.persons {
-		if lang == ENG {
+		if lang == l.ENG {
 			result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
-		} else if lang == RUS {
+		} else if lang == l.RUS {
 			result += fmt.Sprintf("%s (x%d) потрачено: %d\n", p.Name, p.Participants, p.Spent)
 		}
 		// result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
@@ -150,19 +132,19 @@ func (data *PartyData) PrintSpents(lang Language) string {
 	return result
 }
 
-func (data *PartyData) PrintPayments(lang Language) string {
+func (data *PartyData) PrintPayments(lang l.Language) string {
 	var result string
-	if lang == ENG {
+	if lang == l.ENG {
 		result += "   Payments:\n"
-	} else if lang == RUS {
+	} else if lang == l.RUS {
 		result += "   Выплаты:\n"
 	}
 	//result += "   Payments:\n"
 	for _, p := range data.persons {
 		if len(p.IndeptedTo) > 0 {
-			if lang == ENG {
+			if lang == l.ENG {
 				result += fmt.Sprintf("%s owes to:\n", p.Name)
-			} else if lang == RUS {
+			} else if lang == l.RUS {
 				result += fmt.Sprintf("%s выплачивает:\n", p.Name)
 			}
 			//result += fmt.Sprintf("%s owes to:\n", p.Name)
@@ -171,79 +153,19 @@ func (data *PartyData) PrintPayments(lang Language) string {
 			}
 		}
 	}
-	if lang == ENG {
+	if lang == l.ENG {
 		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.average_amount)
-	} else if lang == RUS {
+	} else if lang == l.RUS {
 		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.average_amount)
 	}
 	return result
 }
 
-func (data *PartyData) PrintToFile(fileName string, lang Language) {
+func (data *PartyData) PrintToFile(fileName string, lang l.Language) {
 	file, err := os.Create(fileName)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Fprintln(file, data.PrintSpents(lang))
 	fmt.Fprintln(file, data.PrintPayments(lang))
-}
-
-func main() {
-	jsonInput, err := os.Open("LastNewYear.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer jsonInput.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonInput)
-	var personsFromJSON Persons
-
-	json.Unmarshal(byteValue, &personsFromJSON)
-	result := CalculateDebts(personsFromJSON, 1)
-	result.ShowPayments(Language(ENG))
-	//result.CheckCalculation(personsFromJSON)
-
-	result.PrintToFile("result.txt", Language(RUS))
-
-	//Test1()
-	//Test2()
-}
-
-func Test1() {
-	persons := []Person{
-		{Name: "Alex", Spent: 90, IndeptedTo: make(map[string]float32)},
-		{Name: "Marry", Spent: 55, IndeptedTo: make(map[string]float32)},
-		{Name: "Jhon", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Mike", Spent: 25, IndeptedTo: make(map[string]float32)},
-		{Name: "Suzan", Spent: 30, IndeptedTo: make(map[string]float32)},
-		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Jack", Spent: 5, IndeptedTo: make(map[string]float32)},
-	}
-	data := PartyData{persons: persons}
-
-	data.CalculateTotalAndAverageAmount()
-	data.CalculateBalances()
-	//	data.CalculateDebts(1)
-	//data.CheckCalculation()
-	//data.ShowPayments()
-}
-
-func Test2() {
-	persons := []Person{
-		{Name: "Alex", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Marry", Spent: 2000, IndeptedTo: make(map[string]float32)},
-		{Name: "Jhon", Spent: 4900, IndeptedTo: make(map[string]float32)},
-		{Name: "Mike", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Suzan", Spent: 750, IndeptedTo: make(map[string]float32)},
-		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
-		{Name: "Jack", Spent: 12000, IndeptedTo: make(map[string]float32)},
-		{Name: "Pite", Spent: 49500, IndeptedTo: make(map[string]float32)},
-	}
-	data := PartyData{persons: persons}
-
-	data.CalculateTotalAndAverageAmount()
-	data.CalculateBalances()
-	//	data.CalculateDebts(1)
-	//	data.CheckCalculation()
-	//data.ShowPayments()
 }
