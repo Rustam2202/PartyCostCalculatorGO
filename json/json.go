@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	p "github.com/Rustam2202/PartyCostCalculatorGO/internal/person"
+	p "party-calc/internal/person"
 )
 
 func ReadJSON(jsonInput *os.File) p.Persons {

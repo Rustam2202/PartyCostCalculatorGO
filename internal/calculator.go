@@ -6,8 +6,8 @@ import (
 	"os"
 	"sort"
 
-	p "github.com/Rustam2202/PartyCostCalculatorGO/internal/person"
-	l "github.com/Rustam2202/PartyCostCalculatorGO/internal/language"
+	p "party-calc/internal/person"
+	l "party-calc/internal/language"
 )
 
 type PartyData struct {

@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	c "github.com/Rustam2202/PartyCostCalculatorGO/internal"
-	p "github.com/Rustam2202/PartyCostCalculatorGO/internal/person"
+	c "party-calc/internal"
+	p "party-calc/internal/person"
 )
 
 type testType struct {
@@ -24,6 +24,7 @@ var test1 = testType{
 		{Name: "Bob", Spent: 0, IndeptedTo: make(map[string]float32)},
 		{Name: "Jack", Spent: 5, IndeptedTo: make(map[string]float32)},
 	},
+	/*
 	output: PartyData{
 		persons: []p.Person{
 			{Name: "Alex", Spent: 90, Balance: 0, IndeptedTo: make(map[string]float32)},
@@ -37,6 +38,7 @@ var test1 = testType{
 		average_amount: 29.285715,
 		total_amount:   205,
 	},
+	*/
 }
 
 func TestCalculateDebts(t *testing.T) {

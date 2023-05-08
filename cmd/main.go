@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	c "github.com/Rustam2202/PartyCostCalculatorGO/internal"
-	l "github.com/Rustam2202/PartyCostCalculatorGO/internal/language"
-	j "github.com/Rustam2202/PartyCostCalculatorGO/json"
+	c "party-calc/internal"
+	l "party-calc/internal/language"
+	j "party-calc/json"
 )
 
 func main() {

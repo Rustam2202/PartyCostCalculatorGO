@@ -1,3 +1,3 @@
-module github.com/Rustam2202/PartyCostCalculatorGO
+module party-calc
 
-go 1.19
+go 1.20
