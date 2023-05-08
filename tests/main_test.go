@@ -1,16 +1,21 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	c "github.com/Rustam2202/PartyCostCalculatorGO/internal"
+	p "github.com/Rustam2202/PartyCostCalculatorGO/internal/person"
+)
 
 type testType struct {
 	name   string
-	input  []Person
-	output PartyData
+	input  []p.Person
+	output c.PartyData
 }
 
 var test1 = testType{
 	name: "Test with left preponderance iterator",
-	input: []Person{
+	input: []p.Person{
 		{Name: "Alex", Spent: 90, IndeptedTo: make(map[string]float32)},
 		{Name: "Marry", Spent: 55, IndeptedTo: make(map[string]float32)},
 		{Name: "Jhon", Spent: 0, IndeptedTo: make(map[string]float32)},
@@ -20,7 +25,7 @@ var test1 = testType{
 		{Name: "Jack", Spent: 5, IndeptedTo: make(map[string]float32)},
 	},
 	output: PartyData{
-		persons: []Person{
+		persons: []p.Person{
 			{Name: "Alex", Spent: 90, Balance: 0, IndeptedTo: make(map[string]float32)},
 			{Name: "Marry", Spent: 55, IndeptedTo: make(map[string]float32)},
 			{Name: "Jhon", Spent: 0, IndeptedTo: make(map[string]float32)},
