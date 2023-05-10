@@ -6,54 +6,54 @@ import (
 	"os"
 	"sort"
 
-	p "party-calc/internal/person"
 	l "party-calc/internal/language"
+	p "party-calc/internal/person"
 )
 
 type PartyData struct {
-	persons         []p.Person
+	Persons         []p.Person
 	AllPersonsCount uint
-	average_amount  float32
-	total_amount    uint
+	AverageAmount   float32
+	TotalAmount     uint
 }
 
 func (data *PartyData) CalculateTotalAndAverageAmount() {
-	for _, p := range data.persons {
-		data.total_amount += p.Spent
+	for _, p := range data.Persons {
+		data.TotalAmount += p.Spent
 	}
-	for _, p := range data.persons {
+	for _, p := range data.Persons {
 		data.AllPersonsCount += p.Participants
 	}
-	data.average_amount = float32(data.total_amount) / float32(data.AllPersonsCount)
+	data.AverageAmount = float32(data.TotalAmount) / float32(data.AllPersonsCount)
 }
 
 func (data *PartyData) CalculateBalances() {
-	for i := 0; i < len(data.persons); i++ {
-		data.persons[i].Balance = data.average_amount*float32(data.persons[i].Participants) - float32(data.persons[i].Spent)
+	for i := 0; i < len(data.Persons); i++ {
+		data.Persons[i].Balance = data.AverageAmount*float32(data.Persons[i].Participants) - float32(data.Persons[i].Spent)
 	}
 }
 
 func CalculateDebts(input p.Persons, errorRate float32) PartyData {
 	var result = PartyData{
-		persons: input.Persons,
+		Persons: input.Persons,
 	}
-	for i := 0; i < len(result.persons); i++ {
-		result.persons[i].IndeptedTo = make(map[string]float32) // need `not nil` map to write Balance
-		if result.persons[i].Participants == 0 {                // if "participants" not declareted in json, then one person
-			result.persons[i].Participants = 1
+	for i := 0; i < len(result.Persons); i++ {
+		result.Persons[i].IndeptedTo = make(map[string]float32) // need `not nil` map to write Balance
+		if result.Persons[i].Participants == 0 {                // if "participants" not declareted in json, then one person
+			result.Persons[i].Participants = 1
 		}
 	}
 	result.CalculateTotalAndAverageAmount()
 	result.CalculateBalances()
-	sort.SliceStable(result.persons, func(i, j int) bool {
-		return result.persons[i].Balance < result.persons[j].Balance
+	sort.SliceStable(result.Persons, func(i, j int) bool {
+		return result.Persons[i].Balance < result.Persons[j].Balance
 	})
 
 	i := 0                       // left iterator
-	j := len(result.persons) - 1 // right iterator
+	j := len(result.Persons) - 1 // right iterator
 	for i < j {
-		left := &result.persons[i]
-		right := &result.persons[j]
+		left := &result.Persons[i]
+		right := &result.Persons[j]
 		absLeftBalance := math.Abs(float64(left.Balance))
 		if absLeftBalance >= float64(right.Balance) {
 			if absLeftBalance < float64(errorRate) {
@@ -96,7 +96,7 @@ func (data *PartyData) CheckCalculation(input p.Persons) {
 	}
 	averagePerPerson = float32(totalSpent) / float32(allPersonCount)
 
-	for _, p := range data.persons {
+	for _, p := range data.Persons {
 		for _, p2 := range p.IndeptedTo {
 			allPayments += p2
 		}
@@ -121,7 +121,7 @@ func (data *PartyData) PrintSpents(lang l.Language) string {
 		result += "   Участники:\n"
 	}
 	//result += "   Participants:\n"
-	for _, p := range data.persons {
+	for _, p := range data.Persons {
 		if lang == l.ENG {
 			result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
 		} else if lang == l.RUS {
@@ -140,7 +140,7 @@ func (data *PartyData) PrintPayments(lang l.Language) string {
 		result += "   Выплаты:\n"
 	}
 	//result += "   Payments:\n"
-	for _, p := range data.persons {
+	for _, p := range data.Persons {
 		if len(p.IndeptedTo) > 0 {
 			if lang == l.ENG {
 				result += fmt.Sprintf("%s owes to:\n", p.Name)
@@ -154,9 +154,9 @@ func (data *PartyData) PrintPayments(lang l.Language) string {
 		}
 	}
 	if lang == l.ENG {
-		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.average_amount)
+		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.AverageAmount)
 	} else if lang == l.RUS {
-		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.average_amount)
+		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.AverageAmount)
 	}
 	return result
 }

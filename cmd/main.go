@@ -7,9 +7,13 @@ import (
 	c "party-calc/internal"
 	l "party-calc/internal/language"
 	j "party-calc/json"
+	"party-calc/readers"
 )
 
 func main() {
+	readers.NewWebServer()
+
+
 	jsonInput, err := os.Open("../LastNewYear.json")
 	if err != nil {
 		fmt.Println(err)
