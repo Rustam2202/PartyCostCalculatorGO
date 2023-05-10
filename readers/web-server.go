@@ -6,13 +6,11 @@ import (
 	"log"
 	"net/http"
 
-	//"github.com/gorilla/mux"
-
-	c "party-calc/internal"
+	"party-calc/internal"
 	"party-calc/internal/person"
 )
 
-func handlePost(w http.ResponseWriter, r *http.Request) {
+func handler(w http.ResponseWriter, r *http.Request) {
 	var pers person.Persons
 	err := json.NewDecoder(r.Body).Decode(&pers)
 	if err != nil {
@@ -20,24 +18,18 @@ func handlePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := c.CalculateDebts(pers, 1)
+	// curl -s -XPOST -d'{ "persons": [{"name": "Рустам","spent": 4050}]}' http://localhost:8080/
+
+	result := internal.CalculateDebts(pers, 1)
 
 	err = json.NewEncoder(w).Encode(result)
-
-}
-
-func handleGet(w http.ResponseWriter, r *http.Request) {
-	//err := json.NewEncoder(w).Encode()
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 }
 
 func NewWebServer() {
-	//r := mux.NewRouter()
-	//r.HandleFunc("/", handlePost).Methods("POST")
 	fmt.Println("Server started")
-	http.HandleFunc("/", handlePost)
+	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }
