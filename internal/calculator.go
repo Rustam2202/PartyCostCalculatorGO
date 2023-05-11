@@ -11,10 +11,10 @@ import (
 )
 
 type PartyData struct {
-	Persons         []p.Person
-	AllPersonsCount uint
-	AverageAmount   float32
-	TotalAmount     uint
+	Persons         []p.Person `json:"persons"`
+	AllPersonsCount uint       
+	AverageAmount   float32    
+	TotalAmount     uint       
 }
 
 func (data *PartyData) CalculateTotalAndAverageAmount() {

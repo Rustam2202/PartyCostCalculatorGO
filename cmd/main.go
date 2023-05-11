@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
+	// tests.TestHandler()
 	readers.NewWebServer()
-
 
 	jsonInput, err := os.Open("../LastNewYear.json")
 	if err != nil {
