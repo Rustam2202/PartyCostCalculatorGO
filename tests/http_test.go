@@ -9,11 +9,24 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/nsf/jsondiff"
+	"github.com/stretchr/testify/assert"
 
 	"party-calc/internal"
 	"party-calc/readers"
 )
+
+func TestPersonsHandler(t *testing.T) {
+	router := gin.Default()
+	router.GET("/", readers.PersonsHandler)
+	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader([]byte(case1.InputString)))
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	//fmt.Println(w.Body.String())
+
+	assert.JSONEq(t, case1.Want, w.Body.String())
+}
 
 func TestHandler1(t *testing.T) {
 	marshalled, err := json.Marshal(case1.Input)
