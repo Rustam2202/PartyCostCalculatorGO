@@ -8,6 +8,7 @@ import (
 
 	l "party-calc/internal/language"
 	p "party-calc/internal/person"
+	"party-calc/utils"
 )
 
 type PartyData struct {
@@ -164,7 +165,8 @@ func (data *PartyData) PrintPayments(lang l.Language) string {
 func (data *PartyData) PrintToFile(fileName string, lang l.Language) {
 	file, err := os.Create(fileName)
 	if err != nil {
-		panic(err)
+		utils.Logger.Error("Problem with creating file")
+		panic(nil)
 	}
 	fmt.Fprintln(file, data.PrintSpents(lang))
 	fmt.Fprintln(file, data.PrintPayments(lang))
