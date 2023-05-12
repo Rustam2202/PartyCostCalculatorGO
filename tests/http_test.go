@@ -22,7 +22,6 @@ var case3 = caseType{"", ""}
 var cases []caseType
 
 func TestJsonHandler(t *testing.T) {
-
 	router := gin.Default()
 	router.GET("/", readers.JsonHandler)
 	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader([]byte(case1.InputString)))

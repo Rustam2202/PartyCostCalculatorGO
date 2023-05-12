@@ -1,9 +1,9 @@
 FROM golang:latest
 
-WORKDIR ${workspaceFolder}
+WORKDIR /app
 
-COPY go.mod ./
+COPY . .
 
-COPY *.go ./
+RUN go build -o /bin/party-calc ./cmd/main.go
 
-RUN go build ./cmd
+ENTRYPOINT [ "/bin/party-calc" ]
