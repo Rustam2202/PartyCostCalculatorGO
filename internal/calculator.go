@@ -13,9 +13,9 @@ import (
 
 type PartyData struct {
 	Persons         []p.Person `json:"persons"`
-	AllPersonsCount uint       
-	AverageAmount   float32    
-	TotalAmount     uint       
+	AllPersonsCount uint
+	AverageAmount   float32
+	TotalAmount     uint
 }
 
 func (data *PartyData) CalculateTotalAndAverageAmount() {
@@ -109,56 +109,63 @@ func (data *PartyData) CheckCalculation(input p.Persons) {
 	}
 }
 
-func (data *PartyData) ShowPayments(lang l.Language) {
-	fmt.Println(data.PrintSpents(lang))
-	fmt.Println(data.PrintPayments(lang))
+func (data *PartyData) ShowPayments() {
+	fmt.Println(data.PrintSpents())
+	fmt.Println(data.PrintPayments())
 }
 
-func (data *PartyData) PrintSpents(lang l.Language) string {
+func (data *PartyData) PrintSpents() string {
 	var result string
-	if lang == l.ENG {
+	switch utils.Cfg.Language {
+	case l.ENG:
 		result += "   Participants:\n"
-	} else if lang == l.RUS {
+	case l.RUS:
 		result += "   Участники:\n"
 	}
-	//result += "   Participants:\n"
+
 	for _, p := range data.Persons {
-		if lang == l.ENG {
+		switch utils.Cfg.Language {
+		case l.ENG:
 			result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
-		} else if lang == l.RUS {
+		case l.RUS:
 			result += fmt.Sprintf("%s (x%d) потрачено: %d\n", p.Name, p.Participants, p.Spent)
 		}
-		// result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
 	}
+
 	return result
 }
 
-func (data *PartyData) PrintPayments(lang l.Language) string {
+func (data *PartyData) PrintPayments() string {
 	var result string
-	if lang == l.ENG {
+	switch utils.Cfg.Language {
+	case l.ENG:
 		result += "   Payments:\n"
-	} else if lang == l.RUS {
+	case l.RUS:
 		result += "   Выплаты:\n"
 	}
-	//result += "   Payments:\n"
+
 	for _, p := range data.Persons {
 		if len(p.IndeptedTo) > 0 {
-			if lang == l.ENG {
+			switch utils.Cfg.Language {
+			case l.ENG:
 				result += fmt.Sprintf("%s owes to:\n", p.Name)
-			} else if lang == l.RUS {
+			case l.RUS:
 				result += fmt.Sprintf("%s выплачивает:\n", p.Name)
 			}
-			//result += fmt.Sprintf("%s owes to:\n", p.Name)
+
 			for name, debt := range p.IndeptedTo {
 				result += fmt.Sprintf("  %s %.f\n", name, debt) // .f - format output of integer and decimal
 			}
 		}
 	}
-	if lang == l.ENG {
+
+	switch utils.Cfg.Language {
+	case l.ENG:
 		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.AverageAmount)
-	} else if lang == l.RUS {
+	case l.RUS:
 		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.AverageAmount)
 	}
+
 	return result
 }
 
@@ -168,6 +175,6 @@ func (data *PartyData) PrintToFile(fileName string, lang l.Language) {
 		utils.Logger.Error("Problem with creating file")
 		panic(nil)
 	}
-	fmt.Fprintln(file, data.PrintSpents(lang))
-	fmt.Fprintln(file, data.PrintPayments(lang))
+	fmt.Fprintln(file, data.PrintSpents())
+	fmt.Fprintln(file, data.PrintPayments())
 }

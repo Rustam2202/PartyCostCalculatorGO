@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	utils.LoadConfig()
 	utils.IntializeLogger()
+	utils.LoadConfig()
 	readers.StartServer()
 }

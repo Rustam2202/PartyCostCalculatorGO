@@ -1,22 +1,39 @@
 package utils
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"party-calc/internal/language"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
-	Mode     string `json:"mode"`
-	Address  string `json:"address"`
-	Port     int    `json:"port"`
-	Language string `json:"language"`
+	Host     string
+	Port     int
+	Language language.Language
 }
 
-var v *viper.Viper
+var Cfg Config
 
-func LoadConfig() (Config, error) {
-	v = viper.New()
-	v.AddConfigPath("./")
-	v.SetConfigFile("config")
-	v.SetConfigType("yaml")
-	// var config Config
+func LoadConfig() {
+	//	viper.AddConfigPath(".")
+	//	viper.SetConfigFile("config")
+	//	viper.SetConfigType("yml")
+	viper.SetConfigFile("./config.yaml")
 
-	return Config{}, nil
+	err := viper.ReadInConfig()
+	if err != nil {
+		Logger.Error("Can't read configurations")
+		panic(err)
+	}
+
+
+	err = viper.Unmarshal(&Cfg)
+	if err != nil {
+		Logger.Error("Can't read configurations")
+		panic(err)
+	}
+
+	fmt.Println(Cfg.Language)
+
 }

@@ -1,6 +1,7 @@
 package readers
 
 import (
+	"fmt"
 	"net/http"
 
 	"party-calc/internal"
@@ -15,7 +16,7 @@ func JsonHandler(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&pers)
 	if err != nil {
 		utils.Logger.Error("Incorrect input JSON format")
-		panic(nil)
+		panic(err)
 	}
 	result := internal.CalculateDebts(pers, 1)
 	ctx.JSON(http.StatusOK, result)
@@ -24,9 +25,9 @@ func JsonHandler(ctx *gin.Context) {
 func StartServer() {
 	router := gin.Default()
 	router.GET("/", JsonHandler)
-	err := router.Run(":8080")
+	err := router.Run(fmt.Sprintf(":%d", utils.Cfg.Port))
 	if err != nil {
 		utils.Logger.Error("Server couldn`t start")
-		panic(nil)
+		panic(err)
 	}
 }
