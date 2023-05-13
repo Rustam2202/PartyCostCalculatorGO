@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"party-calc/readers"
+	"party-calc/internal/web"
 )
 
 type caseType struct {
@@ -23,7 +23,7 @@ var cases []caseType
 
 func TestJsonHandler(t *testing.T) {
 	router := gin.Default()
-	router.GET("/", readers.JsonHandler)
+	router.GET("/", web.JsonHandler)
 	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader([]byte(case1.InputString)))
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)

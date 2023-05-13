@@ -1,4 +1,4 @@
-package readers
+package web
 
 import (
 	"fmt"

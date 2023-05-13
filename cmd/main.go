@@ -1,12 +1,12 @@
 package main
 
 import (
-	"party-calc/readers"
+	"party-calc/internal/web"
 	"party-calc/utils"
 )
 
 func main() {
 	utils.IntializeLogger()
 	utils.LoadConfig()
-	readers.StartServer()
+	web.StartServer()
 }

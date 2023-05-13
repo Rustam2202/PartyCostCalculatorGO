@@ -10,15 +10,13 @@ import (
 )
 
 func ReadJSON(jsonInput *os.File) p.Persons {
-	jsonInput, err := os.Open("../LastNewYear.json")
+	jsonInput, err := os.Open("") // path/filename.json
 
 	if err != nil {
 		fmt.Println(err)
 		return p.Persons{}
 	}
 	defer jsonInput.Close()
-
-	// persons := j.ReadJSON(jsonInput)
 
 	byteValue, _ := ioutil.ReadAll(jsonInput)
 	var personsFromJSON p.Persons
