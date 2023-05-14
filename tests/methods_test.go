@@ -9,6 +9,6 @@ import (
 func TestShowPayments(t *testing.T) {
 	utils.IntializeLogger()
 	utils.LoadConfig()
-	result := internal.CalculateDebts(case1.Input, 1)
+	result := internal.CalculateDebts(threePersons.input, 1)
 	result.ShowPayments()
 }

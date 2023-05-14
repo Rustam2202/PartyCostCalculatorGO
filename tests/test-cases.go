@@ -5,114 +5,59 @@ import (
 	"party-calc/internal/person"
 )
 
-type data struct {
-	Input       person.Persons `json:"persons"`
-	InputString string
-	Want        string
-	WantStruct  internal.PartyData
+type testStruct struct {
+	testName string
+	input    person.Persons //`json:"persons"`
+	want     internal.PartyData
 }
 
-var case1 = data{
-	Input: person.Persons{Persons: []person.Person{
+var onePerson = testStruct{
+	testName: "One Person",
+	input: person.Persons{Persons: []person.Person{
+		{Name: "Person 1", Spent: 1000},
+	}},
+
+	want: internal.PartyData{
+		Persons: []person.Person{
+			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
+		},
+		AllPersonsCount: 1,
+		AverageAmount:   1000,
+		TotalAmount:     1000},
+}
+
+var twoPersons = testStruct{
+	testName: "Two Persons",
+	input: person.Persons{Persons: []person.Person{
+		{Name: "Person 1", Spent: 1000},
+		{Name: "Person 2", Spent: 200},
+	}},
+
+	want: internal.PartyData{
+		Persons: []person.Person{
+			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
+			{Name: "Person 2", Spent: 200, Participants: 1, IndeptedTo: map[string]float32{"Person 1": 400}},
+		},
+		AllPersonsCount: 2,
+		AverageAmount:   600,
+		TotalAmount:     1200},
+}
+
+var threePersons = testStruct{
+	testName: "Three Persons",
+	input: person.Persons{Persons: []person.Person{
 		{Name: "Person 1", Spent: 1000},
 		{Name: "Person 2", Spent: 500},
 		{Name: "Person 3", Spent: 0},
 	}},
-	InputString: `{"persons":[
-		{"name":"Person 1","spent":1000},
-		{"name":"Person 2","spent":500},
-		{"name":"Person 3","spent":0}
-	]}`,
-	Want: `{
-		"persons": [
-			{
-				"name": "Person 1",
-				"spent": 1000,
-				"participants": 1,
-				"Balance": 0,
-				"IndeptedTo": {}
-			},
-			{
-				"name": "Person 2",
-				"spent": 500,
-				"participants": 1,
-				"Balance": 0,
-				"IndeptedTo": {}
-			},
-			{
-				"name": "Person 3",
-				"spent": 0,
-				"participants": 1,
-				"Balance": 0,
-				"IndeptedTo": {
-					"Person 1": 500
-					}
-			}
-		],
-		"AllPersonsCount": 3,
-		"AverageAmount": 500,
-		"TotalAmount": 1500
-	}`,
-	WantStruct: internal.PartyData{
-		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Participants: 1, Balance: 0, IndeptedTo: nil},
-			{Name: "Person 2", Spent: 500, Participants: 1, Balance: 0, IndeptedTo: nil},
-			{Name: "Person 3", Spent: 0, Participants: 1, Balance: 0, IndeptedTo: map[string]float32{"Person 1": 500}}, // make(map[string]float32{"Person 1", 500})
-		},
-		AllPersonsCount: 0,
-		AverageAmount:   0,
-		TotalAmount:     0},
-}
 
-var case2 = data{
-	Input: person.Persons{Persons: []person.Person{
-		{Name: "Person 1", Spent: 1000},
-		{Name: "Person 2", Spent: 500},
-		{Name: "Person 3", Spent: 0},
-		{Name: "Person 4", Spent: 2000},
-	}},
-	InputString: `{"persons":[
-		{"name":"Person 1","spent":1000},
-		{"name":"Person 2","spent":500},
-		{"name":"Person 3","spent":0}
-	]}`,
-	Want: `{
-		"persons": [
-			{
-				"name": "Person 1",
-				"spent": 1000,
-				"participants": 1,
-				"Balance": 0,
-				"IndeptedTo": {}
-			},
-			{
-				"name": "Person 2",
-				"spent": 500,
-				"participants": 1,
-				"Balance": 0,
-				"IndeptedTo": {}
-			},
-			{
-				"name": "Person 3",
-				"spent": 0,
-				"participants": 1,
-				"Balance": 0,
-				"IndeptedTo": {
-					"Person 1": 500
-					}
-			}
-		],
-		"AllPersonsCount": 3,
-		"AverageAmount": 500,
-		"TotalAmount": 1500
-	}`,
-	WantStruct: internal.PartyData{
+	want: internal.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Participants: 1, Balance: 0, IndeptedTo: nil},
-			{Name: "Person 2", Spent: 500, Participants: 1, Balance: 0, IndeptedTo: nil},
-			{Name: "Person 3", Spent: 0, Participants: 1, Balance: 0, IndeptedTo: map[string]float32{"Person 1": 500}}, // make(map[string]float32{"Person 1", 500})
+			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
+			{Name: "Person 2", Spent: 500, Participants: 1, IndeptedTo: map[string]float32{}},
+			{Name: "Person 3", Spent: 0, Participants: 1, IndeptedTo: map[string]float32{"Person 1": 500}},
 		},
-		AllPersonsCount: 0,
-		AverageAmount:   0,
-		TotalAmount:     0},
+		AllPersonsCount: 3,
+		AverageAmount:   500,
+		TotalAmount:     1500},
 }

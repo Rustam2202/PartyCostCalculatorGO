@@ -2,6 +2,7 @@ package tests
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,21 +13,27 @@ import (
 	"party-calc/internal/web"
 )
 
-type caseType struct {
-	input string
-	want  string
+var cases = []testStruct{
+	onePerson, twoPersons, threePersons,
 }
 
-var case3 = caseType{"", ""}
+func TestHandler(t *testing.T) {
+	for _, tt := range cases {
+		input, err := json.Marshal(tt.input)
+		if err != nil {
+			t.Errorf("Not correct input-JSON: %s", err)
+		}
+		want, err := json.Marshal(tt.want)
+		if err != nil {
+			t.Errorf("Not correct want-JSON: %s", err)
+		}
 
-var cases []caseType
+		router := gin.Default()
+		router.GET("/", web.JsonHandler)
+		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader(input))
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
 
-func TestJsonHandler(t *testing.T) {
-	router := gin.Default()
-	router.GET("/", web.JsonHandler)
-	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader([]byte(case1.InputString)))
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-
-	assert.JSONEq(t, case1.Want, w.Body.String())
+		assert.JSONEq(t, string(want), w.Body.String(),tt.testName)
+	}
 }
