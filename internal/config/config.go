@@ -9,8 +9,17 @@ import (
 )
 
 type Config struct {
-	Host     string
-	Port     int
+	Server struct {
+		Host string
+		Port int
+	}
+	DataBase struct {
+		Host     string
+		Port     int
+		User     string
+		Password string
+		Dbname   string
+	}
 	Language language.Language
 }
 
@@ -23,7 +32,7 @@ func LoadConfig() {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(*confPath)
-	
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		logger.Logger.Fatal("Can't read configurations")

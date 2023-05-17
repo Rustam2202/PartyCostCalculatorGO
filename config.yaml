@@ -1,3 +1,10 @@
-  host: localhost
-  port: 8080
+  server:
+    host: localhost
+    port: 8080
   language: ENG
+  database:
+    host: localhost
+    port: 5400
+    user: postgres
+    password: password
+    dbname: party-calc-db

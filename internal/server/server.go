@@ -26,7 +26,7 @@ func JsonHandler(ctx *gin.Context) {
 func StartServer() {
 	router := gin.Default()
 	router.GET("/", JsonHandler)
-	err := router.Run(fmt.Sprintf(":%d", config.Cfg.Port))
+	err := router.Run(fmt.Sprintf(":%d", config.Cfg.Server.Port))
 	if err != nil {
 		logger.Logger.Error("Server couldn`t start")
 		return
