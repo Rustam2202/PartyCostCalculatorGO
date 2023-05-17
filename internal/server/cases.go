@@ -1,14 +1,14 @@
-package tests
+package server
 
 import (
-	"party-calc/internal"
+	"party-calc/internal/service"
 	"party-calc/internal/person"
 )
 
 type testStruct struct {
 	testName string
 	input    person.Persons //`json:"persons"`
-	want     internal.PartyData
+	want     service.PartyData
 }
 
 var onePerson = testStruct{
@@ -17,7 +17,7 @@ var onePerson = testStruct{
 		{Name: "Person 1", Spent: 1000},
 	}},
 
-	want: internal.PartyData{
+	want: service.PartyData{
 		Persons: []person.Person{
 			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
 		},
@@ -33,7 +33,7 @@ var twoPersons = testStruct{
 		{Name: "Person 2", Spent: 200},
 	}},
 
-	want: internal.PartyData{
+	want: service.PartyData{
 		Persons: []person.Person{
 			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
 			{Name: "Person 2", Spent: 200, Participants: 1, IndeptedTo: map[string]float32{"Person 1": 400}},
@@ -51,7 +51,7 @@ var threePersons = testStruct{
 		{Name: "Person 3", Spent: 0},
 	}},
 
-	want: internal.PartyData{
+	want: service.PartyData{
 		Persons: []person.Person{
 			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
 			{Name: "Person 2", Spent: 500, Participants: 1, IndeptedTo: map[string]float32{}},

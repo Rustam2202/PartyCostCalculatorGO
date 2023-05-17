@@ -1,4 +1,4 @@
-package internal
+package service
 
 import (
 	"fmt"
@@ -8,7 +8,8 @@ import (
 
 	"party-calc/internal/language"
 	"party-calc/internal/person"
-	"party-calc/utils"
+	"party-calc/internal/logger"
+	"party-calc/internal/config"
 )
 
 type PartyData struct {
@@ -87,7 +88,7 @@ func (data *PartyData) ShowPayments() {
 func (data *PartyData) PrintToFile(fileName string) {
 	file, err := os.Create(fileName)
 	if err != nil {
-		utils.Logger.Error("Problem with creating file")
+		logger.Logger.Error("Problem with creating file")
 		panic(nil)
 	}
 	fmt.Fprintln(file, data.PrintSpents())
@@ -96,7 +97,7 @@ func (data *PartyData) PrintToFile(fileName string) {
 
 func (data *PartyData) PrintSpents() string {
 	var result string
-	switch utils.Cfg.Language {
+	switch config.Cfg.Language {
 	case language.ENG:
 		result += "   Participants:\n"
 	case language.RUS:
@@ -104,7 +105,7 @@ func (data *PartyData) PrintSpents() string {
 	}
 
 	for _, p := range data.Persons {
-		switch utils.Cfg.Language {
+		switch config.Cfg.Language {
 		case language.ENG:
 			result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
 		case language.RUS:
@@ -117,7 +118,7 @@ func (data *PartyData) PrintSpents() string {
 
 func (data *PartyData) PrintPayments() string {
 	var result string
-	switch utils.Cfg.Language {
+	switch config.Cfg.Language {
 	case language.ENG:
 		result += "   Payments:\n"
 	case language.RUS:
@@ -126,7 +127,7 @@ func (data *PartyData) PrintPayments() string {
 
 	for _, p := range data.Persons {
 		if len(p.IndeptedTo) > 0 {
-			switch utils.Cfg.Language {
+			switch config.Cfg.Language {
 			case language.ENG:
 				result += fmt.Sprintf("%s owes to:\n", p.Name)
 			case language.RUS:
@@ -139,7 +140,7 @@ func (data *PartyData) PrintPayments() string {
 		}
 	}
 
-	switch utils.Cfg.Language {
+	switch config.Cfg.Language {
 	case language.ENG:
 		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.AverageAmount)
 	case language.RUS:

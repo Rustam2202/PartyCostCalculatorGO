@@ -1,4 +1,4 @@
-package tests
+package server
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"party-calc/internal/web"
 )
 
 var cases = []testStruct{
@@ -29,11 +28,11 @@ func TestHandler(t *testing.T) {
 		}
 
 		router := gin.Default()
-		router.GET("/", web.JsonHandler)
+		router.GET("/", JsonHandler)
 		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader(input))
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
 
-		assert.JSONEq(t, string(want), w.Body.String(),tt.testName)
+		assert.JSONEq(t, string(want), w.Body.String(), tt.testName)
 	}
 }
