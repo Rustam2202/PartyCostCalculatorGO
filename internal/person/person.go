@@ -1,6 +1,7 @@
 package person
 
 type Person struct {
+	id           int
 	Name         string `json:"name"`
 	Spent        uint   `json:"spent"`
 	Participants uint   `json:"participants"`

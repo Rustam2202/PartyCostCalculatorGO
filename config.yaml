@@ -4,7 +4,7 @@
   language: ENG
   database:
     host: localhost
-    port: 5400
+    port: 5432
     user: postgres
     password: password
     dbname: party-calc-db

@@ -20,10 +20,23 @@ func Open() {
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Dbname)
 	//	connStr := "postgres://postgres:password@localhost/persons?sslmode=disable"
 	DB, err = sql.Open("postgres", psqlconn)
-
 	if err != nil {
 		logger.Logger.Error("Can't open database")
 	}
+	defer DB.Close()
+
+	createTable := `
+	CREATE TABLE IF NOT EXISTS users (
+		id SERIAL PRIMARY KEY,
+		name TEXT NOT NULL,
+		email TEXT NOT NULL
+	)
+`
+	_, err = DB.Exec(createTable)
+	if err != nil {
+		logger.Logger.Error("Can't create teable")
+	}
+
 }
 
 func Insert() {
