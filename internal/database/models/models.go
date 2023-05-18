@@ -2,12 +2,25 @@ package models
 
 import "time"
 
-type Persons struct {
+type Person struct {
 	Id           int
 	Name         string
 	Spent        int
-	Participants int
-	EventsIds    []int
+	Factor int
+	//EventsIds    []int
+}
+
+type Event struct {
+	Id         int
+	//PersonsIds []int
+	Date       time.Time
+	Name       string
+}
+
+type PersonsAndEvents struct {
+	Id       int
+	PersonId int
+	EventId  int
 }
 
 type IndeptedToData struct {
@@ -16,11 +29,4 @@ type IndeptedToData struct {
 	CreditorId int
 	Sum        float32
 	PartyId    int
-}
-
-type Event struct {
-	Id         int
-	PersonsIds []int
-	Date       time.Time
-	Name       string
 }

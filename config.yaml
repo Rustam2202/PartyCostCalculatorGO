@@ -8,5 +8,6 @@ database:
   user: postgres
   password: password
   dbname: party-calc-db
+
 language: ENG
 roundRate: 1.0
