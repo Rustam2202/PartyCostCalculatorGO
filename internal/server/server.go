@@ -20,12 +20,13 @@ func JsonHandler(ctx *gin.Context) {
 		return
 	}
 	result := service.CalculateDebts(pers)
+	//ctx.JSON(http.StatusOK, result)
 	ctx.JSON(http.StatusOK, result)
 }
 
 func StartServer() {
 	router := gin.Default()
-	router.GET("/", JsonHandler)
+	router.POST("/", JsonHandler)
 	err := router.Run(fmt.Sprintf(":%d", config.Cfg.Server.Port))
 	if err != nil {
 		logger.Logger.Error("Server couldn`t start")

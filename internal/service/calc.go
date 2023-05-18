@@ -20,7 +20,7 @@ func CalculateDebts(input person.Persons) PartyData {
 		Persons: input.Persons,
 	}
 	for i := 0; i < len(result.Persons); i++ {
-		result.Persons[i].IndeptedTo = make(map[string]float64)
+		//	result.Persons[i].IndeptedTo = make(map[string]float64)
 		if result.Persons[i].Factor == 0 { // if "participants" not declareted in json, then one participant
 			result.Persons[i].Factor = 1
 		}
@@ -37,17 +37,33 @@ func CalculateDebts(input person.Persons) PartyData {
 		left := &result.Persons[i]
 		right := &result.Persons[j]
 		absLeftBalance := math.Abs(left.Balance)
+
+		if absLeftBalance == 0 {
+			i++
+			continue
+		}
+		if right.Balance == 0 {
+			j--
+			continue
+		}
+
 		if absLeftBalance >= right.Balance {
 			if absLeftBalance < config.Cfg.RoundRate {
 				left.Balance = 0
 				i++
 				continue
 			}
+			if right.IndeptedTo == nil {
+				right.IndeptedTo = make(map[string]float64)
+			}
 			right.IndeptedTo[left.Name] = right.Balance
 			left.Balance += right.Balance
 			right.Balance = 0
 			j--
-		} else {
+		} else if absLeftBalance < right.Balance {
+			if right.IndeptedTo == nil {
+				right.IndeptedTo = make(map[string]float64)
+			}
 			right.IndeptedTo[left.Name] = absLeftBalance
 			right.Balance -= absLeftBalance
 			if right.Balance < config.Cfg.RoundRate {

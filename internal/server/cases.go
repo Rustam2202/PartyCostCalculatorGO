@@ -53,11 +53,60 @@ var threePersons = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: map[string]float64{}},
-			{Name: "Person 2", Spent: 500, Factor: 1, IndeptedTo: map[string]float64{}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: nil},
+			{Name: "Person 2", Spent: 500, Factor: 1, IndeptedTo: nil},
 			{Name: "Person 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 500}},
 		},
 		AllPersonsCount: 3,
 		AverageAmount:   500,
 		TotalAmount:     1500},
+}
+
+var fivePersons = testStruct{
+	testName: "Five Persons",
+	input: person.Persons{Persons: []person.Person{
+		{Name: "Person 1", Spent: 1000},
+		{Name: "Person 2", Spent: 800},
+		{Name: "Person 3", Spent: 0},
+		{Name: "Person 4", Spent: 0},
+		{Name: "Person 5", Spent: 0},
+	}},
+
+	want: service.PartyData{
+		Persons: []person.Person{
+			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: nil},
+			{Name: "Person 2", Spent: 800, Factor: 1, IndeptedTo: nil},
+			{Name: "Person 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 2": 360}},
+			{Name: "Person 4", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 280, "Person 2": 80}},
+			{Name: "Person 5", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 360}},
+		},
+		AllPersonsCount: 5,
+		AverageAmount:   360,
+		TotalAmount:     1800},
+}
+
+// JSONs not equal because different positions of blocks
+var sixPersons = testStruct{
+	testName: "Six Persons",
+	input: person.Persons{Persons: []person.Person{
+		{Name: "Person 1", Spent: 1000, Factor: 2},
+		{Name: "Person 2", Spent: 800,Factor: 1},
+		{Name: "Person 3", Spent: 300, Factor: 3},
+		{Name: "Person 4", Spent: 0,Factor: 1},
+		{Name: "Person 5", Spent: 0, Factor: 2},
+		{Name: "Person 6", Spent: 0, Factor: 3},
+	}},
+
+	want: service.PartyData{
+		Persons: []person.Person{
+			{Name: "Person 1", Spent: 1000, Factor: 2},
+			{Name: "Person 2", Spent: 800, Factor: 1},
+			{Name: "Person 3", Spent: 300, Factor: 3, IndeptedTo: map[string]float64{"Person 2": 225}},
+			{Name: "Person 4", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 2": 175}},
+			{Name: "Person 5", Spent: 0, Factor: 2, IndeptedTo: map[string]float64{"Person 1": 125, "Person 2": 225}},
+			{Name: "Person 6", Spent: 0, Factor: 3, IndeptedTo: map[string]float64{"Person 1": 525}},
+		},
+		AllPersonsCount: 12,
+		AverageAmount:   175,
+		TotalAmount:     2100},
 }

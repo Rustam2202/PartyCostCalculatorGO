@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,7 +32,28 @@ func TestHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader(input))
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
-
+		fmt.Println(w.Body.String())
 		assert.JSONEq(t, string(want), w.Body.String(), tt.testName)
 	}
+}
+
+func TestAny(t *testing.T) {
+	var test = sixPersons
+	input, err := json.Marshal(test.input)
+	if err != nil {
+		t.Errorf("Not correct input-JSON: %s", err)
+	}
+	want, err := json.Marshal(test.want)
+	if err != nil {
+		t.Errorf("Not correct want-JSON: %s", err)
+	}
+
+	router := gin.Default()
+	router.GET("/", JsonHandler)
+	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader(input))
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	// fmt.Println(w.Body.String())
+	// fmt.Println(string(want))
+	assert.JSONEq(t, string(want), w.Body.String(), test.testName)
 }
