@@ -36,8 +36,8 @@
         </h4>
         <a>
             <ul>
-                <li>Finish CheckCalculation()</li>
-                <li>Create tests in main_test.go</li>
+                <li></li>
+                <li></li>
             </ul>
         </a>
     </div>

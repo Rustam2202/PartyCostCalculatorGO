@@ -20,7 +20,8 @@ type Config struct {
 		Password string
 		Dbname   string
 	}
-	Language language.Language
+	Language  language.Language
+	RoundRate float64
 }
 
 var Cfg Config

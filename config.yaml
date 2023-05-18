@@ -1,10 +1,12 @@
-  server:
-    host: localhost
-    port: 8080
-  language: ENG
-  database:
-    host: localhost
-    port: 5432
-    user: postgres
-    password: password
-    dbname: party-calc-db
+server:
+  host: localhost
+  port: 8080
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: password
+  dbname: party-calc-db
+language: ENG
+roundRate: 1.0

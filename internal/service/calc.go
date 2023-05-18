@@ -1,33 +1,28 @@
 package service
 
 import (
-	"fmt"
 	"math"
-	"os"
 	"sort"
 
-	"party-calc/internal/language"
-	"party-calc/internal/person"
-	"party-calc/internal/logger"
 	"party-calc/internal/config"
+	"party-calc/internal/person"
 )
 
 type PartyData struct {
-	id int
 	Persons         []person.Person `json:"persons"`
 	AllPersonsCount uint
-	AverageAmount   float32
+	AverageAmount   float64
 	TotalAmount     uint
 }
 
-func CalculateDebts(input person.Persons, errorRate float32) PartyData {
+func CalculateDebts(input person.Persons) PartyData {
 	var result = PartyData{
 		Persons: input.Persons,
 	}
 	for i := 0; i < len(result.Persons); i++ {
-		result.Persons[i].IndeptedTo = make(map[string]float32)
-		if result.Persons[i].Participants == 0 { // if "participants" not declareted in json, then one participant
-			result.Persons[i].Participants = 1
+		result.Persons[i].IndeptedTo = make(map[string]float64)
+		if result.Persons[i].Factor == 0 { // if "participants" not declareted in json, then one participant
+			result.Persons[i].Factor = 1
 		}
 	}
 	result.CalculateTotalAndAverageAmount()
@@ -41,9 +36,9 @@ func CalculateDebts(input person.Persons, errorRate float32) PartyData {
 	for i < j {
 		left := &result.Persons[i]
 		right := &result.Persons[j]
-		absLeftBalance := math.Abs(float64(left.Balance))
-		if absLeftBalance >= float64(right.Balance) {
-			if absLeftBalance < float64(errorRate) {
+		absLeftBalance := math.Abs(left.Balance)
+		if absLeftBalance >= right.Balance {
+			if absLeftBalance < config.Cfg.RoundRate {
 				left.Balance = 0
 				i++
 				continue
@@ -53,9 +48,9 @@ func CalculateDebts(input person.Persons, errorRate float32) PartyData {
 			right.Balance = 0
 			j--
 		} else {
-			right.IndeptedTo[left.Name] = float32(absLeftBalance)
-			right.Balance -= float32(absLeftBalance)
-			if float64(right.Balance) < float64(errorRate) {
+			right.IndeptedTo[left.Name] = absLeftBalance
+			right.Balance -= absLeftBalance
+			if right.Balance < config.Cfg.RoundRate {
 				right.Balance = 0
 			}
 			left.Balance = 0
@@ -70,17 +65,18 @@ func (data *PartyData) CalculateTotalAndAverageAmount() {
 		data.TotalAmount += p.Spent
 	}
 	for _, p := range data.Persons {
-		data.AllPersonsCount += p.Participants
+		data.AllPersonsCount += p.Factor
 	}
-	data.AverageAmount = float32(data.TotalAmount) / float32(data.AllPersonsCount)
+	data.AverageAmount = float64(data.TotalAmount) / float64(data.AllPersonsCount)
 }
 
 func (data *PartyData) CalculateBalances() {
 	for i := 0; i < len(data.Persons); i++ {
-		data.Persons[i].Balance = data.AverageAmount*float32(data.Persons[i].Participants) - float32(data.Persons[i].Spent)
+		data.Persons[i].Balance = data.AverageAmount*float64(data.Persons[i].Factor) - float64(data.Persons[i].Spent)
 	}
 }
 
+/*
 func (data *PartyData) ShowPayments() {
 	fmt.Println(data.PrintSpents())
 	fmt.Println(data.PrintPayments())
@@ -147,6 +143,6 @@ func (data *PartyData) PrintPayments() string {
 	case language.RUS:
 		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.AverageAmount)
 	}
-
 	return result
 }
+*/

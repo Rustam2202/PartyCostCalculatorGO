@@ -19,7 +19,7 @@ func JsonHandler(ctx *gin.Context) {
 		logger.Logger.Error("Incorrect input JSON format")
 		return
 	}
-	result := service.CalculateDebts(pers, 1)
+	result := service.CalculateDebts(pers)
 	ctx.JSON(http.StatusOK, result)
 }
 

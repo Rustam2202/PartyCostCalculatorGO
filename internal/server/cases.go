@@ -1,8 +1,8 @@
 package server
 
 import (
-	"party-calc/internal/service"
 	"party-calc/internal/person"
+	"party-calc/internal/service"
 )
 
 type testStruct struct {
@@ -19,7 +19,7 @@ var onePerson = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: map[string]float64{}},
 		},
 		AllPersonsCount: 1,
 		AverageAmount:   1000,
@@ -35,8 +35,8 @@ var twoPersons = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
-			{Name: "Person 2", Spent: 200, Participants: 1, IndeptedTo: map[string]float32{"Person 1": 400}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: map[string]float64{}},
+			{Name: "Person 2", Spent: 200, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 400}},
 		},
 		AllPersonsCount: 2,
 		AverageAmount:   600,
@@ -53,9 +53,9 @@ var threePersons = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Participants: 1, IndeptedTo: map[string]float32{}},
-			{Name: "Person 2", Spent: 500, Participants: 1, IndeptedTo: map[string]float32{}},
-			{Name: "Person 3", Spent: 0, Participants: 1, IndeptedTo: map[string]float32{"Person 1": 500}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: map[string]float64{}},
+			{Name: "Person 2", Spent: 500, Factor: 1, IndeptedTo: map[string]float64{}},
+			{Name: "Person 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 500}},
 		},
 		AllPersonsCount: 3,
 		AverageAmount:   500,
