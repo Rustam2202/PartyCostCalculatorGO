@@ -9,6 +9,7 @@ import (
 )
 
 type PartyData struct {
+	Id int
 	Persons         []person.Person `json:"persons"`
 	AllPersonsCount uint
 	AverageAmount   float64

@@ -1,6 +1,7 @@
 package person
 
 type Person struct {
+	Id         int
 	Name       string `json:"name"`
 	Spent      uint   `json:"spent"`
 	Factor     uint   `json:"factor"` // default must be = 1

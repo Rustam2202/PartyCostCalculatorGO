@@ -6,6 +6,7 @@ import (
 	"party-calc/internal/logger"
 
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -29,6 +30,10 @@ var Cfg Config
 func LoadConfig() {
 	confPath := flag.String("config", "", "path to config file")
 	flag.Parse()
+	if *confPath == "" {
+		*confPath = "../../" 
+		//*confPath="${workspaceFolder}/"
+	}
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
@@ -36,11 +41,11 @@ func LoadConfig() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		logger.Logger.Fatal("Can't read configurations")
+		logger.Logger.Fatal("Can't read configs: ", zap.Error(err))
 	}
 
 	err = viper.Unmarshal(&Cfg)
 	if err != nil {
-		logger.Logger.Fatal("Can't read configurations")
+		logger.Logger.Fatal("Can't unmarshal configs: ", zap.Error(err))
 	}
 }

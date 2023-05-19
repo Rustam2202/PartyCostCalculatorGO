@@ -3,18 +3,19 @@ package models
 import "time"
 
 type Person struct {
-	Id           int
-	Name         string
-	Spent        int
+	Id     int
+	Name   string
+	Spent  int
 	Factor int
 	//EventsIds    []int
 }
 
 type Event struct {
-	Id         int
+	Id   int
+	Date time.Time // postgres format: `YYYY-MM-DD`
+	Name string
 	//PersonsIds []int
-	Date       time.Time
-	Name       string
+
 }
 
 type PersonsAndEvents struct {

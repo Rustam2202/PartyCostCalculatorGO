@@ -7,7 +7,7 @@ database:
   port: 5432
   user: postgres
   password: password
-  dbname: party-calc-db
+  dbname: partycalc
 
 language: ENG
 roundRate: 1.0
