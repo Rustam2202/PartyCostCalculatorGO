@@ -38,7 +38,8 @@ func TestHandler(t *testing.T) {
 }
 
 func TestAny(t *testing.T) {
-	var test = sixPersons
+	// chose between test cases ('onePersons', 'twoPersons' ...)
+	var test = threePersons
 	input, err := json.Marshal(test.input)
 	if err != nil {
 		t.Errorf("Not correct input-JSON: %s", err)
@@ -53,7 +54,8 @@ func TestAny(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader(input))
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	// fmt.Println(w.Body.String())
+	fmt.Println(string(input))
+	fmt.Println(w.Body.String())
 	// fmt.Println(string(want))
 	assert.JSONEq(t, string(want), w.Body.String(), test.testName)
 }

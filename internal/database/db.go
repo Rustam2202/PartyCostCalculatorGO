@@ -36,7 +36,12 @@ func (db *DataBase) Open() error {
 }
 
 func (db *DataBase) CreateTables() error {
-	db.Open()
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
 	createTables := `
 	CREATE TABLE IF NOT EXISTS persons (
 		id SERIAL PRIMARY KEY,
@@ -54,7 +59,7 @@ func (db *DataBase) CreateTables() error {
 		person INTEGER,
 		event INTEGER
 	)`
-	_, err := db.db.Exec(createTables)
+	_, err = db.db.Exec(createTables)
 	if err != nil {
 		logger.Logger.Error("Failed to create teables:", zap.Error(err))
 		return err
@@ -67,30 +72,37 @@ func (db *DataBase) AddPerson(name string, spent, factor, eventId int) (int64, e
 	if err != nil {
 		return 0, err
 	}
-	stmt, err := db.db.Prepare(`INSERT INTO persons (name, spent, factor)
-		VALUES($1,$2,$3)`)
+	defer db.db.Close()
+
+	result, err := db.db.Exec(`INSERT INTO persons (name, spent, factor)
+		VALUES($1,$2,$3)`, name, spent, factor)
+
 	if err != nil {
-		logger.Logger.Error("Statement prepare is incorrect: ", zap.Error(err))
+		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
 		return 0, err
 	}
-	result, err := stmt.Exec(name, spent, factor)
+	personId, _ := result.LastInsertId() // ?? always returns 0
+
+	_, err = db.db.Exec(`INSERT INTO pers_events (person)
+		VALUES($1) WHERE id=$2`, personId, eventId)
 	if err != nil {
-		logger.Logger.Error("Failed to Execute Insert operation: ", zap.Error(err))
+		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
 		return 0, err
 	}
-	personId, _ := result.LastInsertId()
+
 	return personId, nil
 }
 
-func (db *DataBase) GetPerson(id int64) (person.Person, error) {
+func (db *DataBase) GetPerson(name string) (person.Person, error) {
+	err := db.Open()
+	if err != nil {
+		return person.Person{}, err
+	}
+	defer db.db.Close()
+
 	var per person.Person
-	var ids int
-	var name string
-	var spent int
-	var factor int
-	row := db.db.QueryRow(`SELECT * FROM persons WHERE id = $1`, id)
-		//Scan(&per.Id, &per.Name, &per.Spent, &per.Factor)
-	err:=	row.Scan(&ids, &name, &spent, &factor)
+	err = db.db.QueryRow(`SELECT * FROM persons WHERE name = $1`, name).
+		Scan(&per.Id, &per.Name, &per.Spent, &per.Factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data: ", zap.Error(err))
 		return person.Person{}, err
@@ -99,12 +111,17 @@ func (db *DataBase) GetPerson(id int64) (person.Person, error) {
 }
 
 func (db *DataBase) UpdatePerson(id int64, name string, spent int, factor int) error {
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
 	stmt, err := db.db.Prepare(`UPDATE persons SET name=$1 spent=$2, factor=$3 WHERE id=$4`)
 	if err != nil {
 		logger.Logger.Error("Statement prepare is incorrect: ", zap.Error(err))
 		return err
 	}
-	defer stmt.Close()
 	_, err = stmt.Exec(name, spent, factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
@@ -114,6 +131,12 @@ func (db *DataBase) UpdatePerson(id int64, name string, spent int, factor int) e
 }
 
 func (db *DataBase) DeletePerson(id int64) error {
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
 	stmt, err := db.db.Prepare(`DELETE FROM persons WHERE id=$1`)
 	if err != nil {
 		logger.Logger.Error("Statement prepare is incorrect: ", zap.Error(err))
@@ -128,18 +151,15 @@ func (db *DataBase) DeletePerson(id int64) error {
 	return nil
 }
 
-func (db *DataBase) AddEvent(name string, date time.Time) int64 {
-	stmt, err := db.db.Prepare(`INSERT INTO events (name, date)
-		VALUES(?,?)`)
-	if err != nil {
-		logger.Logger.Error("Statement prepare is incorrect")
-	}
-	result, err := stmt.Exec(name, date)
+func (db *DataBase) AddEvent(name string, date time.Time) (int64, error) {
+	result, err := db.db.Exec(`
+		INSERT INTO events (name, date) VALUES($1,$2);`,name, date)
 	if err != nil {
 		logger.Logger.Error("Couldn`t execute Insert operation")
+		return 0, err
 	}
 	eventId, _ := result.LastInsertId()
-	return eventId
+	return eventId, nil
 }
 
 // use interface for call with id, name or time arguments

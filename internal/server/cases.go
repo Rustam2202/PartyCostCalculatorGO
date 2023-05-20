@@ -46,20 +46,20 @@ var twoPersons = testStruct{
 var threePersons = testStruct{
 	testName: "Three Persons",
 	input: person.Persons{Persons: []person.Person{
-		{Name: "Person 1", Spent: 1000},
-		{Name: "Person 2", Spent: 500},
-		{Name: "Person 3", Spent: 0},
+		{Name: "Participant 1", Spent: 800, Factor: 2},
+		{Name: "Participant 2", Spent: 600},
+		{Name: "Participant 3"},
 	}},
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: nil},
-			{Name: "Person 2", Spent: 500, Factor: 1, IndeptedTo: nil},
-			{Name: "Person 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 500}},
+			{Name: "Participant 1", Spent: 800, Factor: 2, IndeptedTo: map[string]float64{"Participant 2": 100}},
+			{Name: "Participant 2", Spent: 600, Factor: 1, IndeptedTo: nil},
+			{Name: "Participant 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Participant 2": 250}},
 		},
-		AllPersonsCount: 3,
-		AverageAmount:   500,
-		TotalAmount:     1500},
+		AllPersonsCount: 4,
+		AverageAmount:   350,
+		TotalAmount:     1400},
 }
 
 var fivePersons = testStruct{
@@ -90,9 +90,9 @@ var sixPersons = testStruct{
 	testName: "Six Persons",
 	input: person.Persons{Persons: []person.Person{
 		{Name: "Person 1", Spent: 1000, Factor: 2},
-		{Name: "Person 2", Spent: 800,Factor: 1},
+		{Name: "Person 2", Spent: 800, Factor: 1},
 		{Name: "Person 3", Spent: 300, Factor: 3},
-		{Name: "Person 4", Spent: 0,Factor: 1},
+		{Name: "Person 4", Spent: 0, Factor: 1},
 		{Name: "Person 5", Spent: 0, Factor: 2},
 		{Name: "Person 6", Spent: 0, Factor: 3},
 	}},

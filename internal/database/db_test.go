@@ -47,7 +47,7 @@ func TestCRUDPersons(t *testing.T) {
 		t.Errorf("Failed to ADD Person: %s", err)
 	}
 
-	per, err := db.GetPerson(id)
+	per, err := db.GetPerson("Person 1")
 	if err != nil {
 		t.Errorf("Failed to GET Person: %s", err)
 	}
@@ -60,7 +60,7 @@ func TestCRUDPersons(t *testing.T) {
 		t.Errorf("Failed to DELETE Person: %s", err)
 	}
 
-	_, err = db.GetPerson(id)
+	_, err = db.GetPerson("Person 1")
 	if err == nil {
 		t.Errorf("Expected error: %s", err)
 	}
