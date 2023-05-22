@@ -11,7 +11,7 @@ import (
 type PartyData struct {
 	Id              int             `json:"id"`
 	Persons         []person.Person `json:"persons"`
-	AllPersonsCount uint            `json:"all_persons_count"`
+	AllPersonsCount uint            `json:"persons_count"`
 	AverageAmount   float64         `json:"average"`
 	TotalAmount     uint            `json:"total"`
 }
@@ -54,18 +54,18 @@ func CalculateDebts(input person.Persons) PartyData {
 				i++
 				continue
 			}
-			if right.IndeptedTo == nil {
-				right.IndeptedTo = make(map[string]float64)
+			if right.Owe == nil {
+				right.Owe = make(map[string]float64)
 			}
-			right.IndeptedTo[left.Name] = right.Balance
+			right.Owe[left.Name] = right.Balance
 			left.Balance += right.Balance
 			right.Balance = 0
 			j--
 		} else if absLeftBalance < right.Balance {
-			if right.IndeptedTo == nil {
-				right.IndeptedTo = make(map[string]float64)
+			if right.Owe == nil {
+				right.Owe = make(map[string]float64)
 			}
-			right.IndeptedTo[left.Name] = absLeftBalance
+			right.Owe[left.Name] = absLeftBalance
 			right.Balance -= absLeftBalance
 			if right.Balance < config.Cfg.RoundRate {
 				right.Balance = 0

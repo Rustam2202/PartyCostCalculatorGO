@@ -19,7 +19,7 @@ var onePerson = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: map[string]float64{}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, Owe: map[string]float64{}},
 		},
 		AllPersonsCount: 1,
 		AverageAmount:   1000,
@@ -35,8 +35,8 @@ var twoPersons = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: map[string]float64{}},
-			{Name: "Person 2", Spent: 200, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 400}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, Owe: map[string]float64{}},
+			{Name: "Person 2", Spent: 200, Factor: 1, Owe: map[string]float64{"Person 1": 400}},
 		},
 		AllPersonsCount: 2,
 		AverageAmount:   600,
@@ -53,9 +53,9 @@ var threePersons = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Peter", Spent: 600, Factor: 1, IndeptedTo: nil},
-			{Name: "Alex and Kate", Spent: 800, Factor: 2, IndeptedTo: nil},
-			{Name: "Ivan", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Peter": 250, "Alex and Kate": 100}},
+			{Name: "Peter", Spent: 600, Factor: 1, Owe: nil},
+			{Name: "Alex and Kate", Spent: 800, Factor: 2, Owe: nil},
+			{Name: "Ivan", Spent: 0, Factor: 1, Owe: map[string]float64{"Peter": 250, "Alex and Kate": 100}},
 		},
 		AllPersonsCount: 4,
 		AverageAmount:   350,
@@ -74,11 +74,11 @@ var fivePersons = testStruct{
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Person 1", Spent: 1000, Factor: 1, IndeptedTo: nil},
-			{Name: "Person 2", Spent: 800, Factor: 1, IndeptedTo: nil},
-			{Name: "Person 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 2": 360}},
-			{Name: "Person 4", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 280, "Person 2": 80}},
-			{Name: "Person 5", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 1": 360}},
+			{Name: "Person 1", Spent: 1000, Factor: 1, Owe: nil},
+			{Name: "Person 2", Spent: 800, Factor: 1, Owe: nil},
+			{Name: "Person 3", Spent: 0, Factor: 1, Owe: map[string]float64{"Person 2": 360}},
+			{Name: "Person 4", Spent: 0, Factor: 1, Owe: map[string]float64{"Person 1": 280, "Person 2": 80}},
+			{Name: "Person 5", Spent: 0, Factor: 1, Owe: map[string]float64{"Person 1": 360}},
 		},
 		AllPersonsCount: 5,
 		AverageAmount:   360,
@@ -101,10 +101,10 @@ var sixPersons = testStruct{
 		Persons: []person.Person{
 			{Name: "Person 1", Spent: 1000, Factor: 2},
 			{Name: "Person 2", Spent: 800, Factor: 1},
-			{Name: "Person 3", Spent: 300, Factor: 3, IndeptedTo: map[string]float64{"Person 2": 225}},
-			{Name: "Person 4", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Person 2": 175}},
-			{Name: "Person 5", Spent: 0, Factor: 2, IndeptedTo: map[string]float64{"Person 1": 125, "Person 2": 225}},
-			{Name: "Person 6", Spent: 0, Factor: 3, IndeptedTo: map[string]float64{"Person 1": 525}},
+			{Name: "Person 3", Spent: 300, Factor: 3, Owe: map[string]float64{"Person 2": 225}},
+			{Name: "Person 4", Spent: 0, Factor: 1, Owe: map[string]float64{"Person 2": 175}},
+			{Name: "Person 5", Spent: 0, Factor: 2, Owe: map[string]float64{"Person 1": 125, "Person 2": 225}},
+			{Name: "Person 6", Spent: 0, Factor: 3, Owe: map[string]float64{"Person 1": 525}},
 		},
 		AllPersonsCount: 12,
 		AverageAmount:   175,
