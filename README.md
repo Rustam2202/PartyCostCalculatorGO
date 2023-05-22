@@ -54,8 +54,8 @@
     }
   ]
 }</pre>
-            Enter a <code>name</code> of participant, <code>spent</code> and <code>factor</code> if one participant exist more than one person. By default <code>spent = 0</code> and <code>factor = 1</code>.
-            In json response you can take info:
+            Enter a <code>name</code> of participant, <code>spent</code> and <code>factor</code> if one participant exist more than one person. By default <code>spent = 0</code> and <code>factor = 1</code>.<br>
+            In json response you can take info about participants and their <code>owes</code> plus general info about <code>persons_count</code>, <code>average</code> and <code>total</code> amounts:
             <pre>
 {
   "id": 0,
@@ -66,7 +66,7 @@
       "spent": 600,
       "factor": 1,
       "balance": 0,
-      "indepted": null
+      "owe": null
     },
     {
       "id": 0,
@@ -74,7 +74,7 @@
       "spent": 800,
       "factor": 2,
       "balance": 0,
-      "indepted": null
+      "owe": null
     },
     {
       "id": 0,
@@ -82,13 +82,13 @@
       "spent": 0,
       "factor": 1,
       "balance": 0,
-      "indepted": {
+      "owe": {
         "Alex and Kate": 100,
         "Peter": 250
       }
     }
   ],
-  "all_persons_count": 4,
+  "persons_count": 4,
   "average": 350,
   "total": 1400
 }</pre>
