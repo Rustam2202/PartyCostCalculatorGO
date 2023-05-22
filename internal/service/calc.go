@@ -9,11 +9,11 @@ import (
 )
 
 type PartyData struct {
-	Id int
+	Id              int             `json:"id"`
 	Persons         []person.Person `json:"persons"`
-	AllPersonsCount uint
-	AverageAmount   float64
-	TotalAmount     uint
+	AllPersonsCount uint            `json:"all_persons_count"`
+	AverageAmount   float64         `json:"average"`
+	TotalAmount     uint            `json:"total"`
 }
 
 func CalculateDebts(input person.Persons) PartyData {

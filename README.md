@@ -41,16 +41,16 @@
 {
   "persons": [
     {
-      "name": "Participant 1",
+      "name": "Alex and Kate",
       "spent": 800,
       "factor": 2,
     },
     {
-      "name": "Participant 2",
+      "name": "Peter",
       "spent": 600,
     },
     {
-     "name": "Participant 3",
+     "name": "Ivan",
     }
   ]
 }</pre>
@@ -58,39 +58,39 @@
             In json response you can take info:
             <pre>
 {
-  "Id": 0,
+  "id": 0,
   "persons": [
-  {
-      "Id": 0,
-      "name": "Participant 1",
-      "spent": 800,
-      "factor": 2,
-      "Balance": 0,
-      "IndeptedTo": null
-    },
     {
-      "Id": 0,
-      "name": "Participant 2",
+      "id": 0,
+      "name": "Peter",
       "spent": 600,
       "factor": 1,
-      "Balance": 0,
-      "IndeptedTo": null
+      "balance": 0,
+      "indepted": null
     },
     {
-      "Id": 0,
-      "name": "Participant 3",
+      "id": 0,
+      "name": "Alex and Kate",
+      "spent": 800,
+      "factor": 2,
+      "balance": 0,
+      "indepted": null
+    },
+    {
+      "id": 0,
+      "name": "Ivan",
       "spent": 0,
       "factor": 1,
-      "Balance": 0,
-      "IndeptedTo": {
-        "Participant 1": 100,
-        "Participant 2": 250
+      "balance": 0,
+      "indepted": {
+        "Alex and Kate": 100,
+        "Peter": 250
       }
     }
   ],
-  "AllPersonsCount": 4,
-  "AverageAmount": 350,
-  "TotalAmount": 1400
+  "all_persons_count": 4,
+  "average": 350,
+  "total": 1400
 }</pre>
         </a>
     </div>

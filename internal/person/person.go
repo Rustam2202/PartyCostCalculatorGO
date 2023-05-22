@@ -1,12 +1,12 @@
 package person
 
 type Person struct {
-	Id         int
-	Name       string `json:"name"`
-	Spent      uint   `json:"spent"`
-	Factor     uint   `json:"factor"` // default must be = 1
-	Balance    float64
-	IndeptedTo map[string]float64
+	Id         int                `json:"id"`
+	Name       string             `json:"name"`
+	Spent      uint               `json:"spent"`
+	Factor     uint               `json:"factor"`  // default must be = 1
+	Balance    float64            `json:"balance"` // ?? unuseful in output json
+	IndeptedTo map[string]float64 `json:"indepted"`
 }
 
 type Persons struct {

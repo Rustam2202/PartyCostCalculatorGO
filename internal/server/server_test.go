@@ -54,8 +54,7 @@ func TestAny(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", bytes.NewReader(input))
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	fmt.Println(string(input))
-	fmt.Println(w.Body.String())
 	// fmt.Println(string(want))
-	assert.JSONEq(t, string(want), w.Body.String(), test.testName)
+	// fmt.Println(w.Body.String())
+	assert.JSONEq(t, string(want), w.Body.String(), test.testName) // ?? sensitive to persons-blocks order
 }

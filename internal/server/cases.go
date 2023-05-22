@@ -46,16 +46,16 @@ var twoPersons = testStruct{
 var threePersons = testStruct{
 	testName: "Three Persons",
 	input: person.Persons{Persons: []person.Person{
-		{Name: "Participant 1", Spent: 800, Factor: 2},
-		{Name: "Participant 2", Spent: 600},
-		{Name: "Participant 3"},
+		{Name: "Alex and Kate", Spent: 800, Factor: 2},
+		{Name: "Peter", Spent: 600},
+		{Name: "Ivan"},
 	}},
 
 	want: service.PartyData{
 		Persons: []person.Person{
-			{Name: "Participant 1", Spent: 800, Factor: 2, IndeptedTo: map[string]float64{"Participant 2": 100}},
-			{Name: "Participant 2", Spent: 600, Factor: 1, IndeptedTo: nil},
-			{Name: "Participant 3", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Participant 2": 250}},
+			{Name: "Peter", Spent: 600, Factor: 1, IndeptedTo: nil},
+			{Name: "Alex and Kate", Spent: 800, Factor: 2, IndeptedTo: nil},
+			{Name: "Ivan", Spent: 0, Factor: 1, IndeptedTo: map[string]float64{"Peter": 250, "Alex and Kate": 100}},
 		},
 		AllPersonsCount: 4,
 		AverageAmount:   350,

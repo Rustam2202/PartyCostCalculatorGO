@@ -20,7 +20,6 @@ func JsonHandler(ctx *gin.Context) {
 		return
 	}
 	result := service.CalculateDebts(pers)
-	//ctx.JSON(http.StatusOK, result)
 	ctx.JSON(http.StatusOK, result)
 }
 
