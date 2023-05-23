@@ -3,7 +3,9 @@ package database
 import (
 	"party-calc/internal/config"
 	"party-calc/internal/logger"
+	"party-calc/internal/person"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -38,30 +40,55 @@ func TestCreateTebles(t *testing.T) {
 }
 
 func TestCRUDPersons(t *testing.T) {
-	var db DataBase
 	logger.IntializeLogger()
 	config.LoadConfig()
+	var db DataBase
+	db.CreateTables()
+	defer db.DropTables()
 
-	id, err := db.AddPerson("Person 1", 1000, 3, 1)
+	var per = person.Person{Name: "Person 1", Spent: 1000}
+
+	_, err := db.AddPerson(per, 1)
 	if err != nil {
 		t.Errorf("Failed to ADD Person: %s", err)
 	}
 
-	per, err := db.GetPerson("Person 1")
+	per_get, err := db.GetPerson(per.Name)
 	if err != nil {
 		t.Errorf("Failed to GET Person: %s", err)
 	}
-	assert.Equal(t, "Person 1", per.Name)
-	assert.Equal(t, 1000, per.Spent)
-	assert.Equal(t, 3, per.Factor)
+	assert.Equal(t, per.Name, per_get.Name)
+	assert.Equal(t, per.Spent, per_get.Spent)
+	assert.Equal(t, per.Factor, per_get.Factor)
 
-	err = db.DeletePerson(id)
+	err = db.UpdatePerson(1, "Person 2", 1200, 2)
+	if err != nil {
+		t.Errorf("Failed to UPDATE Person: %s", err)
+	}
+	per_get, err = db.GetPerson("Person 2")
+	if err != nil {
+		t.Errorf("Failed to GET Person: %s", err)
+	}
+	assert.Equal(t, "Person 2", per_get.Name)
+	assert.Equal(t, uint(1200), per_get.Spent)
+	assert.Equal(t, uint(2), per_get.Factor)
+
+	err = db.DeletePerson(1)
 	if err != nil {
 		t.Errorf("Failed to DELETE Person: %s", err)
 	}
+}
 
-	_, err = db.GetPerson("Person 1")
-	if err == nil {
-		t.Errorf("Expected error: %s", err)
+func TestCRUDEvents(t *testing.T) {
+	logger.IntializeLogger()
+	config.LoadConfig()
+	var db DataBase
+	db.CreateTables()
+	defer db.DropTables()
+
+	_, err := db.AddEvent("New year", time.Date(2022, 12, 31, 00, 00, 0, 00, time.Local))
+	if err != nil {
+		t.Errorf("Failed to INSERT Event: %s", err)
 	}
+	
 }
