@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS persons;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS pers_events

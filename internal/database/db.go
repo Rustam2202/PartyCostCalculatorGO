@@ -3,14 +3,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"time"
 
 	"party-calc/internal/config"
-	"party-calc/internal/person"
+	"party-calc/internal/database/models"
 
-	// "party-calc/internal/database/models"
 	"party-calc/internal/logger"
-	"party-calc/internal/service"
 
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -35,67 +32,14 @@ func (db *DataBase) Open() error {
 	return nil
 }
 
-func (db *DataBase) CreateTables() error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
-	createTables := `
-	CREATE TABLE IF NOT EXISTS persons (
-		id SERIAL PRIMARY KEY,
-		name TEXT NOT NULL,
-		spent INTEGER,
-		factor INTEGER
-	);
-	CREATE TABLE IF NOT EXISTS events (
-		id SERIAL PRIMARY KEY,
-		name TEXT,
-		date DATE 
-	);
-	CREATE TABLE IF NOT EXISTS pers_events (
-		id SERIAL PRIMARY KEY,
-		person INTEGER,
-		event INTEGER
-	)`
-	_, err = db.db.Exec(createTables)
-	if err != nil {
-		logger.Logger.Error("Failed to create teables:", zap.Error(err))
-		return err
-	}
-	return nil
-}
-
-func (db *DataBase) DropTables() error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
-	dropTables := `
-		DROP TABLE IF EXISTS persons;
-		DROP TABLE IF EXISTS events;
-		DROP TABLE IF EXISTS pers_events
-		`
-	_, err = db.db.Exec(dropTables)
-	if err != nil {
-		logger.Logger.Error("Failed to drop teables:", zap.Error(err))
-		return err
-	}
-	return nil
-}
-
-func (db *DataBase) AddPerson(per person.Person, eventId int) (int64, error) {
+func (db *DataBase) AddPerson(per models.Person) (int64, error) {
 	err := db.Open()
 	if err != nil {
 		return 0, err
 	}
 	defer db.db.Close()
 
-	result, err := db.db.Exec(`INSERT INTO persons (name, spent, factor)
-		VALUES($1,$2,$3)`, per.Name, per.Spent, per.Factor)
+	result, err := db.db.Exec(`INSERT INTO persons (name) VALUES($1)`, per.Name)
 
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
@@ -103,34 +47,27 @@ func (db *DataBase) AddPerson(per person.Person, eventId int) (int64, error) {
 	}
 	personId, _ := result.LastInsertId() // ?? always returns 0
 
-	// _, err = db.db.Exec(`INSERT INTO pers_events (person)
-	// 	VALUES($1) WHERE id=$2`, personId, eventId)
-	// if err != nil {
-	// 	logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
-	// 	return 0, err
-	// }
-
 	return personId, nil
 }
 
-func (db *DataBase) GetPerson(name string) (person.Person, error) {
+func (db *DataBase) GetPerson(name string) (models.Person, error) {
 	err := db.Open()
 	if err != nil {
-		return person.Person{}, err
+		return models.Person{}, err
 	}
 	defer db.db.Close()
 
-	var per person.Person
+	var per models.Person
 	err = db.db.QueryRow(`SELECT * FROM persons WHERE name = $1`, name).
-		Scan(&per.Id, &per.Name, &per.Spent, &per.Factor)
+		Scan(&per.Id, &per.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from persons: ", zap.Error(err))
-		return person.Person{}, err
+		return models.Person{}, err
 	}
 	return per, nil
 }
 
-func (db *DataBase) UpdatePerson(id int64, name string, spent int, factor int) error {
+func (db *DataBase) UpdatePerson(id int64, per models.Person) error {
 	err := db.Open()
 	if err != nil {
 		return err
@@ -138,8 +75,8 @@ func (db *DataBase) UpdatePerson(id int64, name string, spent int, factor int) e
 	defer db.db.Close()
 
 	_, err = db.db.Exec(
-		`UPDATE persons SET name=$1, spent=$2, factor=$3 WHERE id=$4`,
-		name, spent, factor, id)
+		`UPDATE persons SET name=$1 WHERE id=$2`,
+		per.Name, id)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -162,14 +99,14 @@ func (db *DataBase) DeletePerson(id int64) error {
 	return nil
 }
 
-func (db *DataBase) AddEvent(name string, date time.Time) (int64, error) {
+func (db *DataBase) AddEvent(event models.Event) (int64, error) {
 	err := db.Open()
 	if err != nil {
 		return 0, err
 	}
 	defer db.db.Close()
 
-	result, err := db.db.Exec(`INSERT INTO events (name, date) VALUES($1,$2);`, name, date.Format("2006-01-02"))
+	result, err := db.db.Exec(`INSERT INTO events (name, date) VALUES($1,$2);`, event.Name, event.Date.Format("2006-01-02"))
 	if err != nil {
 		logger.Logger.Error("Couldn`t execute Insert operation", zap.Error(err))
 		return 0, err
@@ -178,36 +115,30 @@ func (db *DataBase) AddEvent(name string, date time.Time) (int64, error) {
 	return eventId, nil
 }
 
-func (db *DataBase) GetEvent(name string) (service.PartyData, error) {
+func (db *DataBase) GetEvent(name string) (models.Event, error) {
 	err := db.Open()
 	if err != nil {
-		return service.PartyData{}, err
+		return models.Event{}, err
 	}
 	defer db.db.Close()
 
-	var ev service.PartyData
-	err = db.db.QueryRow(`SELECT * FROM events WHERE name=$1`, name).Scan(&ev.Id)
+	var ev models.Event
+	err = db.db.QueryRow(`SELECT * FROM events WHERE name=$1`, name).Scan(&ev.Id, &ev.Name, &ev.Date)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from events:", zap.Error(err))
-		return service.PartyData{}, err
+		return models.Event{}, err
 	}
 	return ev, nil
 }
 
-func (db *DataBase) UpdateEvent(id int, name string, date time.Time) error {
+func (db *DataBase) UpdateEvent(id int, ev models.Event) error {
 	err := db.Open()
 	if err != nil {
 		return err
 	}
 	defer db.db.Close()
 
-	// stmt, err := db.db.Prepare(`UPDATE events SET name=$1, fate=$2 WHERE id=$3`)
-	// if err != nil {
-	// 	logger.Logger.Error("Statement prepare is incorrect: ", zap.Error(err))
-	// 	return err
-	// }
-	_, err = db.db.Exec(`UPDATE events SET name=$1, date=$2 WHERE id=$3`, name, date, id)
-	//_, err = stmt.Exec(name, date)
+	_, err = db.db.Exec(`UPDATE events SET name=$1, date=$2 WHERE id=$3`, ev.Name, ev.Date, id)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -222,12 +153,6 @@ func (db *DataBase) DeleteEvent(id int) error {
 	}
 	defer db.db.Close()
 
-	// stmt, err := db.db.Prepare(`DELETE FROM evenets WHERE id=$1`)
-	// if err != nil {
-	// 	logger.Logger.Error("Statement prepare is incorrect: ", zap.Error(err))
-	// 	return err
-	// }
-
 	_, err = db.db.Exec(`DELETE FROM evenets WHERE id=$1`, id)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
@@ -235,3 +160,148 @@ func (db *DataBase) DeleteEvent(id int) error {
 	}
 	return nil
 }
+
+func (db *DataBase) AddPersonToEvent(evId, perId int64) error {
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
+	_, err = db.db.Exec(`INSERT INTO pers_events (Person, Event) VALUES ($1,$2)`, evId, perId)
+	if err != nil {
+		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (db *DataBase) AddPersonToEventWithSpent(evId, perId int64, spent float32, factor int) error {
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
+	_, err = db.db.Exec(`INSERT INTO pers_events (Person, Event, Spent, Factor) 
+		VALUES ($1,$2,$3,$4); 
+		UPDATE events SET Total=Total+$3 WHERE Event=$1
+		`, evId, perId, spent, factor)
+	if err != nil {
+		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (db *DataBase) GetPersEvents(name string) (models.PersonsAndEvents, error) {
+	err := db.Open()
+	if err != nil {
+		return models.PersonsAndEvents{}, err
+	}
+	defer db.db.Close()
+
+	var pe models.PersonsAndEvents
+	err = db.db.QueryRow(`SELECT * FROM pers_events WHERE name=$1`, name).
+		Scan(&pe.Id, &pe.PersonId, &pe.EventId, &pe.Spent, &pe.Factor)
+	if err != nil {
+		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
+		return models.PersonsAndEvents{}, err
+	}
+	return pe, nil
+}
+
+func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float32, factor int) error {
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
+	_, err = db.db.Exec(`UPDATE pers_events SET spent=$3, factor=$4 WHERE Event=$1, Person=$2`, evId, perId, spent, factor)
+	if err != nil {
+		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (db *DataBase) DeletePersEvents(id int64) error {
+	err := db.Open()
+	if err != nil {
+		return err
+	}
+	defer db.db.Close()
+
+	_, err = db.db.Exec(`DELETE FROM pers_evenets WHERE id=$1`, id)
+	if err != nil {
+		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+// func (db *DataBase) AddSpentOfPersonToEvent(evId, perId int64, spent float32, factor int) error {
+// 	err := db.Open()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer db.db.Close()
+// 	_, err = db.db.Exec(`UPDATE pers_events SET
+// 	UPDATE events SET Total=Total+$3`, evId, perId)
+// 	if err != nil {
+// 		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
+// 		return err
+// 	}
+// 	return nil
+// }
+
+// func (db *DataBase) CreateTables() error {
+// 	err := db.Open()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer db.db.Close()
+// 	createTables := `
+// 	CREATE TABLE IF NOT EXISTS persons (
+// 		id SERIAL PRIMARY KEY,
+// 		name TEXT NOT NULL,
+// 		spent INTEGER,
+// 		factor INTEGER
+// 	);
+// 	CREATE TABLE IF NOT EXISTS events (
+// 		id SERIAL PRIMARY KEY,
+// 		name TEXT,
+// 		date DATE
+// 	);
+// 	CREATE TABLE IF NOT EXISTS pers_events (
+// 		id SERIAL PRIMARY KEY,
+// 		person INTEGER,
+// 		event INTEGER
+// 	)`
+// 	_, err = db.db.Exec(createTables)
+// 	if err != nil {
+// 		logger.Logger.Error("Failed to create teables:", zap.Error(err))
+// 		return err
+// 	}
+// 	return nil
+// }
+
+// func (db *DataBase) DropTables() error {
+// 	err := db.Open()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer db.db.Close()
+// 	dropTables := `
+// 		DROP TABLE IF EXISTS persons;
+// 		DROP TABLE IF EXISTS events;
+// 		DROP TABLE IF EXISTS pers_events
+// 		`
+// 	_, err = db.db.Exec(dropTables)
+// 	if err != nil {
+// 		logger.Logger.Error("Failed to drop teables:", zap.Error(err))
+// 		return err
+// 	}
+// 	return nil
+// }
