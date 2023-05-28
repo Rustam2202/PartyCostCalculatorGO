@@ -28,7 +28,6 @@ func (db *DataBase) Open() error {
 		logger.Logger.Error("Can't open database: ", zap.Error(err))
 		return err
 	}
-	// defer db.db.Close()
 	return nil
 }
 
