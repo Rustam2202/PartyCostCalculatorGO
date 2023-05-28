@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"party-calc/internal/config"
 	"party-calc/internal/database/models"
 	"party-calc/internal/logger"
@@ -34,10 +35,11 @@ func TestCRUDPersons(t *testing.T) {
 	config.LoadConfig()
 	var db DataBase
 
-	_, err := db.AddPerson(models.Person{Name: "Person 1"})
+	lastId, err := db.AddPerson(models.Person{Name: "Person 5"})
 	if err != nil {
 		t.Errorf("Failed to ADD Person: %s", err)
 	}
+	fmt.Println(lastId)
 
 	per_get, err := db.GetPerson("Person 1")
 	if err != nil {

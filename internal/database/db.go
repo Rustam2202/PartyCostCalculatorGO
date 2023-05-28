@@ -38,15 +38,14 @@ func (db *DataBase) AddPerson(per models.Person) (int64, error) {
 	}
 	defer db.db.Close()
 
-	result, err := db.db.Exec(`INSERT INTO persons (name) VALUES($1)`, per.Name)
-
+	var lastInsertedId int64
+	err = db.db.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).Scan(&lastInsertedId)
+	//result, err := db.db.Exec(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
 		return 0, err
 	}
-	personId, _ := result.LastInsertId() // ?? always returns 0
-
-	return personId, nil
+	return lastInsertedId, nil
 }
 
 func (db *DataBase) GetPerson(name string) (models.Person, error) {
@@ -105,13 +104,14 @@ func (db *DataBase) AddEvent(event models.Event) (int64, error) {
 	}
 	defer db.db.Close()
 
-	result, err := db.db.Exec(`INSERT INTO events (name, date) VALUES($1,$2);`, event.Name, event.Date.Format("2006-01-02"))
+	var lastInsertedId int64
+	err = db.db.QueryRow(`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id;`,
+		event.Name, event.Date.Format("2006-01-02")).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Couldn`t execute Insert operation", zap.Error(err))
 		return 0, err
 	}
-	eventId, _ := result.LastInsertId() // ?? always returns 0
-	return eventId, nil
+	return lastInsertedId, nil
 }
 
 func (db *DataBase) GetEvent(name string) (models.Event, error) {
@@ -184,7 +184,7 @@ func (db *DataBase) AddPersonToEventWithSpent(evId, perId int64, spent float32, 
 
 	_, err = db.db.Exec(`INSERT INTO pers_events (Person, Event, Spent, Factor) 
 		VALUES ($1,$2,$3,$4); 
-		UPDATE events SET Total=Total+$3 WHERE Event=$1
+		UPDATE events SET Total=Total+$3 WHERE Id=$1
 		`, evId, perId, spent, factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
@@ -239,68 +239,3 @@ func (db *DataBase) DeletePersEvents(id int64) error {
 	}
 	return nil
 }
-
-// func (db *DataBase) AddSpentOfPersonToEvent(evId, perId int64, spent float32, factor int) error {
-// 	err := db.Open()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer db.db.Close()
-// 	_, err = db.db.Exec(`UPDATE pers_events SET
-// 	UPDATE events SET Total=Total+$3`, evId, perId)
-// 	if err != nil {
-// 		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
-// 		return err
-// 	}
-// 	return nil
-// }
-
-// func (db *DataBase) CreateTables() error {
-// 	err := db.Open()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer db.db.Close()
-// 	createTables := `
-// 	CREATE TABLE IF NOT EXISTS persons (
-// 		id SERIAL PRIMARY KEY,
-// 		name TEXT NOT NULL,
-// 		spent INTEGER,
-// 		factor INTEGER
-// 	);
-// 	CREATE TABLE IF NOT EXISTS events (
-// 		id SERIAL PRIMARY KEY,
-// 		name TEXT,
-// 		date DATE
-// 	);
-// 	CREATE TABLE IF NOT EXISTS pers_events (
-// 		id SERIAL PRIMARY KEY,
-// 		person INTEGER,
-// 		event INTEGER
-// 	)`
-// 	_, err = db.db.Exec(createTables)
-// 	if err != nil {
-// 		logger.Logger.Error("Failed to create teables:", zap.Error(err))
-// 		return err
-// 	}
-// 	return nil
-// }
-
-// func (db *DataBase) DropTables() error {
-// 	err := db.Open()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer db.db.Close()
-// 	dropTables := `
-// 		DROP TABLE IF EXISTS persons;
-// 		DROP TABLE IF EXISTS events;
-// 		DROP TABLE IF EXISTS pers_events
-// 		`
-// 	_, err = db.db.Exec(dropTables)
-// 	if err != nil {
-// 		logger.Logger.Error("Failed to drop teables:", zap.Error(err))
-// 		return err
-// 	}
-// 	return nil
-// }
