@@ -9,10 +9,11 @@ type Person struct {
 }
 
 type Event struct {
-	Id          int
-	Name        string
-	Date        time.Time // postgres format: `YYYY-MM-DD`
-	TotalAmount float32
+	Id            int
+	Name          string
+	Date          time.Time // postgres format: `YYYY-MM-DD`
+	// AverageAmount float32
+	TotalAmount   float32
 }
 
 type PersonsAndEvents struct {

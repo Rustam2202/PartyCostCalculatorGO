@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"party-calc/internal/config"
 	"party-calc/internal/database/models"
@@ -39,8 +40,8 @@ func (db *DataBase) AddPerson(per models.Person) (int64, error) {
 	defer db.db.Close()
 
 	var lastInsertedId int64
-	err = db.db.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).Scan(&lastInsertedId)
-	//result, err := db.db.Exec(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name)
+	err = db.db.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).
+		Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
 		return 0, err
@@ -122,11 +123,14 @@ func (db *DataBase) GetEvent(name string) (models.Event, error) {
 	defer db.db.Close()
 
 	var ev models.Event
-	err = db.db.QueryRow(`SELECT * FROM events WHERE name=$1`, name).Scan(&ev.Id, &ev.Name, &ev.Date)
+	var date string
+	err = db.db.QueryRow(`SELECT * FROM events WHERE name=$1`, name).
+		Scan(&ev.Id, &ev.Name, &date, &ev.TotalAmount)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from events:", zap.Error(err))
 		return models.Event{}, err
 	}
+	ev.Date, _ = time.Parse("2006-01-02", date)
 	return ev, nil
 }
 
@@ -137,7 +141,8 @@ func (db *DataBase) UpdateEvent(id int, ev models.Event) error {
 	}
 	defer db.db.Close()
 
-	_, err = db.db.Exec(`UPDATE events SET name=$1, date=$2 WHERE id=$3`, ev.Name, ev.Date, id)
+	_, err = db.db.Exec(`UPDATE events SET name=$2, date=$3 WHERE id=$1`,
+		id, ev.Name, ev.Date.Format("2006-01-02"))
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -182,12 +187,13 @@ func (db *DataBase) AddPersonToEventWithSpent(evId, perId int64, spent float32, 
 	}
 	defer db.db.Close()
 
-	_, err = db.db.Exec(`INSERT INTO pers_events (Person, Event, Spent, Factor) 
-		VALUES ($1,$2,$3,$4); 
-		UPDATE events SET Total=Total+$3 WHERE Id=$1
+	_, err = db.db.Exec(`
+		INSERT INTO pers_events (Person, Event, Spent, Factor) VALUES ($1, $2, $3, $4);
+		UPDATE events SET Total = Total + $3 WHERE Id = $1
 		`, evId, perId, spent, factor)
 	if err != nil {
-		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
+		logger.Logger.Error("Failed to INSERT to 'pers_events' or UPDATE 'events': ",
+			zap.Error(err))
 		return err
 	}
 	return nil
@@ -210,6 +216,23 @@ func (db *DataBase) GetPersEvents(name string) (models.PersonsAndEvents, error) 
 	return pe, nil
 }
 
+func (db *DataBase) GetPersFromEvents(id int64) (models.PersonsAndEvents, error) {
+	err := db.Open()
+	if err != nil {
+		return models.PersonsAndEvents{}, err
+	}
+	defer db.db.Close()
+
+	var pe models.PersonsAndEvents
+	err = db.db.QueryRow(`SELECT * FROM pers_events WHERE id=$1`, id).
+		Scan(&pe.Id, &pe.PersonId, &pe.EventId, &pe.Spent, &pe.Factor)
+	if err != nil {
+		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
+		return models.PersonsAndEvents{}, err
+	}
+	return pe, nil
+}
+
 func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float32, factor int) error {
 	err := db.Open()
 	if err != nil {
@@ -217,7 +240,12 @@ func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float32, factor in
 	}
 	defer db.db.Close()
 
-	_, err = db.db.Exec(`UPDATE pers_events SET spent=$3, factor=$4 WHERE Event=$1, Person=$2`, evId, perId, spent, factor)
+	per, _ := db.GetPersFromEvents(perId)
+	_, err = db.db.Exec(`
+		UPDATE pers_events SET spent=$3, factor=$4 WHERE Event=$1, Person=$2;
+		UPDATE events SET Total=Total+$3-$5 WHERE id=$1
+		`,
+		evId, perId, spent, factor, per.Spent)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -225,14 +253,18 @@ func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float32, factor in
 	return nil
 }
 
-func (db *DataBase) DeletePersEvents(id int64) error {
+func (db *DataBase) DeletePersonFromEvents(perId int64) error {
 	err := db.Open()
 	if err != nil {
 		return err
 	}
 	defer db.db.Close()
 
-	_, err = db.db.Exec(`DELETE FROM pers_evenets WHERE id=$1`, id)
+	per, _ := db.GetPersFromEvents(perId)
+	_, err = db.db.Exec(`
+		DELETE FROM pers_evenets WHERE Person=$1;
+		UPDATE events SET Total=Total-$2 WHERE id=$1
+	`, perId, per.Spent)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err
