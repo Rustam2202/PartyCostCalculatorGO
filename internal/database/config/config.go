@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"party-calc/internal/language"
 	"party-calc/internal/logger"
 
 	"github.com/spf13/viper"
@@ -10,19 +9,11 @@ import (
 )
 
 type Config struct {
-	Server struct {
-		Host string
-		Port int
-	}
-	DataBase struct {
-		Host     string
-		Port     int
-		User     string
-		Password string
-		Dbname   string
-	}
-	Language  language.Language
-	RoundRate float64
+	Host     string
+	Port     int
+	User     string
+	Password string
+	Dbname   string
 }
 
 var Cfg Config
@@ -30,10 +21,6 @@ var Cfg Config
 func LoadConfig() {
 	confPath := flag.String("config", "./", "path to config file")
 	flag.Parse()
-	if *confPath == "" {
-		*confPath = "../../" 
-		//*confPath="${workspaceFolder}/"
-	}
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")

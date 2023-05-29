@@ -15,9 +15,15 @@ import (
 )
 
 var cfg = &config.Cfg.DataBase
+var cfg2 = &config.Cfg
 
 type DataBase struct {
-	db *sql.DB
+	db       *sql.DB
+	host     string
+	port     int
+	user     string
+	password string
+	dbName   string
 }
 
 func (db *DataBase) Open() error {
