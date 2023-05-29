@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"party-calc/internal/config"
+	"party-calc/internal/database/config"
 	"party-calc/internal/database/models"
 
 	"party-calc/internal/logger"
@@ -14,22 +14,19 @@ import (
 	"go.uber.org/zap"
 )
 
-var cfg = &config.Cfg.DataBase
-var cfg2 = &config.Cfg
-
 type DataBase struct {
-	db       *sql.DB
-	host     string
-	port     int
-	user     string
-	password string
-	dbName   string
+	db  *sql.DB
+	cfg *config.Config
 }
 
 func (db *DataBase) Open() error {
 	var err error
+	db.cfg.LoadConfig()
+
 	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
+		db.cfg.Database.User, db.cfg.Database.Password, db.cfg.Database.Host,
+		db.cfg.Database.Port, db.cfg.Database.Dbname)
+	//		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
 	db.db, err = sql.Open("postgres", psqlconn)
 	if err != nil {
 		logger.Logger.Error("Can't open database: ", zap.Error(err))

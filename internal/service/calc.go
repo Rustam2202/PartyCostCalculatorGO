@@ -21,7 +21,6 @@ func CalculateDebts(input person.Persons) PartyData {
 		Persons: input.Persons,
 	}
 	for i := 0; i < len(result.Persons); i++ {
-		//	result.Persons[i].IndeptedTo = make(map[string]float64)
 		if result.Persons[i].Factor == 0 { // if "participants" not declareted in json, then one participant
 			result.Persons[i].Factor = 1
 		}

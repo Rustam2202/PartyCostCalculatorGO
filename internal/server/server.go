@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"party-calc/internal/config"
 	"party-calc/internal/database"
 	"party-calc/internal/database/models"
 	"party-calc/internal/logger"
 	"party-calc/internal/person"
+	"party-calc/internal/server/config"
 	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -16,11 +16,14 @@ import (
 )
 
 func StartServer() {
+	var cfg config.ServerConfig
+	cfg.LoadConfig()
+
 	router := gin.Default()
 	router.POST("/", JsonHandler)
 	router.POST("/addper", AddPersonToDbHandler)
 	router.GET("/getper", GetPersonFromDbHandler)
-	err := router.Run(fmt.Sprintf(":%d", config.Cfg.Server.Port))
+	err := router.Run(fmt.Sprintf(":%d", cfg.Server.Port))
 	if err != nil {
 		logger.Logger.Error("Server couldn`t start:", zap.Error(err))
 		return

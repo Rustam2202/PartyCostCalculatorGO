@@ -2,13 +2,13 @@ build:
 	go build -o bin/party-calc ./cmd/main.go
 	
 run:
-	go run ./cmd/main.go
+	go run ./cmd/main.go -serverconfig=./internal/server/config/
 
 exe:
-	./bin/party-calc -config=.
+	./bin/party-calc 
 
-build-dockerfile:
+build-docker:
 	docker build --tag party-calc .
 
-run-dockerfile:
+run-docker:
 	docker run -p 8080:8080 party-calc
