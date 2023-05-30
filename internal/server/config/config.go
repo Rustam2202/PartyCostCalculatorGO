@@ -19,6 +19,7 @@ func (cfg *ServerConfig) LoadConfig() {
 	confPath := flag.String("serverconfig", "./internal/server/config", "path to config file")
 	flag.Parse()
 
+	viper.Reset()
 	viper.SetConfigType("yml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(*confPath)
@@ -28,7 +29,7 @@ func (cfg *ServerConfig) LoadConfig() {
 		logger.Logger.Fatal("Can't read configs: ", zap.Error(err))
 	}
 
-	err = viper.Unmarshal(cfg)
+	err = viper.Unmarshal(&cfg)
 	if err != nil {
 		logger.Logger.Fatal("Can't unmarshal configs: ", zap.Error(err))
 	}

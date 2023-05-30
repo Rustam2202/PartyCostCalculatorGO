@@ -16,7 +16,7 @@ import (
 
 type DataBase struct {
 	db  *sql.DB
-	cfg *config.Config
+	cfg config.DatabaseConfig
 }
 
 func (db *DataBase) Open() error {

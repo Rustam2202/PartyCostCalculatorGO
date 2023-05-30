@@ -8,21 +8,22 @@ import (
 	"go.uber.org/zap"
 )
 
-type Config struct {
+type DatabaseConfig struct {
 	Database struct {
-		Host     string
-		Port     int
-		User     string
-		Password string
-		Dbname   string
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		User     string `mapstructure:"user"`
+		Password string `mapstructure:"password"`
+		Dbname   string `mapstructure:"dbname"`
 	}
 }
 
-func (cfg *Config) LoadConfig() {
-	confPath := flag.String("dbconfig", "./internal/database/config", "path to config file")
+func (cfg *DatabaseConfig) LoadConfig() {
+	confPath := flag.String("dbconfig", "./internal/database/config/", "path to config file")
 	flag.Parse()
 
-	viper.SetConfigType("yaml")
+	viper.Reset()
+	viper.SetConfigType("yml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(*confPath)
 
