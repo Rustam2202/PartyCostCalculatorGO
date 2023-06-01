@@ -137,7 +137,7 @@ func (db *DataBase) GetEvent(name string) (models.Event, error) {
 	return ev, nil
 }
 
-func (db *DataBase) UpdateEvent(id int, ev models.Event) error {
+func (db *DataBase) UpdateEvent(id int64, ev models.Event) error {
 	err := db.Open()
 	if err != nil {
 		return err
@@ -153,7 +153,7 @@ func (db *DataBase) UpdateEvent(id int, ev models.Event) error {
 	return nil
 }
 
-func (db *DataBase) DeleteEvent(id int) error {
+func (db *DataBase) DeleteEvent(id int64) error {
 	err := db.Open()
 	if err != nil {
 		return err
@@ -183,7 +183,7 @@ func (db *DataBase) AddPersonToEvent(evId, perId int64) error {
 	return nil
 }
 
-func (db *DataBase) AddPersonToEventWithSpent(evId, perId int64, spent float32, factor int) error {
+func (db *DataBase) AddPersonToEventWithSpent(evId, perId int64, spent float64, factor int) error {
 	err := db.Open()
 	if err != nil {
 		return err
@@ -236,7 +236,7 @@ func (db *DataBase) GetPersFromEvents(id int64) (models.PersonsAndEvents, error)
 	return pe, nil
 }
 
-func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float32, factor int) error {
+func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float64, factor int) error {
 	err := db.Open()
 	if err != nil {
 		return err

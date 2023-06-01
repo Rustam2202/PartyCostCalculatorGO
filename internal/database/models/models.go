@@ -13,13 +13,13 @@ type Event struct {
 	Name          string
 	Date          time.Time // postgres format: `YYYY-MM-DD`
 	// AverageAmount float32
-	TotalAmount   float32
+	TotalAmount   float64
 }
 
 type PersonsAndEvents struct {
 	Id       int
 	PersonId int
 	EventId  int
-	Spent    float32
+	Spent    float64
 	Factor   int
 }
