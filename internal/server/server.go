@@ -65,151 +65,229 @@ func AddPersonHandler(ctx *gin.Context) {
 	per.Name = name
 	id, err := db.AddPerson(per)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database:": err})
 		return
 	}
-	ctx.String(http.StatusOK, "", id)
+	ctx.JSON(http.StatusOK, gin.H{"Person added with id:": id})
 }
 
 func GetPersonHandler(ctx *gin.Context) {
 	var db database.DataBase
 	name := ctx.Query("name")
-	_, err := db.GetPerson(name)
+	per, err := db.GetPerson(name)
 	if err != nil {
-		//logger.Logger.Error("couldn't GET person: ", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database:": err})
 		return
 	}
+	ctx.JSON(http.StatusOK, per)
 }
 
 func UpdatePersonHandler(ctx *gin.Context) {
 	var db database.DataBase
 	var per = models.Person{}
-	id, _ := strconv.ParseInt(ctx.Query("id"), 10, 64)
-	per.Name = ctx.Query("name")
-	err := db.UpdatePerson(id, per)
+	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
 		return
 	}
+	// id := ctx.GetInt64("id") // ?? returns 0
+	per.Name = ctx.Query("name")
+	err = db.UpdatePerson(id, per)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update person in database:": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Person updated:": id})
 }
 
 func DeletePersonHandler(ctx *gin.Context) {
 	var db database.DataBase
-	id, _ := strconv.Atoi(ctx.Query("id"))
-	err := db.DeletePerson(int64(id))
+	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
 		return
 	}
+	//id := ctx.GetInt64("id") // ?? returns 0
+	err = db.DeletePerson(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person from database:": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Person deleted:": id})
 }
 
 func AddEventHandler(ctx *gin.Context) {
 	var db database.DataBase
 	var ev = models.Event{}
 	ev.Name = ctx.Query("name")
+	//ev.Date = ctx.GetTime("date") // ?? don't parsing
 	date, err := time.Parse("2006-01-02", ctx.Query("date"))
 	if err != nil {
-
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
+		return
 	}
 	ev.Date = date
-	_, err = db.AddEvent(ev)
+	id, err := db.AddEvent(ev)
 	if err != nil {
-
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with added event to database:": err})
+		return
 	}
+	ctx.JSON(http.StatusOK, gin.H{"Event added with id:": id})
 }
 
 func GetEventHandler(ctx *gin.Context) {
 	var db database.DataBase
 	name := ctx.Query("name")
-	_, err := db.GetEvent(name)
+	ev, err := db.GetEvent(name)
 	if err != nil {
-		//logger.Logger.Error("couldn't GET person: ", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting event from database:": err})
 		return
 	}
+	ctx.JSON(http.StatusOK, ev)
 }
 
 func UpdateEventHandler(ctx *gin.Context) {
 	var db database.DataBase
 	var ev = models.Event{}
-	id, _ := strconv.ParseInt(ctx.Query("id"), 10, 64)
+	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
+		return
+	}
 	date, err := time.Parse("2006-01-02", ctx.Query("date"))
 	if err != nil {
-
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
+		return
 	}
 	ev.Date = date
 	ev.Name = ctx.Query("name")
 	err = db.UpdateEvent(id, ev)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update event in database:": err})
 		return
 	}
+	ctx.JSON(http.StatusOK, gin.H{"Event updated:": id})
 }
 
 func DeleteEventHandler(ctx *gin.Context) {
 	var db database.DataBase
-	id, _ := strconv.ParseInt(ctx.Query("id"), 10, 64)
-	err := db.DeleteEvent(id)
+	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
 		return
 	}
+	err = db.DeleteEvent(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete event from database:": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Event deleted:": id})
 }
 
 func AddPersonToEventHandler(ctx *gin.Context) {
 	var db database.DataBase
-	perid, _ := strconv.ParseInt(ctx.Query("perid"), 10, 64)
-	evid, _ := strconv.ParseInt(ctx.Query("evid"), 10, 64)
-	err := db.AddPersonToEvent(perid, evid)
+	perid, err := strconv.ParseInt(ctx.Query("perid"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing person id: ": err})
 		return
 	}
+	evid, err := strconv.ParseInt(ctx.Query("evid"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing event id: ": err})
+		return
+	}
+	id, err := db.AddPersonToEvent(perid, evid)
+	if err != nil {
+		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to events: ": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Person added to events with id: ": id})
 }
 
 func AddPersonToEventWithSpentHandler(ctx *gin.Context) {
 	var db database.DataBase
-	perid, _ := strconv.ParseInt(ctx.Query("perid"), 10, 64)
-	evid, _ := strconv.ParseInt(ctx.Query("evid"), 10, 64)
-	spent, _ := strconv.ParseFloat(ctx.Query("perid"), 64)
-	factor, _ := strconv.Atoi(ctx.Query("evid"))
-
-	err := db.AddPersonToEventWithSpent(perid, evid, spent, factor)
+	perid, err := strconv.ParseInt(ctx.Query("personId"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing person id: ": err})
 		return
 	}
+	evid, err := strconv.ParseInt(ctx.Query("eventId"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing event id: ": err})
+		return
+	}
+	spent, err := strconv.ParseFloat(ctx.Query("spent"), 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing spent: ": err})
+		return
+	}
+	factor, err := strconv.Atoi(ctx.Query("factor"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing factor: ": err})
+		return
+	}
+
+	id, err := db.AddPersonToEventWithSpent(perid, evid, spent, factor)
+	if err != nil {
+		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database: ": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Person added to events with id: ": id})
 }
 
 func GetPersEventsHandler(ctx *gin.Context) {
 	var db database.DataBase
 	name := ctx.Query("name")
-	_, err := db.GetPersEvents(name)
+	perEv, err := db.GetPersEvents(name)
 	if err != nil {
-		//logger.Logger.Error("couldn't GET person: ", zap.Error(err))
+		ctx.JSON(http.StatusNotModified, gin.H{"Error with getting person from events: ": err})
 		return
 	}
+	ctx.JSON(http.StatusOK, perEv)
 }
 
 func UpdatePersEventsHandler(ctx *gin.Context) {
 	var db database.DataBase
-	perid, _ := strconv.ParseInt(ctx.Query("perid"), 10, 64)
-	evid, _ := strconv.ParseInt(ctx.Query("evid"), 10, 64)
-	spent, _ := strconv.ParseFloat(ctx.Query("perid"), 64)
-	factor, _ := strconv.Atoi(ctx.Query("evid"))
-
-	err := db.UpdatePersEvents(perid, evid, spent, factor)
+	perid, err := strconv.ParseInt(ctx.Query("personId"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing person id: ": err})
 		return
 	}
+	evid, err := strconv.ParseInt(ctx.Query("eventId"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing event id: ": err})
+		return
+	}
+	spent, err := strconv.ParseFloat(ctx.Query("spent"), 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing spent: ": err})
+		return
+	}
+	factor, err := strconv.Atoi(ctx.Query("factor"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing factor: ": err})
+		return
+	}
+
+	err = db.UpdatePersEvents(perid, evid, spent, factor)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update person in events: ": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Person in events updated: ": perid})
 }
 
 func DeletePersonFromEventsHandler(ctx *gin.Context) {
 	var db database.DataBase
-	id, _ := strconv.ParseInt(ctx.Query("id"), 10, 64)
-	err := db.DeletePersonFromEvents(id)
+	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
-		//logger.Logger.Error("couldn't INSERT person: ", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
 		return
 	}
+	err = db.DeletePersonFromEvents(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person in events: ": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"Person deleted from events: ": id})
 }

@@ -19,7 +19,7 @@ type DatabaseConfig struct {
 }
 
 func (cfg *DatabaseConfig) LoadConfig() {
-	confPath := flag.String("dbconfig", "./internal/database/config/", "path to config file")
+	confPath := flag.String("dbconfig", "../internal/database/config/", "path to config file")
 	flag.Parse()
 
 	viper.Reset()

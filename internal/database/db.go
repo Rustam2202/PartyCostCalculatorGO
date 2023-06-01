@@ -168,38 +168,44 @@ func (db *DataBase) DeleteEvent(id int64) error {
 	return nil
 }
 
-func (db *DataBase) AddPersonToEvent(evId, perId int64) error {
+func (db *DataBase) AddPersonToEvent(evId, perId int64) (int64, error) {
 	err := db.Open()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer db.db.Close()
 
-	_, err = db.db.Exec(`INSERT INTO pers_events (Person, Event) VALUES ($1,$2)`, evId, perId)
+	var lastInsertedId int64
+	err = db.db.QueryRow(`INSERT INTO pers_events (Person, Event) VALUES ($1,$2) RETURNING Id`,
+		evId, perId).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
-		return err
+		return 0, err
 	}
-	return nil
+	return lastInsertedId, nil
 }
 
-func (db *DataBase) AddPersonToEventWithSpent(evId, perId int64, spent float64, factor int) error {
+func (db *DataBase) AddPersonToEventWithSpent(
+	evId, perId int64, spent float64, factor int) (int64, error) {
+
 	err := db.Open()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer db.db.Close()
 
-	_, err = db.db.Exec(`
-		INSERT INTO pers_events (Person, Event, Spent, Factor) VALUES ($1, $2, $3, $4);
+	var lastInsertedId int64
+	err = db.db.QueryRow(`
+		INSERT INTO pers_events (Person, Event, Spent, Factor) 
+		VALUES ($1, $2, $3, $4) RETURNING Id;
 		UPDATE events SET Total = Total + $3 WHERE Id = $1
-		`, evId, perId, spent, factor)
+		`, evId, perId, spent, factor).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Failed to INSERT to 'pers_events' or UPDATE 'events': ",
 			zap.Error(err))
-		return err
+		return 0, err
 	}
-	return nil
+	return lastInsertedId, nil
 }
 
 func (db *DataBase) GetPersEvents(name string) (models.PersonsAndEvents, error) {

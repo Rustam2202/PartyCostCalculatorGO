@@ -16,7 +16,7 @@ type ServerConfig struct {
 }
 
 func (cfg *ServerConfig) LoadConfig() {
-	confPath := flag.String("serverconfig", "./internal/server/config", "path to config file")
+	confPath := flag.String("serverconfig", "../internal/server/config", "path to config file")
 	flag.Parse()
 
 	viper.Reset()
