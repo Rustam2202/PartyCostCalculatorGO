@@ -1,6 +1,7 @@
 package server
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,16 +11,34 @@ import (
 	"party-calc/internal/database/models"
 	"party-calc/internal/logger"
 	"party-calc/internal/person"
-	"party-calc/internal/server/config"
+	srvCfg "party-calc/internal/server/config"
+
+	//dbCfg "party-calc/internal/database/config"
 	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
+var db database.DataBase
+
 func StartServer() {
-	var cfg config.ServerConfig
-	cfg.LoadConfig()
+	var serverConfig srvCfg.ServerConfig
+	//var databaseConfig dbCfg.DatabaseConfig
+
+	srvCfgPath := flag.String("srvcfg", "./internal/server/config/", "path to server config file")
+	dbCfgPath := flag.String("dbcfg", "./internal/database/config/", "path to database config file")
+	flag.Parse()
+	
+	serverConfig.LoadConfig(*srvCfgPath)
+	db.CFG.LoadConfig(*dbCfgPath)
+
+	err := db.Open()
+	if err != nil {
+		logger.Logger.Error("Database couldn`t open:", zap.Error(err))
+		return
+	}
+	defer db.DB.Close()
 
 	router := gin.Default()
 	router.POST("/", JsonHandler)
@@ -40,7 +59,7 @@ func StartServer() {
 	router.PUT("/updatePersonInEvents", UpdatePersEventsHandler)
 	router.DELETE("/deletePersonInEvents", DeletePersonFromEventsHandler)
 
-	err := router.Run(fmt.Sprintf(":%d", cfg.Server.Port))
+	err = router.Run(fmt.Sprintf(":%d", serverConfig.Server.Port))
 	if err != nil {
 		logger.Logger.Error("Server couldn`t start:", zap.Error(err))
 		return
@@ -59,7 +78,6 @@ func JsonHandler(ctx *gin.Context) {
 }
 
 func AddPersonHandler(ctx *gin.Context) {
-	var db database.DataBase
 	var per = models.Person{}
 	name := ctx.Query("name")
 	per.Name = name
@@ -72,7 +90,6 @@ func AddPersonHandler(ctx *gin.Context) {
 }
 
 func GetPersonHandler(ctx *gin.Context) {
-	var db database.DataBase
 	name := ctx.Query("name")
 	per, err := db.GetPerson(name)
 	if err != nil {
@@ -83,7 +100,6 @@ func GetPersonHandler(ctx *gin.Context) {
 }
 
 func UpdatePersonHandler(ctx *gin.Context) {
-	var db database.DataBase
 	var per = models.Person{}
 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
@@ -101,7 +117,6 @@ func UpdatePersonHandler(ctx *gin.Context) {
 }
 
 func DeletePersonHandler(ctx *gin.Context) {
-	var db database.DataBase
 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
@@ -117,7 +132,6 @@ func DeletePersonHandler(ctx *gin.Context) {
 }
 
 func AddEventHandler(ctx *gin.Context) {
-	var db database.DataBase
 	var ev = models.Event{}
 	ev.Name = ctx.Query("name")
 	//ev.Date = ctx.GetTime("date") // ?? don't parsing
@@ -136,7 +150,6 @@ func AddEventHandler(ctx *gin.Context) {
 }
 
 func GetEventHandler(ctx *gin.Context) {
-	var db database.DataBase
 	name := ctx.Query("name")
 	ev, err := db.GetEvent(name)
 	if err != nil {
@@ -147,7 +160,6 @@ func GetEventHandler(ctx *gin.Context) {
 }
 
 func UpdateEventHandler(ctx *gin.Context) {
-	var db database.DataBase
 	var ev = models.Event{}
 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
@@ -170,7 +182,6 @@ func UpdateEventHandler(ctx *gin.Context) {
 }
 
 func DeleteEventHandler(ctx *gin.Context) {
-	var db database.DataBase
 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
@@ -185,7 +196,6 @@ func DeleteEventHandler(ctx *gin.Context) {
 }
 
 func AddPersonToEventHandler(ctx *gin.Context) {
-	var db database.DataBase
 	perid, err := strconv.ParseInt(ctx.Query("perid"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing person id: ": err})
@@ -205,7 +215,6 @@ func AddPersonToEventHandler(ctx *gin.Context) {
 }
 
 func AddPersonToEventWithSpentHandler(ctx *gin.Context) {
-	var db database.DataBase
 	perid, err := strconv.ParseInt(ctx.Query("personId"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing person id: ": err})
@@ -236,7 +245,6 @@ func AddPersonToEventWithSpentHandler(ctx *gin.Context) {
 }
 
 func GetPersEventsHandler(ctx *gin.Context) {
-	var db database.DataBase
 	name := ctx.Query("name")
 	perEv, err := db.GetPersEvents(name)
 	if err != nil {
@@ -247,7 +255,6 @@ func GetPersEventsHandler(ctx *gin.Context) {
 }
 
 func UpdatePersEventsHandler(ctx *gin.Context) {
-	var db database.DataBase
 	perid, err := strconv.ParseInt(ctx.Query("personId"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing person id: ": err})
@@ -278,7 +285,6 @@ func UpdatePersEventsHandler(ctx *gin.Context) {
 }
 
 func DeletePersonFromEventsHandler(ctx *gin.Context) {
-	var db database.DataBase
 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})

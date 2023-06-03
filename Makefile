@@ -2,7 +2,7 @@ build:
 	go build -o bin/party-calc ./cmd/main.go
 	
 run:
-	go run ./cmd/main.go -serverconfig=./internal/server/config/
+	go run ./cmd/main.go -srvcfg=./internal/server/config/ -dbcfg=./internal/database/config
 
 exe:
 	./bin/party-calc 
@@ -12,3 +12,6 @@ build-docker:
 
 run-docker:
 	docker run -p 8080:8080 party-calc
+
+compose:
+	docker-compose up

@@ -15,19 +15,19 @@ import (
 )
 
 type DataBase struct {
-	db  *sql.DB
-	cfg config.DatabaseConfig
+	DB  *sql.DB
+	CFG config.DatabaseConfig
 }
 
 func (db *DataBase) Open() error {
 	var err error
-	db.cfg.LoadConfig()
+	//db.CFG.LoadConfig()
 
 	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		db.cfg.Database.User, db.cfg.Database.Password, db.cfg.Database.Host,
-		db.cfg.Database.Port, db.cfg.Database.Dbname)
+		db.CFG.Database.User, db.CFG.Database.Password, db.CFG.Database.Host,
+		db.CFG.Database.Port, db.CFG.Database.Dbname)
 	//		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
-	db.db, err = sql.Open("postgres", psqlconn)
+	db.DB, err = sql.Open("postgres", psqlconn)
 	if err != nil {
 		logger.Logger.Error("Can't open database: ", zap.Error(err))
 		return err
@@ -36,14 +36,8 @@ func (db *DataBase) Open() error {
 }
 
 func (db *DataBase) AddPerson(per models.Person) (int64, error) {
-	err := db.Open()
-	if err != nil {
-		return 0, err
-	}
-	defer db.db.Close()
-
 	var lastInsertedId int64
-	err = db.db.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).
+	err := db.DB.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).
 		Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
@@ -53,14 +47,8 @@ func (db *DataBase) AddPerson(per models.Person) (int64, error) {
 }
 
 func (db *DataBase) GetPerson(name string) (models.Person, error) {
-	err := db.Open()
-	if err != nil {
-		return models.Person{}, err
-	}
-	defer db.db.Close()
-
 	var per models.Person
-	err = db.db.QueryRow(`SELECT * FROM persons WHERE name = $1`, name).
+	err := db.DB.QueryRow(`SELECT * FROM persons WHERE name = $1`, name).
 		Scan(&per.Id, &per.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from persons: ", zap.Error(err))
@@ -70,13 +58,7 @@ func (db *DataBase) GetPerson(name string) (models.Person, error) {
 }
 
 func (db *DataBase) UpdatePerson(id int64, per models.Person) error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
-	_, err = db.db.Exec(
+	_, err := db.DB.Exec(
 		`UPDATE persons SET name=$1 WHERE id=$2`,
 		per.Name, id)
 	if err != nil {
@@ -87,13 +69,7 @@ func (db *DataBase) UpdatePerson(id int64, per models.Person) error {
 }
 
 func (db *DataBase) DeletePerson(id int64) error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
-	_, err = db.db.Exec(`DELETE FROM persons WHERE id=$1`, id)
+	_, err := db.DB.Exec(`DELETE FROM persons WHERE id=$1`, id)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err
@@ -102,14 +78,8 @@ func (db *DataBase) DeletePerson(id int64) error {
 }
 
 func (db *DataBase) AddEvent(event models.Event) (int64, error) {
-	err := db.Open()
-	if err != nil {
-		return 0, err
-	}
-	defer db.db.Close()
-
 	var lastInsertedId int64
-	err = db.db.QueryRow(`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id;`,
+	err := db.DB.QueryRow(`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id;`,
 		event.Name, event.Date.Format("2006-01-02")).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Couldn`t execute Insert operation", zap.Error(err))
@@ -119,15 +89,9 @@ func (db *DataBase) AddEvent(event models.Event) (int64, error) {
 }
 
 func (db *DataBase) GetEvent(name string) (models.Event, error) {
-	err := db.Open()
-	if err != nil {
-		return models.Event{}, err
-	}
-	defer db.db.Close()
-
 	var ev models.Event
 	var date string
-	err = db.db.QueryRow(`SELECT * FROM events WHERE name=$1`, name).
+	err := db.DB.QueryRow(`SELECT * FROM events WHERE name=$1`, name).
 		Scan(&ev.Id, &ev.Name, &date, &ev.TotalAmount)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from events:", zap.Error(err))
@@ -138,13 +102,7 @@ func (db *DataBase) GetEvent(name string) (models.Event, error) {
 }
 
 func (db *DataBase) UpdateEvent(id int64, ev models.Event) error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
-	_, err = db.db.Exec(`UPDATE events SET name=$2, date=$3 WHERE id=$1`,
+	_, err := db.DB.Exec(`UPDATE events SET name=$2, date=$3 WHERE id=$1`,
 		id, ev.Name, ev.Date.Format("2006-01-02"))
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
@@ -154,13 +112,7 @@ func (db *DataBase) UpdateEvent(id int64, ev models.Event) error {
 }
 
 func (db *DataBase) DeleteEvent(id int64) error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
-	_, err = db.db.Exec(`DELETE FROM evenets WHERE id=$1`, id)
+	_, err := db.DB.Exec(`DELETE FROM events WHERE id=$1`, id)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err
@@ -169,14 +121,8 @@ func (db *DataBase) DeleteEvent(id int64) error {
 }
 
 func (db *DataBase) AddPersonToEvent(evId, perId int64) (int64, error) {
-	err := db.Open()
-	if err != nil {
-		return 0, err
-	}
-	defer db.db.Close()
-
 	var lastInsertedId int64
-	err = db.db.QueryRow(`INSERT INTO pers_events (Person, Event) VALUES ($1,$2) RETURNING Id`,
+	err := db.DB.QueryRow(`INSERT INTO pers_events (Person, Event) VALUES ($1,$2) RETURNING Id`,
 		evId, perId).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'pers_events' table: ", zap.Error(err))
@@ -187,15 +133,8 @@ func (db *DataBase) AddPersonToEvent(evId, perId int64) (int64, error) {
 
 func (db *DataBase) AddPersonToEventWithSpent(
 	evId, perId int64, spent float64, factor int) (int64, error) {
-
-	err := db.Open()
-	if err != nil {
-		return 0, err
-	}
-	defer db.db.Close()
-
 	var lastInsertedId int64
-	err = db.db.QueryRow(`
+	err := db.DB.QueryRow(`
 		INSERT INTO pers_events (Person, Event, Spent, Factor) 
 		VALUES ($1, $2, $3, $4) RETURNING Id;
 		UPDATE events SET Total = Total + $3 WHERE Id = $1
@@ -209,14 +148,8 @@ func (db *DataBase) AddPersonToEventWithSpent(
 }
 
 func (db *DataBase) GetPersEvents(name string) (models.PersonsAndEvents, error) {
-	err := db.Open()
-	if err != nil {
-		return models.PersonsAndEvents{}, err
-	}
-	defer db.db.Close()
-
 	var pe models.PersonsAndEvents
-	err = db.db.QueryRow(`SELECT * FROM pers_events WHERE name=$1`, name).
+	err := db.DB.QueryRow(`SELECT * FROM pers_events WHERE name=$1`, name).
 		Scan(&pe.Id, &pe.PersonId, &pe.EventId, &pe.Spent, &pe.Factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
@@ -226,14 +159,8 @@ func (db *DataBase) GetPersEvents(name string) (models.PersonsAndEvents, error) 
 }
 
 func (db *DataBase) GetPersFromEvents(id int64) (models.PersonsAndEvents, error) {
-	err := db.Open()
-	if err != nil {
-		return models.PersonsAndEvents{}, err
-	}
-	defer db.db.Close()
-
 	var pe models.PersonsAndEvents
-	err = db.db.QueryRow(`SELECT * FROM pers_events WHERE id=$1`, id).
+	err := db.DB.QueryRow(`SELECT * FROM pers_events WHERE id=$1`, id).
 		Scan(&pe.Id, &pe.PersonId, &pe.EventId, &pe.Spent, &pe.Factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
@@ -243,14 +170,8 @@ func (db *DataBase) GetPersFromEvents(id int64) (models.PersonsAndEvents, error)
 }
 
 func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float64, factor int) error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
 	per, _ := db.GetPersFromEvents(perId)
-	_, err = db.db.Exec(`
+	_, err := db.DB.Exec(`
 		UPDATE pers_events SET spent=$3, factor=$4 WHERE Event=$1, Person=$2;
 		UPDATE events SET Total=Total+$3-$5 WHERE id=$1
 		`,
@@ -263,14 +184,8 @@ func (db *DataBase) UpdatePersEvents(evId, perId int64, spent float64, factor in
 }
 
 func (db *DataBase) DeletePersonFromEvents(perId int64) error {
-	err := db.Open()
-	if err != nil {
-		return err
-	}
-	defer db.db.Close()
-
 	per, _ := db.GetPersFromEvents(perId)
-	_, err = db.db.Exec(`
+	_, err := db.DB.Exec(`
 		DELETE FROM pers_evenets WHERE Person=$1;
 		UPDATE events SET Total=Total-$2 WHERE id=$1
 	`, perId, per.Spent)

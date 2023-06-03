@@ -1,20 +1,23 @@
 version: '3'
 
 services:
-  #app:
-  #  build: .
-  #  ports:
-  #   - "8080:8080"
-  # depends_on:
-  #   - db
-
-  postgres-db:
-    build: ./
-    image: postgres:15
-    ports: -5432:5432
-    volumes: -./
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: partycalc
+  db:
+    image: postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: partycalc
-
+    ports:
+      - "5432:5432"

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"flag"
+//	"flag"
 	"party-calc/internal/logger"
 
 	"github.com/spf13/viper"
@@ -15,14 +15,14 @@ type ServerConfig struct {
 	}
 }
 
-func (cfg *ServerConfig) LoadConfig() {
-	confPath := flag.String("serverconfig", "../internal/server/config", "path to config file")
-	flag.Parse()
+func (cfg *ServerConfig) LoadConfig(path string) {
+	//confPath := flag.String("serverconfig", "../internal/server/config", "path to config file")
+	//flag.Parse()
 
 	viper.Reset()
 	viper.SetConfigType("yml")
 	viper.SetConfigName("config")
-	viper.AddConfigPath(*confPath)
+	viper.AddConfigPath(path)
 
 	err := viper.ReadInConfig()
 	if err != nil {
