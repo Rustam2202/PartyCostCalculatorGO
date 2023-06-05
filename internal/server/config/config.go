@@ -1,7 +1,6 @@
 package config
 
 import (
-//	"flag"
 	"party-calc/internal/logger"
 
 	"github.com/spf13/viper"
@@ -16,9 +15,6 @@ type ServerConfig struct {
 }
 
 func (cfg *ServerConfig) LoadConfig(path string) {
-	//confPath := flag.String("serverconfig", "../internal/server/config", "path to config file")
-	//flag.Parse()
-
 	viper.Reset()
 	viper.SetConfigType("yml")
 	viper.SetConfigName("config")

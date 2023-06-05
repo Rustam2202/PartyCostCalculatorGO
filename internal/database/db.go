@@ -19,14 +19,13 @@ type DataBase struct {
 	CFG config.DatabaseConfig
 }
 
-func (db *DataBase) Open() error {
+func (db *DataBase) Open(dbCfg config.DatabaseConfig) error {
 	var err error
-	//db.CFG.LoadConfig()
 
 	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		db.CFG.Database.User, db.CFG.Database.Password, db.CFG.Database.Host,
-		db.CFG.Database.Port, db.CFG.Database.Dbname)
-	//		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
+		dbCfg.Database.User, dbCfg.Database.Password, dbCfg.Database.Host,
+		dbCfg.Database.Port, dbCfg.Database.Dbname)
+
 	db.DB, err = sql.Open("postgres", psqlconn)
 	if err != nil {
 		logger.Logger.Error("Can't open database: ", zap.Error(err))

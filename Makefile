@@ -5,7 +5,7 @@ run:
 	go run ./cmd/main.go -srvcfg=./internal/server/config/ -dbcfg=./internal/database/config
 
 exe:
-	./bin/party-calc 
+	./bin/party-calc -srvcfg=./internal/server/config/ -dbcfg=./internal/database/config
 
 build-docker:
 	docker build --tag party-calc .

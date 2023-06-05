@@ -4,7 +4,7 @@ import (
 	"math"
 	"sort"
 
-	"party-calc/internal/config"
+	//"party-calc/internal/config"
 	"party-calc/internal/person"
 )
 
@@ -48,11 +48,11 @@ func CalculateDebts(input person.Persons) PartyData {
 		}
 
 		if absLeftBalance >= right.Balance {
-			if absLeftBalance < config.Cfg.RoundRate {
-				left.Balance = 0
-				i++
-				continue
-			}
+			// if absLeftBalance < config.Config.RoundRate {
+			// 	left.Balance = 0
+			// 	i++
+			// 	continue
+			// }
 			if right.Owe == nil {
 				right.Owe = make(map[string]float64)
 			}
@@ -66,9 +66,9 @@ func CalculateDebts(input person.Persons) PartyData {
 			}
 			right.Owe[left.Name] = absLeftBalance
 			right.Balance -= absLeftBalance
-			if right.Balance < config.Cfg.RoundRate {
-				right.Balance = 0
-			}
+			// if right.Balance < config.Cfg.RoundRate {
+			// 	right.Balance = 0
+			// }
 			left.Balance = 0
 			i++
 		}
@@ -91,74 +91,3 @@ func (data *PartyData) CalculateBalances() {
 		data.Persons[i].Balance = data.AverageAmount*float64(data.Persons[i].Factor) - float64(data.Persons[i].Spent)
 	}
 }
-
-/*
-func (data *PartyData) ShowPayments() {
-	fmt.Println(data.PrintSpents())
-	fmt.Println(data.PrintPayments())
-}
-
-func (data *PartyData) PrintToFile(fileName string) {
-	file, err := os.Create(fileName)
-	if err != nil {
-		logger.Logger.Error("Problem with creating file")
-		panic(nil)
-	}
-	fmt.Fprintln(file, data.PrintSpents())
-	fmt.Fprintln(file, data.PrintPayments())
-}
-
-func (data *PartyData) PrintSpents() string {
-	var result string
-	switch config.Cfg.Language {
-	case language.ENG:
-		result += "   Participants:\n"
-	case language.RUS:
-		result += "   Участники:\n"
-	}
-
-	for _, p := range data.Persons {
-		switch config.Cfg.Language {
-		case language.ENG:
-			result += fmt.Sprintf("%s (x%d) spent: %d\n", p.Name, p.Participants, p.Spent)
-		case language.RUS:
-			result += fmt.Sprintf("%s (x%d) потрачено: %d\n", p.Name, p.Participants, p.Spent)
-		}
-	}
-
-	return result
-}
-
-func (data *PartyData) PrintPayments() string {
-	var result string
-	switch config.Cfg.Language {
-	case language.ENG:
-		result += "   Payments:\n"
-	case language.RUS:
-		result += "   Выплаты:\n"
-	}
-
-	for _, p := range data.Persons {
-		if len(p.IndeptedTo) > 0 {
-			switch config.Cfg.Language {
-			case language.ENG:
-				result += fmt.Sprintf("%s owes to:\n", p.Name)
-			case language.RUS:
-				result += fmt.Sprintf("%s выплачивает:\n", p.Name)
-			}
-
-			for name, debt := range p.IndeptedTo {
-				result += fmt.Sprintf("  %s %.f\n", name, debt) // .f - format output of integer and decimal
-			}
-		}
-	}
-
-	switch config.Cfg.Language {
-	case language.ENG:
-		result += fmt.Sprintf("\nAverage to person: %0.1f\n", data.AverageAmount)
-	case language.RUS:
-		result += fmt.Sprintf("\nСреднее на человека: %0.1f\n", data.AverageAmount)
-	}
-	return result
-}
-*/

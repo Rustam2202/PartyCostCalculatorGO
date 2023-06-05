@@ -1,19 +1,16 @@
 package server
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
+	"party-calc/internal/config"
 	"party-calc/internal/database"
 	"party-calc/internal/database/models"
 	"party-calc/internal/logger"
 	"party-calc/internal/person"
-	srvCfg "party-calc/internal/server/config"
-
-	//dbCfg "party-calc/internal/database/config"
 	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -23,17 +20,9 @@ import (
 var db database.DataBase
 
 func StartServer() {
-	var serverConfig srvCfg.ServerConfig
-	//var databaseConfig dbCfg.DatabaseConfig
+	cfg := config.LoadConfig()
 
-	srvCfgPath := flag.String("srvcfg", "./internal/server/config/", "path to server config file")
-	dbCfgPath := flag.String("dbcfg", "./internal/database/config/", "path to database config file")
-	flag.Parse()
-	
-	serverConfig.LoadConfig(*srvCfgPath)
-	db.CFG.LoadConfig(*dbCfgPath)
-
-	err := db.Open()
+	err := db.Open(cfg.DatabaseCobfig)
 	if err != nil {
 		logger.Logger.Error("Database couldn`t open:", zap.Error(err))
 		return
@@ -59,7 +48,7 @@ func StartServer() {
 	router.PUT("/updatePersonInEvents", UpdatePersEventsHandler)
 	router.DELETE("/deletePersonInEvents", DeletePersonFromEventsHandler)
 
-	err = router.Run(fmt.Sprintf(":%d", serverConfig.Server.Port))
+	err = router.Run(fmt.Sprintf("%s:%d", cfg.ServerConfig.Server.Host, cfg.ServerConfig.Server.Port))
 	if err != nil {
 		logger.Logger.Error("Server couldn`t start:", zap.Error(err))
 		return
