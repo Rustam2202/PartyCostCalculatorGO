@@ -1,12 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	"party-calc/internal/config"
 	"party-calc/internal/database"
 	"party-calc/internal/database/models"
 	"party-calc/internal/logger"
@@ -14,20 +12,19 @@ import (
 	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 var db database.DataBase
 
 func StartServer() {
-	cfg := config.LoadConfig()
+	// cfg := LoadConfig()
 
-	err := db.Open(cfg.DatabaseCobfig)
-	if err != nil {
-		logger.Logger.Error("Database couldn`t open:", zap.Error(err))
-		return
-	}
-	defer db.DB.Close()
+	// err := db.Open(cfg.DatabaseConfig)
+	// if err != nil {
+	// 	logger.Logger.Error("Database couldn`t open:", zap.Error(err))
+	// 	return
+	// }
+	// defer db.DB.Close()
 
 	router := gin.Default()
 	router.POST("/", JsonHandler)
@@ -48,11 +45,11 @@ func StartServer() {
 	router.PUT("/updatePersonInEvents", UpdatePersEventsHandler)
 	router.DELETE("/deletePersonInEvents", DeletePersonFromEventsHandler)
 
-	err = router.Run(fmt.Sprintf("%s:%d", cfg.ServerConfig.Server.Host, cfg.ServerConfig.Server.Port))
-	if err != nil {
-		logger.Logger.Error("Server couldn`t start:", zap.Error(err))
-		return
-	}
+	// err := router.Run(fmt.Sprintf("%s:%d", cfg.ServerConfig.Host, cfg.ServerConfig.Port))
+	// if err != nil {
+	// 	logger.Logger.Error("Server couldn`t start:", zap.Error(err))
+	// 	return
+	// }
 }
 
 func JsonHandler(ctx *gin.Context) {

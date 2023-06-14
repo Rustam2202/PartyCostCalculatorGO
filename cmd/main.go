@@ -1,13 +1,15 @@
 package main
 
 import (
-//	"party-calc/internal/config"
+	"fmt"
+	"party-calc/internal/config"
 	"party-calc/internal/logger"
 	"party-calc/internal/server"
 )
 
 func main() {
 	logger.IntializeLogger()
-//	config.LoadConfig()
+	cfg := config.LoadConfig()
+	fmt.Println(cfg)
 	server.StartServer()
 }

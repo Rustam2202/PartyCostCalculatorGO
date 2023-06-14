@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"party-calc/internal/database/config"
 	"party-calc/internal/database/models"
 
 	"party-calc/internal/logger"
@@ -16,15 +15,14 @@ import (
 
 type DataBase struct {
 	DB  *sql.DB
-	CFG config.DatabaseConfig
+	CFG DatabaseConfig
 }
 
-func (db *DataBase) Open(dbCfg config.DatabaseConfig) error {
+func (db *DataBase) Open(dbCfg DatabaseConfig) error {
 	var err error
 
-	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		dbCfg.Database.User, dbCfg.Database.Password, dbCfg.Database.Host,
-		dbCfg.Database.Port, dbCfg.Database.Dbname)
+	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable") //dbCfg.Database.User, dbCfg.Database.Password, dbCfg.Database.Host,
+	//	dbCfg.Database.Port, dbCfg.Database.Dbname
 
 	db.DB, err = sql.Open("postgres", psqlconn)
 	if err != nil {

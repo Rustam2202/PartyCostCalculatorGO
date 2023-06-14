@@ -2,10 +2,10 @@ build:
 	go build -o bin/party-calc ./cmd/main.go
 	
 run:
-	go run ./cmd/main.go -srvcfg=./internal/server/config/ -dbcfg=./internal/database/config
+	go run ./cmd/main.go 
 
 exe:
-	./bin/party-calc -srvcfg=./internal/server/config/ -dbcfg=./internal/database/config
+	./bin/party-calc
 
 build-docker:
 	docker build --tag party-calc .
