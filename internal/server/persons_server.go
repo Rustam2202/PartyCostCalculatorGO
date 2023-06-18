@@ -9,11 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct {
-	service service.PersonService
+type PersonHandler struct {
+	service *service.PersonService
 }
 
-func (h *Handler) Add(ctx *gin.Context) {
+func NewPersonHandler(s *service.PersonService) *PersonHandler {
+	return &PersonHandler{service: s}
+}
+
+func (h *PersonHandler) Add(ctx *gin.Context) {
 	name := ctx.Query("name")
 	id, err := h.service.NewPerson(name)
 	if err != nil {

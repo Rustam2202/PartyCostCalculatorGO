@@ -18,6 +18,17 @@ type DataBase struct {
 	CFG DatabaseConfig
 }
 
+func New(cfg DatabaseConfig) *DataBase {
+	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
+	db, err := sql.Open("postgres", psqlconn)
+	if err != nil {
+		logger.Logger.Error("Can't open database: ", zap.Error(err))
+		return nil
+	}
+	return &DataBase{DB: db}
+}
+
 func (db *DataBase) Open(dbCfg DatabaseConfig) error {
 	var err error
 

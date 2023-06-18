@@ -9,6 +9,10 @@ type PersonService struct {
 	repo *database.PersonRepository
 }
 
+func NewPersonService(r *database.PersonRepository) *PersonService {
+	return &PersonService{repo: r}
+}
+
 func (p *PersonService) NewPerson(name string) (int64, error) {
 	id, err := p.repo.Create(&models.Person{Name: name})
 	if err != nil {
