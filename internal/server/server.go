@@ -16,7 +16,11 @@ import (
 
 var db database.DataBase
 
-func StartServer() {
+type Server struct {
+	personHandler Handler
+}
+
+func (s *Server) StartServer() {
 	// cfg := LoadConfig()
 
 	// err := db.Open(cfg.DatabaseConfig)
@@ -28,11 +32,10 @@ func StartServer() {
 
 	router := gin.Default()
 	router.POST("/", JsonHandler)
-
-	router.POST("/addPerson", AddPersonHandler)
-	router.GET("/getPerson", GetPersonHandler)
-	router.PUT("/updatePerson", UpdatePersonHandler)
-	router.DELETE("/deletPerson", DeletePersonHandler)
+	router.POST("/person", s.personHandler.Add)
+	router.GET("/person", GetPersonHandler)
+	router.PUT("/person", UpdatePersonHandler)
+	router.DELETE("/person", DeletePersonHandler)
 
 	router.POST("/addEvent", AddEventHandler)
 	router.GET("/getEvent", GetEventHandler)
@@ -63,59 +66,59 @@ func JsonHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-func AddPersonHandler(ctx *gin.Context) {
-	var per = models.Person{}
-	name := ctx.Query("name")
-	per.Name = name
-	id, err := db.AddPerson(per)
-	if err != nil {
-		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database:": err})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"Person added with id:": id})
-}
+// func AddPersonHandler(ctx *gin.Context) {
+// 	var per = models.Person{}
+// 	name := ctx.Query("name")
+// 	per.Name = name
+// 	id, err := db.AddPerson(per)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database:": err})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, gin.H{"Person added with id:": id})
+// }
 
-func GetPersonHandler(ctx *gin.Context) {
-	name := ctx.Query("name")
-	per, err := db.GetPerson(name)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database:": err})
-		return
-	}
-	ctx.JSON(http.StatusOK, per)
-}
+// func GetPersonHandler(ctx *gin.Context) {
+// 	name := ctx.Query("name")
+// 	per, err := db.GetPerson(name)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database:": err})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, per)
+// }
 
-func UpdatePersonHandler(ctx *gin.Context) {
-	var per = models.Person{}
-	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
-		return
-	}
-	// id := ctx.GetInt64("id") // ?? returns 0
-	per.Name = ctx.Query("name")
-	err = db.UpdatePerson(id, per)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update person in database:": err})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"Person updated:": id})
-}
+// func UpdatePersonHandler(ctx *gin.Context) {
+// 	var per = models.Person{}
+// 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
+// 		return
+// 	}
+// 	// id := ctx.GetInt64("id") // ?? returns 0
+// 	per.Name = ctx.Query("name")
+// 	err = db.UpdatePerson(id, per)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update person in database:": err})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, gin.H{"Person updated:": id})
+// }
 
-func DeletePersonHandler(ctx *gin.Context) {
-	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
-		return
-	}
-	//id := ctx.GetInt64("id") // ?? returns 0
-	err = db.DeletePerson(id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person from database:": err})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"Person deleted:": id})
-}
+// func DeletePersonHandler(ctx *gin.Context) {
+// 	id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing id:": err})
+// 		return
+// 	}
+// 	//id := ctx.GetInt64("id") // ?? returns 0
+// 	err = db.DeletePerson(id)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person from database:": err})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, gin.H{"Person deleted:": id})
+// }
 
 func AddEventHandler(ctx *gin.Context) {
 	var ev = models.Event{}
