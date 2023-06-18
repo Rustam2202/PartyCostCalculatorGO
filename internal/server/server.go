@@ -23,7 +23,7 @@ type Server struct {
 }
 
 func NewServer(cfg ServerConfig) *Server {
-	
+
 }
 
 func (s *Server) Start() {

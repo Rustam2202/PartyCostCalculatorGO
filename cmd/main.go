@@ -18,6 +18,6 @@ func main() {
 	personService := service.NewPersonService(personRepo)
 	personHandler := server.NewPersonHandler(personService)
 
-	srv := server.NewServer(cfg.ServerConfig, personHandler)
+	srv := server.NewServer(cfg.ServerConfig)
 	srv.Start()
 }

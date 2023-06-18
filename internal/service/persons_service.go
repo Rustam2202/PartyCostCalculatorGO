@@ -1,15 +1,15 @@
 package service
 
 import (
-	"party-calc/internal/database"
 	"party-calc/internal/database/models"
+	"party-calc/internal/database/repository"
 )
 
 type PersonService struct {
-	repo *database.PersonRepository
+	repo *repository.PersonRepository
 }
 
-func NewPersonService(r *database.PersonRepository) *PersonService {
+func NewPersonService(r *repository.PersonRepository) *PersonService {
 	return &PersonService{repo: r}
 }
 

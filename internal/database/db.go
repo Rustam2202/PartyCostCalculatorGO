@@ -31,10 +31,8 @@ func New(cfg DatabaseConfig) *DataBase {
 
 func (db *DataBase) Open(dbCfg DatabaseConfig) error {
 	var err error
-
 	psqlconn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable") //dbCfg.Database.User, dbCfg.Database.Password, dbCfg.Database.Host,
 	//	dbCfg.Database.Port, dbCfg.Database.Dbname
-
 	db.DB, err = sql.Open("postgres", psqlconn)
 	if err != nil {
 		logger.Logger.Error("Can't open database: ", zap.Error(err))
