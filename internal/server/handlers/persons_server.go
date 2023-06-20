@@ -27,9 +27,9 @@ func (h *PersonHandler) Add(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"Person added with id:": id})
 }
 
-func GetPersonHandler(ctx *gin.Context) {
+func (h *PersonHandler)GetPersonHandler(ctx *gin.Context) {
 	name := ctx.Query("name")
-	per, err := db.GetPerson(name)
+	per, err := h.service.(name)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database:": err})
 		return

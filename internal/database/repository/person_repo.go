@@ -38,10 +38,10 @@ func (r *PersonRepository) Get(p *models.Person) (models.Person, error) {
 	return per, nil
 }
 
-func (r *PersonRepository) Update(p *models.Person) error {
+func (r *PersonRepository) Update(perOld, perNew *models.Person) error {
 	_, err := r.db.DB.Exec(
-		`UPDATE persons SET name = $1 WHERE id = $2`,
-		p.Name, p.Id)
+		`UPDATE persons SET name=$1 WHERE id=$2`,
+		perNew.Name, perOld.Id)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -50,7 +50,7 @@ func (r *PersonRepository) Update(p *models.Person) error {
 }
 
 func (r *PersonRepository) Delete(p *models.Person) error {
-	_, err := r.db.DB.Exec(`DELETE FROM persons WHERE name = $1`, p.Name)
+	_, err := r.db.DB.Exec(`DELETE FROM persons WHERE name=$1`, p.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err

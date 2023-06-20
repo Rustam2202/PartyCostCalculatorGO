@@ -9,14 +9,20 @@ import (
 )
 
 type PersEventsRepository struct {
-	db *database.DataBase
+	db         *database.DataBase
+	PersRepo   *PersonRepository
+	EventsRepo *EventRepository
 }
 
-func NewPersEventsRepository(db *database.DataBase) *PersEventsRepository {
-	return &PersEventsRepository{db: db}
+func NewPersEventsRepository(db *database.DataBase, pr *PersonRepository, evr *EventRepository) *PersEventsRepository {
+	return &PersEventsRepository{
+		db:         db,
+		PersRepo:   pr,
+		EventsRepo: evr,
+	}
 }
 
-func (r *PersEventsRepository) Add(pe *models.PersonsAndEvents) (int64, error) {
+func (r *PersEventsRepository) Create(pe *models.PersonsAndEvents) (int64, error) {
 	var lastInsertedId int64
 	err := r.db.DB.QueryRow(`
 		INSERT INTO pers_events (Person, Event, Spent, Factor) 
@@ -31,35 +37,28 @@ func (r *PersEventsRepository) Add(pe *models.PersonsAndEvents) (int64, error) {
 	return lastInsertedId, nil
 }
 
-func (r *PersEventsRepository) Get(perName string) (models.PersonsAndEvents, error) {
-	var pe models.PersonsAndEvents
-	err := r.db.DB.QueryRow(`SELECT * FROM pers_events WHERE Person = $1`, perName).
-		Scan(&pe.Id, &pe.PersonId, &pe.EventId, &pe.Spent, &pe.Factor)
+func (r *PersEventsRepository) Get(pe *models.PersonsAndEvents) (models.PersonsAndEvents, error) {
+	var result models.PersonsAndEvents
+	err := r.db.DB.QueryRow(`SELECT * FROM pers_events WHERE Person = $1`, pe.PersonId).
+		Scan(&result.Id, &result.PersonId, &result.EventId, &result.Spent, &result.Factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
 		return models.PersonsAndEvents{}, err
 	}
-	return pe, nil
+	return result, nil
 }
 
-func (r *PersEventsRepository) GetPersFromEvents(id int64) (models.PersonsAndEvents, error) {
-	var pe models.PersonsAndEvents
-	err := r.db.DB.QueryRow(`SELECT * FROM pers_events WHERE id=$1`, id).
-		Scan(&pe.Id, &pe.PersonId, &pe.EventId, &pe.Spent, &pe.Factor)
+func (r *PersEventsRepository) Update(oldData, NewData *models.PersonsAndEvents) error {
+	old, err := r.Get(oldData)
 	if err != nil {
-		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
-		return models.PersonsAndEvents{}, err
+		//logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
+		return err
 	}
-	return pe, nil
-}
-
-func (r*PersEventsRepository) UpdatePersEvents(evId, perId int64, spent float64, factor int) error {
-	per, _ := r.GetPersFromEvents(perId)
-	_, err := r.db.DB.Exec(`
+	_, err = r.db.DB.Exec(`
 		UPDATE pers_events SET spent=$3, factor=$4 WHERE Event=$1, Person=$2;
-		UPDATE events SET Total=Total+$3-$5 WHERE id=$1
-		`,
-		evId, perId, spent, factor, per.Spent)
+		UPDATE events SET Total=Total+$3-$5 WHERE id=$1`,
+		oldData.Id, oldData.PersonId, NewData.Spent, NewData.Factor, old.Spent,
+	)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -67,12 +66,12 @@ func (r*PersEventsRepository) UpdatePersEvents(evId, perId int64, spent float64,
 	return nil
 }
 
-func (r*PersEventsRepository) Delete(perId int64) error {
-	per, _ := r.db.GetPersFromEvents(perId)
+func (r *PersEventsRepository) Delete(perEv *models.PersonsAndEvents) error {
+	//	per, _ := r.db.GetPersFromEvents(perId)
 	_, err := r.db.DB.Exec(`
 		DELETE FROM pers_evenets WHERE Person=$1;
-		UPDATE events SET Total=Total-$2 WHERE id=$1
-	`, perId, per.Spent)
+		UPDATE events SET Total=Total-$2 WHERE id=$1`,
+		perEv.Id, perEv.Spent)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err

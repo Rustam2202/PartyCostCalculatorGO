@@ -17,10 +17,10 @@ func NewEventRepository(db *database.DataBase) *EventRepository {
 	return &EventRepository{db: db}
 }
 
-func (r *EventRepository) Add(event models.Event) (int64, error) {
+func (r *EventRepository) Add(ev *models.Event) (int64, error) {
 	var lastInsertedId int64
 	err := r.db.DB.QueryRow(`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id;`,
-		event.Name, event.Date.Format("2006-01-02")).Scan(&lastInsertedId)
+		ev.Name, ev.Date.Format("2006-01-02")).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Couldn`t execute Insert operation", zap.Error(err))
 		return 0, err
@@ -28,22 +28,22 @@ func (r *EventRepository) Add(event models.Event) (int64, error) {
 	return lastInsertedId, nil
 }
 
-func (r *EventRepository) Get(name string) (models.Event, error) {
-	var ev models.Event
+func (r *EventRepository) Get(ev *models.Event) (models.Event, error) {
+	var result models.Event
 	var date string
-	err := r.db.DB.QueryRow(`SELECT * FROM events WHERE name=$1`, name).
-		Scan(&ev.Id, &ev.Name, &date, &ev.TotalAmount)
+	err := r.db.DB.QueryRow(`SELECT * FROM events WHERE name=$1`, ev.Name).
+		Scan(&result.Id, &result.Name, &date, &result.TotalAmount)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from events:", zap.Error(err))
 		return models.Event{}, err
 	}
-	ev.Date, _ = time.Parse("2006-01-02", date)
-	return ev, nil
+	result.Date, _ = time.Parse("2006-01-02", date)
+	return result, nil
 }
 
-func (r *EventRepository) Update(id int64, ev models.Event) error {
+func (r *EventRepository) Update(evOld, evNew *models.Event) error {
 	_, err := r.db.DB.Exec(`UPDATE events SET name=$2, date=$3 WHERE id=$1`,
-		id, ev.Name, ev.Date.Format("2006-01-02"))
+		evOld.Id, evNew.Name, evNew.Date.Format("2006-01-02"))
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -51,8 +51,8 @@ func (r *EventRepository) Update(id int64, ev models.Event) error {
 	return nil
 }
 
-func (r *EventRepository) Delete(id int64) error {
-	_, err := r.db.DB.Exec(`DELETE FROM events WHERE id=$1`, id)
+func (r *EventRepository) Delete(ev *models.Event) error {
+	_, err := r.db.DB.Exec(`DELETE FROM events WHERE name=$1`, ev.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err
