@@ -21,20 +21,20 @@ func (p *PersonService) NewPerson(name string) (int64, error) {
 	return id, nil
 }
 
-func (p *PersonService) GetPerson(name string) (models.Person, error) {
+func (p *PersonService) GetPerson(name string) (PersonData, error) {
 	per, err := p.repo.Get(&models.Person{Name: name})
 	if err != nil {
-		return models.Person{}, err
+		return PersonData{}, err
 	}
-	return per, nil
+	return PersonData{Id: per.Id, Name: per.Name}, nil
 }
 
 func (p *PersonService) UpdatePerson(name, newName string) error {
-	perOld, err := p.GetPerson(name)
+	per, err := p.GetPerson(name)
 	if err != nil {
 		return err
 	}
-	err = p.repo.Update(&perOld, &models.Person{Name: newName})
+	err = p.repo.Update(&models.Person{Id: per.Id, Name: per.Name}, &models.Person{Name: newName})
 	if err != nil {
 		return err
 	}

@@ -19,7 +19,7 @@ func NewEventRepository(db *database.DataBase) *EventRepository {
 
 func (r *EventRepository) Add(ev *models.Event) (int64, error) {
 	var lastInsertedId int64
-	err := r.db.DB.QueryRow(`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id;`,
+	err := r.db.DB.QueryRow(`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id`,
 		ev.Name, ev.Date.Format("2006-01-02")).Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Couldn`t execute Insert operation", zap.Error(err))

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"party-calc/internal/database"
 	"party-calc/internal/database/models"
 	"party-calc/internal/logger"
@@ -37,10 +39,15 @@ func (r *PersEventsRepository) Create(pe *models.PersonsAndEvents) (int64, error
 	return lastInsertedId, nil
 }
 
-func (r *PersEventsRepository) Get(pe *models.PersonsAndEvents) (models.PersonsAndEvents, error) {
+func (r *PersEventsRepository) GetPerson(pe *models.PersonsAndEvents) (models.PersonsAndEvents, error) {
+	var row *sql.Row
+	if pe.PersonId != 0 {
+		row = r.db.DB.QueryRow(`SELECT * FROM pers_events WHERE Person = $1`, pe.EventId)
+	} else {
+		return models.PersonsAndEvents{}, errors.New("incorrect input, 'Person Id' mustn't be zero")
+	}
 	var result models.PersonsAndEvents
-	err := r.db.DB.QueryRow(`SELECT * FROM pers_events WHERE Person = $1`, pe.PersonId).
-		Scan(&result.Id, &result.PersonId, &result.EventId, &result.Spent, &result.Factor)
+	err := row.Scan(&result.Id, &result.PersonId, &result.EventId, &result.Spent, &result.Factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
 		return models.PersonsAndEvents{}, err
@@ -48,8 +55,32 @@ func (r *PersEventsRepository) Get(pe *models.PersonsAndEvents) (models.PersonsA
 	return result, nil
 }
 
+func (r *PersEventsRepository) GetEvent(pe *models.PersonsAndEvents) ([]models.PersonsAndEvents, error) {
+	var rows *sql.Rows
+	var err error
+	if pe.EventId != 0 {
+		rows, err = r.db.DB.Query(`SELECT * FROM pers_events WHERE Event = $1`, pe.PersonId)
+		if err != nil {
+			logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
+			return nil, err
+		}
+	} else {
+		return nil, errors.New("incorrect input, 'Event Id' mustn't be zero")
+	}
+	var result []models.PersonsAndEvents
+	for rows.Next() {
+		var perEv models.PersonsAndEvents
+		err = rows.Scan(perEv.Id, perEv.PersonId, perEv.EventId, perEv.Spent, perEv.Factor)
+		if err != nil {
+			logger.Logger.Error("Failed to Scan data from pers_events:", zap.Error(err))
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
 func (r *PersEventsRepository) Update(oldData, NewData *models.PersonsAndEvents) error {
-	old, err := r.Get(oldData)
+	old, err := r.GetPerson(oldData)
 	if err != nil {
 		//logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
 		return err
@@ -67,7 +98,6 @@ func (r *PersEventsRepository) Update(oldData, NewData *models.PersonsAndEvents)
 }
 
 func (r *PersEventsRepository) Delete(perEv *models.PersonsAndEvents) error {
-	//	per, _ := r.db.GetPersFromEvents(perId)
 	_, err := r.db.DB.Exec(`
 		DELETE FROM pers_evenets WHERE Person=$1;
 		UPDATE events SET Total=Total-$2 WHERE id=$1`,
