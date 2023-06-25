@@ -1,8 +1,9 @@
-package repository
+package tests
 
 import (
 	"party-calc/internal/database"
 	"party-calc/internal/database/models"
+	"party-calc/internal/database/repository"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -15,7 +16,7 @@ func TestCreate(t *testing.T) {
 	}
 	defer db.Close()
 
-	repo := PersonRepository{db: &database.DataBase{DB: db}}
+	repo := repository.PersonRepository{Db: &database.DataBase{DB: db}}
 
 	name := "Person 1"
 	mock.ExpectQuery(`INSERT INTO persons (.+)`).WithArgs(name).WillReturnRows(sqlmock.NewRows([]string{"Id"}).AddRow(1))
@@ -41,7 +42,7 @@ func TestGet(t *testing.T) {
 	}
 	defer db.Close()
 
-	repo := PersonRepository{db: &database.DataBase{DB: db}}
+	repo := repository.PersonRepository{Db: &database.DataBase{DB: db}}
 
 	rows := sqlmock.NewRows([]string{"id", "name"}).AddRow(1, "Person 1").AddRow(2, "Person 2")
 	mock.ExpectQuery(`SELECT (.+) FROM persons WHERE name = (.+)`).WithArgs("Person 1").WillReturnRows(rows)
@@ -73,53 +74,52 @@ func TestGet(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-    db, mock, err := sqlmock.New()
-    if err != nil {
-        t.Fatalf("failed to create mock database: %v", err)
-    }
-    defer db.Close()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to create mock database: %v", err)
+	}
+	defer db.Close()
 
-    repo := PersonRepository{db: &database.DataBase{DB: db}}
+	repo := repository.PersonRepository{Db: &database.DataBase{DB: db}}
 
-    mock.ExpectExec("UPDATE persons SET name=(.+) WHERE id=(.+)").
-        WithArgs("Person 2", 1).
-        WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec("UPDATE persons SET name=(.+) WHERE id=(.+)").
+		WithArgs("Person 2", 1).
+		WillReturnResult(sqlmock.NewResult(0, 1))
 
-    perOld := models.Person{Id: 1, Name: "Person 1"}
-    perNew := models.Person{Id: 1, Name: "Person 2"}
-    err = repo.Update(&perOld, &perNew)
+	perOld := models.Person{Id: 1, Name: "Person 1"}
+	perNew := models.Person{Id: 1, Name: "Person 2"}
+	err = repo.Update(&perOld, &perNew)
 
-    if err != nil {
-        t.Errorf("Update returned an error: %v", err)
-    }
+	if err != nil {
+		t.Errorf("Update returned an error: %v", err)
+	}
 
-    if err := mock.ExpectationsWereMet(); err != nil {
-        t.Errorf("there were unfulfilled expectations: %v", err)
-    }
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %v", err)
+	}
 }
 
 func TestDelete(t *testing.T) {
-    db, mock, err := sqlmock.New()
-    if err != nil {
-        t.Fatalf("failed to create mock database: %v", err)
-    }
-    defer db.Close()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("failed to create mock database: %v", err)
+	}
+	defer db.Close()
 
-    repo := PersonRepository{db: &database.DataBase{DB: db}}
+	repo := repository.PersonRepository{Db: &database.DataBase{DB: db}}
 
-    mock.ExpectExec("DELETE FROM persons WHERE name=(.+)").
-        WithArgs("Person 1").
-        WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec("DELETE FROM persons WHERE name=(.+)").
+		WithArgs("Person 1").
+		WillReturnResult(sqlmock.NewResult(0, 1))
 
-    per := models.Person{Name: "Person 1"}
-    err = repo.Delete(&per)
+	per := models.Person{Name: "Person 1"}
+	err = repo.Delete(&per)
 
-    if err != nil {
-        t.Errorf("Delete returned an error: %v", err)
-    }
+	if err != nil {
+		t.Errorf("Delete returned an error: %v", err)
+	}
 
-    if err := mock.ExpectationsWereMet(); err != nil {
-        t.Errorf("there were unfulfilled expectations: %v", err)
-    }
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %v", err)
+	}
 }
-

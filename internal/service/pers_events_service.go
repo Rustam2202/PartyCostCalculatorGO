@@ -54,12 +54,12 @@ func (p *PersEventsService) GetPerson(perName string) (PersonData, error) {
 
 func (p *PersEventsService) GetPersonsByEvent(eventId int64) (EventData, error) {
 	// persEvents by Event-Id
-	persEvSlice, err := p.repo.GetEvent(&models.PersonsAndEvents{Id: eventId})
+	persEvSlice, err := p.repo.GetEvent(&models.PersonsAndEvents{EventId: eventId})
 	if err != nil {
 		return EventData{}, err
 	}
 	var result EventData
-	// get event Name and Data 
+	// get event Name and Data
 	if len(persEvSlice) != 0 {
 		ev, err := p.repo.EventsRepo.Get(&models.Event{Id: persEvSlice[0].EventId})
 		if err != nil {
@@ -77,13 +77,14 @@ func (p *PersEventsService) GetPersonsByEvent(eventId int64) (EventData, error) 
 			return EventData{}, err
 		}
 		pd := PersonData{
-			Id:   per.Id,
-			Name: per.Name,
+			Id:    per.Id,
+			Name:  per.Name,
 			Spent: pe.Spent,
+			Factor: pe.Factor,
 			//Owe:  map[string]float32{},
 		}
-		// add other fields of EventData 
-		result.Owes = append(result.Owes, pd)
+		// add other fields of EventData
+		result.Persons = append(result.Persons, pd)
 		result.AllPersonsCount += pe.Factor
 		result.TotalAmount += pe.Spent
 	}

@@ -38,15 +38,6 @@ func NewServer(
 }
 
 func (s *Server) Start() {
-
-	// cfg := LoadConfig()
-	// err := db.Open(cfg.DatabaseConfig)
-	// if err != nil {
-	// 	logger.Logger.Error("Database couldn`t open:", zap.Error(err))
-	// 	return
-	// }
-	// defer db.DB.Close()
-
 	router := gin.Default()
 	router.POST("/", JsonHandler)
 	router.POST("/person", s.personHandler.Add)

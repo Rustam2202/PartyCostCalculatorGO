@@ -8,103 +8,121 @@ import (
 )
 
 type PersonData struct {
-	Id    int64
-	Name  string
-	Spent float64
-	Owe   map[string]float64
+	Id     int64
+	Name   string
+	Spent  float64
+	Factor int
+	Owe    map[string]float64
 }
 
 type PersonBalance struct {
-	Person  *PersonData
+	Person *PersonData
+	//Person  string
 	Balance float64
 }
 
 type EventData struct {
-	Name            string
-	Date            time.Time
-	Owes            []PersonData
+	Name    string
+	Date    time.Time
+	Persons []PersonData
+	//Owes map[string]float64
 	AllPersonsCount int
 	AverageAmount   float64
 	TotalAmount     float64
 }
 
 type CalcService struct {
-	repo    *repository.PersEventsRepository
-	service *PersEventsService
-	//data    *EventData
+	repo     *repository.PersEventsRepository
+	service  *PersEventsService
+	data     *EventData
+	balances []PersonBalance
 }
 
 func NewCalcService(r *repository.PersEventsRepository, s *PersEventsService) *CalcService {
 	return &CalcService{repo: r, service: s}
 }
 
-
-func (s *CalcService) CreateEventData(eventName string) (EventData, error) {
+func (s *CalcService) createEventData(eventName string) error {
 	ev, _ := s.repo.EventsRepo.Get(&models.Event{Name: eventName})
-	result, err := s.service.GetPersonsByEvent(ev.Id)
+	data, err := s.service.GetPersonsByEvent(ev.Id)
 	if err != nil {
-		return EventData{}, err
+		return err
 	}
-	return result, nil
+	s.data = &data
+	return nil
 }
 
-func fillAndSortBalances(data *EventData) []PersonBalance {
-	pers := data.Owes
-	var result []PersonBalance
-	for _, p := range pers {
-		result = append(result, PersonBalance{
-			Person:  &p,
-			Balance: p.Spent,
+func (s *CalcService) fillAndSortBalances() {
+	for i := 0; i < s.data.AllPersonsCount-1; i++ {
+		s.balances = append(s.balances, PersonBalance{
+			Person:  &s.data.Persons[i],
+			Balance: s.data.Persons[i].Spent - s.data.AverageAmount*float64(s.data.Persons[i].Factor),
 		})
 	}
-	sort.SliceStable(result, func(i, j int) bool {
-		return result[i].Balance < result[j].Balance
+	sort.SliceStable(s.balances, func(i, j int) bool {
+		return s.balances[i].Balance < s.balances[j].Balance
 	})
-	return result
 }
 
-func (s *CalcService) calculateOwes(b []PersonBalance) {
-	for i, j := 0, len(b)-1; i < j; {
-		if b[i].Balance < b[j].Balance {
-			b[i].Person.Owe[b[j].Person.Name] = b[i].Balance
-			b[i].Balance = 0
+func (s *CalcService) calculateOwes() {
+	for i, j := 0, len(s.balances)-1; i < j; {
+		switch {
+		case s.balances[i].Balance+s.balances[j].Balance > 0:
+			if s.balances[i].Person.Owe == nil {
+				s.balances[i].Person.Owe = map[string]float64{}
+			}
+			s.balances[i].Person.Owe[s.balances[j].Person.Name] = -s.balances[i].Balance
+			s.balances[j].Balance += s.balances[i].Balance
+			s.balances[i].Balance = 0
 			i++
-		} else if b[i].Balance >= b[j].Balance {
-			b[i].Balance -= b[j].Balance
-			b[i].Person.Owe[b[j].Person.Name] = b[j].Balance
-			b[j].Balance = 0
+		case s.balances[i].Balance+s.balances[j].Balance <= 0:
+			if s.balances[i].Person.Owe == nil {
+				s.balances[i].Person.Owe = map[string]float64{}
+			}
+			s.balances[i].Person.Owe[s.balances[j].Person.Name] = s.balances[j].Balance
+			s.balances[i].Balance += s.balances[j].Balance
+			s.balances[j].Balance = 0
 			j--
-		} else if b[i].Balance == 0 {
+		case s.balances[i].Balance == 0:
 			i++
-			continue
-		} else if b[j].Balance == 0 {
+		case s.balances[j].Balance == 0:
 			j--
-			continue
 		}
+		// if s.balances[i].Balance < s.balances[j].Balance {
+		// 	s.balances[i].Person.Owe[s.balances[j].Person.Name] = s.balances[i].Balance
+		// 	s.balances[i].Balance = 0
+		// 	i++
+		// } else if s.balances[i].Balance >= s.balances[j].Balance {
+		// 	s.balances[i].Balance -= s.balances[j].Balance
+		// 	s.balances[i].Person.Owe[s.balances[j].Person.Name] = s.balances[j].Balance
+		// 	s.balances[j].Balance = 0
+		// 	j--
+		// } else if s.balances[i].Balance == 0 {
+		// 	i++
+		// 	continue
+		// } else if s.balances[j].Balance == 0 {
+		// 	j--
+		// 	continue
+		// }
 	}
 }
 
-func (s *CalcService) CalcPerson(name string) (PersonData, error) {
-	per, err := s.repo.PersRepo.Get(&models.Person{Name: name})
-	if err!=nil{
-		return PersonData{},err
+func (s *CalcService) CalcPerson(perName, evName string) (PersonData, error) {
+	_, err := s.repo.PersRepo.Get(&models.Person{Name: perName})
+	if err != nil {
+		return PersonData{}, err
 	}
-	perEv, err := s.repo.GetPerson(&models.PersonsAndEvents{PersonId: per.Id})
-	if err!=nil{
-		return PersonData{},err
-	}
-	ev, err := s.repo.EventsRepo.Get(&models.Event{Id: perEv.EventId})
-	if err!=nil{
-		return PersonData{},err
-	}
-	s.CalcEvent(ev.Name)
-	
+	s.CalcEvent(evName)
+
 	return PersonData{}, nil
 }
 
-func (s *CalcService) CalcEvent(name string) ( error) {
-	data, _ := s.CreateEventData(name)
-	balances := fillAndSortBalances(&data)
-	s.calculateOwes(balances)
-	return nil
+func (s *CalcService) CalcEvent(name string) (EventData, error) {
+	err := s.createEventData(name)
+	if err != nil {
+		return EventData{}, err
+	}
+	s.fillAndSortBalances()
+	s.calculateOwes()
+	return *s.data, nil
 }

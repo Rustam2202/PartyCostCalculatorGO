@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -15,9 +16,14 @@ func NewCalcHandler(s *service.CalcService) *CalcHandler {
 }
 
 func (s *CalcHandler) GetPerson(ctx *gin.Context) {
-
+	
 }
 
 func (s *CalcHandler) GetEvent(ctx *gin.Context) {
-
-}
+	name := ctx.Query("name")
+	result, err := s.service.CalcEvent(name)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
+		return
+	}
+	ctx.JSON(http.StatusOK, result)}

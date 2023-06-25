@@ -29,12 +29,12 @@ func (h *PersEventsHandler) Add(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing factor: ": err})
 		return
 	}
-	h.service.AddPersonToPersEvent(per, ev, spent, factor)
+	id,err:=h.service.AddPersonToPersEvent(per, ev, spent, factor)
 	if err != nil {
 		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database: ": err})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"Person added to events with id: ": ""})
+	ctx.JSON(http.StatusOK, gin.H{"Person added to events with id: ": id})
 }
 
 func (h *PersEventsHandler) Get(ctx *gin.Context) {

@@ -11,16 +11,16 @@ import (
 )
 
 type PersonRepository struct {
-	db *database.DataBase
+	Db *database.DataBase
 }
 
 func NewPersonRepository(db *database.DataBase) *PersonRepository {
-	return &PersonRepository{db: db}
+	return &PersonRepository{Db: db}
 }
 
 func (r *PersonRepository) Create(per *models.Person) (int64, error) {
 	var lastInsertedId int64
-	err := r.db.DB.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).
+	err := r.Db.DB.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).
 		Scan(&lastInsertedId)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
@@ -33,9 +33,9 @@ func (r *PersonRepository) Get(per *models.Person) (models.Person, error) {
 	var result models.Person
 	var row *sql.Row
 	if per.Id != 0 {
-		row = r.db.DB.QueryRow(`SELECT * FROM persons WHERE id = $1`, per.Id)
+		row = r.Db.DB.QueryRow(`SELECT * FROM persons WHERE id = $1`, per.Id)
 	} else if per.Name != "" {
-		row = r.db.DB.QueryRow(`SELECT * FROM persons WHERE name = $1`, per.Name)
+		row = r.Db.DB.QueryRow(`SELECT * FROM persons WHERE name = $1`, per.Name)
 	} else {
 		return models.Person{}, errors.New("empty input Person model")
 	}
@@ -48,7 +48,7 @@ func (r *PersonRepository) Get(per *models.Person) (models.Person, error) {
 }
 
 func (r *PersonRepository) Update(perOld, perNew *models.Person) error {
-	_, err := r.db.DB.Exec(
+	_, err := r.Db.DB.Exec(
 		`UPDATE persons SET name=$1 WHERE id=$2`,
 		perNew.Name, perOld.Id)
 	if err != nil {
@@ -59,7 +59,7 @@ func (r *PersonRepository) Update(perOld, perNew *models.Person) error {
 }
 
 func (r *PersonRepository) Delete(per *models.Person) error {
-	_, err := r.db.DB.Exec(`DELETE FROM persons WHERE name=$1`, per.Name)
+	_, err := r.Db.DB.Exec(`DELETE FROM persons WHERE name=$1`, per.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
 		return err
