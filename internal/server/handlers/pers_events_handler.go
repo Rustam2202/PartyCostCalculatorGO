@@ -9,10 +9,10 @@ import (
 )
 
 type PersEventsHandler struct {
-	service *service.PersEventsService
+	service *service.PersonsEventsService
 }
 
-func NewPersEventsHandler(s *service.PersEventsService) *PersEventsHandler {
+func NewPersEventsHandler(s *service.PersonsEventsService) *PersEventsHandler {
 	return &PersEventsHandler{service: s}
 }
 
@@ -29,7 +29,7 @@ func (h *PersEventsHandler) Add(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing factor: ": err})
 		return
 	}
-	id,err:=h.service.AddPersonToPersEvent(per, ev, spent, factor)
+	id, err := h.service.AddPersonToPersEvent(per, ev, spent, factor)
 	if err != nil {
 		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database: ": err})
 		return

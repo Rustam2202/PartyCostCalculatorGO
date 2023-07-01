@@ -2,12 +2,9 @@ package server
 
 import (
 	"fmt"
-	"net/http"
 
 	"party-calc/internal/logger"
-	"party-calc/internal/person"
 	"party-calc/internal/server/handlers"
-	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -39,7 +36,7 @@ func NewServer(
 
 func (s *Server) Start() {
 	router := gin.Default()
-	router.POST("/", JsonHandler)
+
 	router.POST("/person", s.personHandler.Add)
 	router.GET("/person", s.personHandler.Get)
 	router.PUT("/person", s.personHandler.Update)
@@ -63,15 +60,4 @@ func (s *Server) Start() {
 		logger.Logger.Error("Server couldn`t start:", zap.Error(err))
 		return
 	}
-}
-
-func JsonHandler(ctx *gin.Context) {
-	var pers person.Persons
-	err := ctx.ShouldBindJSON(&pers)
-	if err != nil {
-		logger.Logger.Error("Incorrect input JSON format")
-		return
-	}
-	result := service.CalculateDebts(pers)
-	ctx.JSON(http.StatusOK, result)
 }

@@ -24,17 +24,17 @@ func (h *EventHandler) Add(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return
 	}
-	id, err := h.service.NewEvent(name, date)
+	 err = h.service.NewEvent(name, date)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with added event to database:": err})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"Event added with id:": id})
+	ctx.JSON(http.StatusOK, gin.H{"Event added with id:": ""})
 }
 
 func (h *EventHandler) Get(ctx *gin.Context) {
 	name := ctx.Query("name")
-	_, err := h.service.GetEvent(name)
+	_, err := h.service.GetEventById(name)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting event from database:": err})
 		return

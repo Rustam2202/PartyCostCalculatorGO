@@ -14,7 +14,7 @@ func main() {
 	logger.IntializeLogger()
 	cfg := config.LoadConfig()
 
-	db := database.New(cfg.DatabaseConfig)
+	db := database.NewPGX(cfg.DatabaseConfig)
 
 	personsRepo := repository.NewPersonRepository(db)
 	eventsRepo := repository.NewEventRepository(db)
@@ -22,7 +22,7 @@ func main() {
 
 	personService := service.NewPersonService(personsRepo)
 	eventService := service.NewEventService(eventsRepo)
-	persEventService := service.NewPersEventsService(persEventsRepo)
+	persEventService := service.NewPersonsEventsService(persEventsRepo)
 	calcService := service.NewCalcService(persEventsRepo, persEventService)
 
 	personHandler := handlers.NewPersonHandler(personService)

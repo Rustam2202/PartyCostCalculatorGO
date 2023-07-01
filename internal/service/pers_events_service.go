@@ -1,121 +1,70 @@
 package service
 
 import (
-	"errors"
-	"party-calc/internal/database/models"
-	"party-calc/internal/database/repository"
+	"party-calc/internal/domain"
 )
 
-type PersEventsService struct {
-	repo *repository.PersEventsRepository
+type PersonsEventsRepository interface {
+	Create(pe *domain.PersonsAndEvents) error
+	GetByPersonId(id int64) (*domain.PersonsAndEvents, error)
+	GetByEventId(id int64) (*domain.PersonsAndEvents, error)
+	Update(pe *domain.PersonsAndEvents) error
+	Delete(id int64) error
 }
 
-func NewPersEventsService(r *repository.PersEventsRepository) *PersEventsService {
-	return &PersEventsService{repo: r}
+type PersonsEventsService struct {
+	repo PersonsEventsRepository
 }
 
-func (p *PersEventsService) AddPersonToPersEvent(perName, evName string, spent float64, factor int) (int64, error) {
-	per, err := p.repo.PersRepo.Get(&models.Person{Name: perName})
-	if err != nil {
-		return 0, err
-	}
-	ev, err := p.repo.EventsRepo.Get(&models.Event{Name: evName})
-	if err != nil {
-		return 0, err
-	}
-	id, err := p.repo.Create(&models.PersonsAndEvents{
-		PersonId: per.Id,
-		EventId:  ev.Id,
+func NewPersonsEventsService(r PersonsEventsRepository) *PersonsEventsService {
+	return &PersonsEventsService{repo: r}
+}
+
+func (p *PersonsEventsService) AddPersonToPersEvent(personId, eventId int64, spent float64, factor int) error {
+	err := p.repo.Create(&domain.PersonsAndEvents{
+		PersonId: personId,
+		EventId:  eventId,
 		Spent:    spent,
 		Factor:   factor,
 	})
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-
-func (p *PersEventsService) GetPerson(perName string) (PersonData, error) {
-	per, err := p.repo.PersRepo.Get(&models.Person{Name: perName})
-	if err != nil {
-		return PersonData{}, err
-	}
-	//perFromPersEvents, err := p.repo.GetPerson(&models.PersonsAndEvents{Id: per.Id})
-	result := PersonData{
-		Id:   per.Id,
-		Name: per.Name,
-		//Owe:  map[string]float32{},
-	}
-	if err != nil {
-		return PersonData{}, err
-	}
-	return result, nil
-}
-
-func (p *PersEventsService) GetPersonsByEvent(eventId int64) (EventData, error) {
-	// persEvents by Event-Id
-	persEvSlice, err := p.repo.GetEvent(&models.PersonsAndEvents{EventId: eventId})
-	if err != nil {
-		return EventData{}, err
-	}
-	var result EventData
-	// get event Name and Data
-	if len(persEvSlice) != 0 {
-		ev, err := p.repo.EventsRepo.Get(&models.Event{Id: persEvSlice[0].EventId})
-		if err != nil {
-			return EventData{}, err
-		}
-		result.Name = ev.Name
-		result.Date = ev.Date
-	} else {
-		return EventData{}, errors.New("not Persons in Event")
-	}
-	// add Persons to EventData
-	for _, pe := range persEvSlice {
-		per, err := p.repo.PersRepo.Get(&models.Person{Id: pe.PersonId})
-		if err != nil {
-			return EventData{}, err
-		}
-		pd := PersonData{
-			Id:    per.Id,
-			Name:  per.Name,
-			Spent: pe.Spent,
-			Factor: pe.Factor,
-			//Owe:  map[string]float32{},
-		}
-		// add other fields of EventData
-		result.Persons = append(result.Persons, pd)
-		result.AllPersonsCount += pe.Factor
-		result.TotalAmount += pe.Spent
-	}
-	result.AverageAmount = result.TotalAmount / float64(result.AllPersonsCount)
-	return result, nil
-}
-
-func (p *PersEventsService) UpdatePerson(perName, newEventName string, newSpent float64, newFactor int) error {
-	perOld, err := p.repo.PersRepo.Get(&models.Person{Name: perName})
-	if err != nil {
-		return err
-	}
-	evId, err := p.repo.EventsRepo.Get(&models.Event{Name: newEventName})
-	if err != nil {
-		return err
-	}
-	err = p.repo.Update(
-		&models.PersonsAndEvents{PersonId: perOld.Id},
-		&models.PersonsAndEvents{PersonId: perOld.Id, EventId: evId.Id, Spent: newSpent, Factor: newFactor})
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *PersEventsService) DeletePerson(perName string) error {
-	per, err := p.repo.PersRepo.Get(&models.Person{Name: perName})
+func (p *PersonsEventsService) GetByPersonId(id int64) (*domain.PersonsAndEvents, error) {
+	result, err := p.repo.GetByPersonId(id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (p *PersonsEventsService) GetByEventId(id int64) (*domain.PersonsAndEvents, error) {
+	result, err := p.repo.GetByEventId(id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (p *PersonsEventsService) UpdatePerson(id, personId, eventId int64, spent float64, factor int) error {
+	err := p.repo.Update(&domain.PersonsAndEvents{
+		Id:       id,
+		PersonId: personId,
+		EventId:  eventId,
+		Spent:    spent,
+		Factor:   factor,
+	})
 	if err != nil {
 		return err
 	}
-	err = p.repo.Delete(&models.PersonsAndEvents{PersonId: per.Id})
+	return nil
+}
+
+func (p *PersonsEventsService) DeletePerson(id int64) error {
+	err := p.repo.Delete(id)
 	if err != nil {
 		return err
 	}
