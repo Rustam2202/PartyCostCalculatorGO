@@ -69,7 +69,7 @@ func (p *PersonService) DeletePersonById(id int64) error {
 	return nil
 }
 
-func (p *PersonService) DeletePersonByNane(name string) error {
+func (p *PersonService) DeletePersonByName(name string) error {
 	err := p.repo.DeleteByName(name)
 	if err != nil {
 		return err

@@ -23,7 +23,7 @@ func main() {
 	personService := service.NewPersonService(personsRepo)
 	eventService := service.NewEventService(eventsRepo)
 	persEventService := service.NewPersonsEventsService(persEventsRepo)
-	calcService := service.NewCalcService(persEventsRepo, persEventService)
+	calcService := service.NewCalcService(personService, eventService, persEventService)
 
 	personHandler := handlers.NewPersonHandler(personService)
 	eventHandler := handlers.NewEventHandler(eventService)

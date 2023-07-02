@@ -37,8 +37,14 @@ func (r *EventRepository) GetById(id int64) (*domain.Event, error) {
 	var date string
 	err := r.Db.DBPGX.QueryRow(context.Background(),
 		`SELECT * FROM events WHERE id=$1`, id).
-		// err := r.Db.DB.QueryRow(`SELECT * FROM events WHERE id=$1`, id).
 		Scan(&result.Id, &result.Name, &date)
+	rows, err := r.Db.DBPGX.Query(context.Background(),
+		`SELECT * FROM persons_events WHERE event_id=$1`, result.Id)
+	for rows.Next() {
+		var personId int64
+		rows.Scan(&personId)
+		result.PersonIds = append(result.PersonIds, personId)
+	}
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from events:", zap.Error(err))
 		return nil, err
@@ -54,6 +60,14 @@ func (r *EventRepository) GetByName(name string) (*domain.Event, error) {
 		`SELECT * FROM events WHERE name=$1`, name).
 		//	err := r.Db.DB.QueryRow(`SELECT * FROM events WHERE name=$1`, name).
 		Scan(&result.Id, &result.Name, &date)
+	rows, err := r.Db.DBPGX.Query(context.Background(),
+		`SELECT * FROM persons_events WHERE event_id=$1`, result.Id)
+	for rows.Next() {
+		var personId int64
+		rows.Scan(&personId)
+		result.PersonIds = append(result.PersonIds, personId)
+	}
+
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from events:", zap.Error(err))
 		return nil, err

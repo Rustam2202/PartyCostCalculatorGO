@@ -52,7 +52,6 @@ func (s *Server) Start() {
 	router.PUT("/persEvents", s.persEventsHandler.Update)
 	router.DELETE("/persEvents", s.persEventsHandler.Delete)
 
-	router.GET("/calcPerson", s.calcHandler.GetPerson)
 	router.GET("/calcEvent", s.calcHandler.GetEvent)
 
 	err := router.Run(fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))

@@ -35,7 +35,7 @@ func NewPGX(cfg DatabaseConfig) *DataBase {
 		logger.Logger.Error("Can't open database: ", zap.Error(err))
 		return nil
 	}
-	defer conn.Close(context.Background())
+	//defer conn.Close(context.Background())
 
 	return &DataBase{DBPGX: conn}
 }

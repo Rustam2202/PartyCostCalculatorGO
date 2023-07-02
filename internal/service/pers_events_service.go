@@ -49,7 +49,7 @@ func (p *PersonsEventsService) GetByEventId(id int64) (*domain.PersonsAndEvents,
 	return result, nil
 }
 
-func (p *PersonsEventsService) UpdatePerson(id, personId, eventId int64, spent float64, factor int) error {
+func (p *PersonsEventsService) Update(id, personId, eventId int64, spent float64, factor int) error {
 	err := p.repo.Update(&domain.PersonsAndEvents{
 		Id:       id,
 		PersonId: personId,
@@ -63,7 +63,7 @@ func (p *PersonsEventsService) UpdatePerson(id, personId, eventId int64, spent f
 	return nil
 }
 
-func (p *PersonsEventsService) DeletePerson(id int64) error {
+func (p *PersonsEventsService) Delete(id int64) error {
 	err := p.repo.Delete(id)
 	if err != nil {
 		return err

@@ -36,7 +36,15 @@ func (r *PersonRepository) Create(per *domain.Person) error {
 func (r *PersonRepository) GetById(id int64) (*domain.Person, error) {
 	var result domain.Person
 	err := r.Db.DBPGX.QueryRow(context.Background(),
-		`SELECT * FROM persons WHERE id = $1`, id).Scan(&result.Id, &result.Name)
+		`SELECT * FROM persons WHERE id=$1`, id).Scan(&result.Id, &result.Name)
+	rows, err := r.Db.DBPGX.Query(context.Background(),
+		`SELECT * FROM persons_events WHERE person_id=$1`, id)
+	for rows.Next() {
+		var eventId int64
+		err = rows.Scan(&eventId)
+		result.EventIds = append(result.EventIds, eventId)
+	}
+
 	//	err := r.Db.DB.QueryRow(`SELECT * FROM persons WHERE id = $1`, id).Scan(&result.Id, &result.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from persons: ", zap.Error(err))
@@ -48,7 +56,15 @@ func (r *PersonRepository) GetById(id int64) (*domain.Person, error) {
 func (r *PersonRepository) GetByName(name string) (*domain.Person, error) {
 	var result domain.Person
 	err := r.Db.DBPGX.QueryRow(context.Background(),
-		`SELECT * FROM persons WHERE name = $1`, name).Scan(&result.Id, &result.Name)
+		`SELECT * FROM persons WHERE name=$1`, name).Scan(&result.Id, &result.Name)
+	rows, err := r.Db.DBPGX.Query(context.Background(),
+		`SELECT * FROM persons_events WHERE person_id=$1`, result.Id)
+	for rows.Next() {
+		var eventId int64
+		err = rows.Scan(&eventId)
+		result.EventIds = append(result.EventIds, eventId)
+	}
+
 	//	err := r.Db.DB.QueryRow(`SELECT * FROM persons WHERE name = $1`, name).Scan(&result.Id, &result.Name)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from persons: ", zap.Error(err))

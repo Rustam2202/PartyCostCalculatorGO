@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"party-calc/internal/domain"
 	"party-calc/internal/service"
 	"time"
 
@@ -17,14 +18,17 @@ func NewEventHandler(s *service.EventService) *EventHandler {
 }
 
 func (h *EventHandler) Add(ctx *gin.Context) {
-	name := ctx.Query("name")
-	//ev.Date = ctx.GetTime("date") // ?? don't parsing
+	event := struct {
+		Name string `json:"name"`
+		Date string `json:"date"`
+	}{}
+	err := ctx.ShouldBindJSON(&event)
 	date, err := time.Parse("2006-01-02", ctx.Query("date"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return
 	}
-	 err = h.service.NewEvent(name, date)
+	err = h.service.NewEvent(event.Name, date)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with added event to database:": err})
 		return
@@ -33,24 +37,39 @@ func (h *EventHandler) Add(ctx *gin.Context) {
 }
 
 func (h *EventHandler) Get(ctx *gin.Context) {
-	name := ctx.Query("name")
-	_, err := h.service.GetEventById(name)
+	req := struct {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+	}{}
+	err := ctx.ShouldBindJSON(&req)
+	var ev *domain.Event
+	if req.Id != 0 {
+		ev, err = h.service.GetEventById(req.Id)
+	} else if req.Name != "" {
+		ev, err = h.service.GetEventByName(req.Name)
+	} else {
+	}
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting event from database:": err})
 		return
 	}
-	ctx.JSON(http.StatusOK, "")
+	ctx.JSON(http.StatusOK, *ev)
 }
 
 func (h *EventHandler) Update(ctx *gin.Context) {
-	name := ctx.Query("name")
-	newName := ctx.Query("newname")
-	newDate, err := time.Parse("2006-01-02", ctx.Query("newdate"))
+	req := struct {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+		Date string `json:"date"`
+	}{}
+	err := ctx.ShouldBindJSON(&req)
+
+	date, err := time.Parse("2006-01-02", req.Date)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return
 	}
-	err = h.service.UpdateEvent(name, newName, newDate)
+	err = h.service.UpdateEvent(req.Id, req.Name, date)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update event in database:": err})
 		return
@@ -59,10 +78,19 @@ func (h *EventHandler) Update(ctx *gin.Context) {
 }
 
 func (h *EventHandler) Delete(ctx *gin.Context) {
-	//id, err := strconv.ParseInt(ctx.Query("id"), 10, 64)
+	req := struct {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+	}{}
+	err := ctx.ShouldBindJSON(&req)
 
-	name := ctx.Query("name")
-	err := h.service.DeleteEvent(name)
+	if req.Id != 0 {
+		err = h.service.DeleteEventById(req.Id)
+	} else if req.Name != "" {
+		err = h.service.DeleteEventByName(req.Name)
+	} else {
+	}
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete event from database:": err})
 		return
