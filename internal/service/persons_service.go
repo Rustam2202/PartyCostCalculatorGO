@@ -12,14 +12,6 @@ type PersonRepository interface {
 	DeleteById(id int64) error
 	DeleteByName(name string) error
 }
- 
-// type PersonService struct {
-// 	repo *repository.PersonRepository
-// }
-//func NewPersonService(r *repository.PersonRepository) *PersonService {
-	// 	return &PersonService{repo: r}
-	// }
-	
 
 type PersonService struct {
 	repo PersonRepository
@@ -30,11 +22,12 @@ func NewPersonService(r PersonRepository) *PersonService {
 }
 
 func (p *PersonService) NewPerson(name string) (int64, error) {
-	err := p.repo.Create(&domain.Person{Name: name})
+	per := domain.Person{Name: name}
+	err := p.repo.Create(&per)
 	if err != nil {
 		return 0, err
 	}
-	return 0, nil
+	return per.Id, nil
 }
 
 func (p *PersonService) GetPersonById(id int64) (*domain.Person, error) {

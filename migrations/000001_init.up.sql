@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS events (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
 	date DATE,
-	total NUMERIC DEFAULT 0
 );
 CREATE INDEX events_name_idx ON events (name);
 CREATE TABLE IF NOT EXISTS persons_events (

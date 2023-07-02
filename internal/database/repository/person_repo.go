@@ -19,14 +19,10 @@ func NewPersonRepository(db *database.DataBase) *PersonRepository {
 
 func (r *PersonRepository) Create(per *domain.Person) error {
 	var lastInsertedId int64
-	// select name, weight from widgets where id=$1
-	// insert
 	err := r.Db.DBPGX.QueryRow(context.Background(),
 		`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).Scan(&lastInsertedId)
-	// err := r.Db.DB.QueryRow(`INSERT INTO persons (name) VALUES($1) RETURNING Id`, per.Name).
-	// 	Scan(&lastInsertedId)
 	if err != nil {
-		logger.Logger.Error("Failed to Execute Insert to 'persons' table: ", zap.Error(err))
+		logger.Logger.Error("Failed Insert to 'persons' table: ", zap.Error(err))
 		return err
 	}
 	per.Id = lastInsertedId
@@ -37,18 +33,24 @@ func (r *PersonRepository) GetById(id int64) (*domain.Person, error) {
 	var result domain.Person
 	err := r.Db.DBPGX.QueryRow(context.Background(),
 		`SELECT * FROM persons WHERE id=$1`, id).Scan(&result.Id, &result.Name)
+	if err != nil {
+		logger.Logger.Error("Failed Scan data from 'persons' by id: ", zap.Error(err))
+		return nil, err
+	}
 	rows, err := r.Db.DBPGX.Query(context.Background(),
 		`SELECT * FROM persons_events WHERE person_id=$1`, id)
+	if err != nil {
+		logger.Logger.Error("Failed take 'event_ids' from 'persons' table by id: ", zap.Error(err))
+		return nil, err
+	}
 	for rows.Next() {
 		var eventId int64
 		err = rows.Scan(&eventId)
+		if err != nil {
+			logger.Logger.Error("Failed scan 'event_id' from 'event_ids' rows: ", zap.Error(err))
+			return nil, err
+		}
 		result.EventIds = append(result.EventIds, eventId)
-	}
-
-	//	err := r.Db.DB.QueryRow(`SELECT * FROM persons WHERE id = $1`, id).Scan(&result.Id, &result.Name)
-	if err != nil {
-		logger.Logger.Error("Failed to Scan data from persons: ", zap.Error(err))
-		return nil, err
 	}
 	return &result, nil
 }
@@ -57,18 +59,24 @@ func (r *PersonRepository) GetByName(name string) (*domain.Person, error) {
 	var result domain.Person
 	err := r.Db.DBPGX.QueryRow(context.Background(),
 		`SELECT * FROM persons WHERE name=$1`, name).Scan(&result.Id, &result.Name)
+	if err != nil {
+		logger.Logger.Error("Failed take 'event_ids' from 'persons' table by name: ", zap.Error(err))
+		return nil, err
+	}
 	rows, err := r.Db.DBPGX.Query(context.Background(),
 		`SELECT * FROM persons_events WHERE person_id=$1`, result.Id)
+	if err != nil {
+		logger.Logger.Error("Failed take 'event_ids' from 'persons' by name: ", zap.Error(err))
+		return nil, err
+	}
 	for rows.Next() {
 		var eventId int64
 		err = rows.Scan(&eventId)
+		if err != nil {
+			logger.Logger.Error("Failed scan 'event_id' from 'event_ids' rows: ", zap.Error(err))
+			return nil, err
+		}
 		result.EventIds = append(result.EventIds, eventId)
-	}
-
-	//	err := r.Db.DB.QueryRow(`SELECT * FROM persons WHERE name = $1`, name).Scan(&result.Id, &result.Name)
-	if err != nil {
-		logger.Logger.Error("Failed to Scan data from persons: ", zap.Error(err))
-		return nil, err
 	}
 	return &result, nil
 }
@@ -76,11 +84,8 @@ func (r *PersonRepository) GetByName(name string) (*domain.Person, error) {
 func (r *PersonRepository) Update(per *domain.Person) error {
 	_, err := r.Db.DBPGX.Exec(context.Background(),
 		`UPDATE persons SET name=$2 WHERE id=$1`, per.Id, per.Name)
-	// _, err := r.Db.DB.Exec(
-	// 	`UPDATE persons SET name=$2 WHERE id=$1`,
-	// 	per.Id, per.Name)
 	if err != nil {
-		logger.Logger.Error("Failed to Execute Update operation: ", zap.Error(err))
+		logger.Logger.Error("Failed Update in 'persons' table: ", zap.Error(err))
 		return err
 	}
 	return nil
@@ -89,9 +94,8 @@ func (r *PersonRepository) Update(per *domain.Person) error {
 func (r *PersonRepository) DeleteById(id int64) error {
 	_, err := r.Db.DBPGX.Exec(context.Background(),
 		`DELETE FROM persons WHERE id=$1`, id)
-	//_, err := r.Db.DB.Exec(`DELETE FROM persons WHERE id=$1`, id)
 	if err != nil {
-		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
+		logger.Logger.Error("Failed Delete in 'persons' table: ", zap.Error(err))
 		return err
 	}
 	return nil
@@ -100,9 +104,8 @@ func (r *PersonRepository) DeleteById(id int64) error {
 func (r *PersonRepository) DeleteByName(name string) error {
 	_, err := r.Db.DBPGX.Exec(context.Background(),
 		`DELETE FROM persons WHERE name=$1`, name)
-	//	_, err := r.Db.DB.Exec(`DELETE FROM persons WHERE name=$1`, name)
 	if err != nil {
-		logger.Logger.Error("Failed to Execute Delete operation: ", zap.Error(err))
+		logger.Logger.Error("Failed Delete in 'persons' table: ", zap.Error(err))
 		return err
 	}
 	return nil
