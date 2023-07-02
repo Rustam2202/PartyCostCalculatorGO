@@ -17,10 +17,10 @@ func NewCalcHandler(s *service.CalcService) *CalcHandler {
 
 func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 	req := struct {
-		EvName string `json:"event_id"`
+		EventId int64 `json:"event_id"`
 	}{}
 	err := ctx.ShouldBindJSON(&req)
-	result, err := s.service.CalcEvent(req.EvName)
+	result, err := s.service.CalcEvent(req.EventId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
 		return

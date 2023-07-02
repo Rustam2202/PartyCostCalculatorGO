@@ -5,7 +5,6 @@ import (
 	"party-calc/internal/database"
 	"party-calc/internal/domain"
 	"party-calc/internal/logger"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -33,15 +32,14 @@ func (r *EventRepository) Add(ev *domain.Event) error {
 
 func (r *EventRepository) GetById(id int64) (*domain.Event, error) {
 	var result domain.Event
-	var date string
 	err := r.Db.DBPGX.QueryRow(context.Background(),
-		`SELECT * FROM events WHERE id=$1`, id).Scan(&result.Id, &result.Name, &date)
+		`SELECT * FROM events WHERE id=$1`, id).Scan(&result.Id, &result.Name, &result.Date)
 	if err != nil {
 		logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
 		return nil, err
 	}
 	rows, err := r.Db.DBPGX.Query(context.Background(),
-		`SELECT * FROM persons_events WHERE event_id=$1`, result.Id)
+		`SELECT person_id FROM persons_events WHERE event_id=$1`, result.Id)
 	if err != nil {
 		logger.Logger.Error("Failed take 'persons_ids' from 'events' table by id: ", zap.Error(err))
 		return nil, err
@@ -55,21 +53,19 @@ func (r *EventRepository) GetById(id int64) (*domain.Event, error) {
 		}
 		result.PersonIds = append(result.PersonIds, personId)
 	}
-	result.Date, _ = time.Parse("2006-01-02", date)
 	return &result, nil
 }
 
 func (r *EventRepository) GetByName(name string) (*domain.Event, error) {
 	var result domain.Event
-	var date string
 	err := r.Db.DBPGX.QueryRow(context.Background(),
-		`SELECT * FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &date)
+		`SELECT * FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &result.Date)
 	if err != nil {
 		logger.Logger.Error("Failed Scan data from 'events' by name: ", zap.Error(err))
 		return nil, err
 	}
 	rows, err := r.Db.DBPGX.Query(context.Background(),
-		`SELECT * FROM persons_events WHERE event_id=$1`, result.Id)
+		`SELECT person_id FROM persons_events WHERE event_id=$1`, result.Id)
 	if err != nil {
 		logger.Logger.Error("Failed take 'persons_ids' from 'events' table by name: ", zap.Error(err))
 		return nil, err
@@ -83,7 +79,6 @@ func (r *EventRepository) GetByName(name string) (*domain.Event, error) {
 		}
 		result.PersonIds = append(result.PersonIds, personId)
 	}
-	result.Date, _ = time.Parse("2006-01-02", date)
 	return &result, nil
 }
 

@@ -20,17 +20,18 @@ func NewPersonsEventsService(r PersonsEventsRepository) *PersonsEventsService {
 	return &PersonsEventsService{repo: r}
 }
 
-func (p *PersonsEventsService) AddPersonToPersEvent(personId, eventId int64, spent float64, factor int) error {
-	err := p.repo.Create(&domain.PersonsAndEvents{
+func (p *PersonsEventsService) AddPersonToPersEvent(personId, eventId int64, spent float64, factor int) (int64, error) {
+	perEv := domain.PersonsAndEvents{
 		PersonId: personId,
 		EventId:  eventId,
 		Spent:    spent,
 		Factor:   factor,
-	})
-	if err != nil {
-		return err
 	}
-	return nil
+	err := p.repo.Create(&perEv)
+	if err != nil {
+		return 0, err
+	}
+	return perEv.Id, nil
 }
 
 func (p *PersonsEventsService) GetByPersonId(id int64) (*domain.PersonsAndEvents, error) {

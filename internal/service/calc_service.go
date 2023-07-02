@@ -29,7 +29,6 @@ type EventData struct {
 }
 
 type CalcService struct {
-	//repo                 *repository.PersEventsRepository
 	PersonsService       *PersonService
 	EventsService        *EventService
 	PersonsEventsService *PersonsEventsService
@@ -43,20 +42,32 @@ func NewCalcService(ps *PersonService, es *EventService, pes *PersonsEventsServi
 	}
 }
 
-func (s *CalcService) createEventData(eventName string) (*EventData, error) {
+func (s *CalcService) createEventData(id int64) (*EventData, error) {
 	var result EventData
-	event, _ := s.EventsService.GetEventByName(eventName)
+	event, err := s.EventsService.GetEventById(id)
+	if err != nil {
+		return nil, err
+	}
 	result.Name = event.Name
 	result.Date = event.Date
 	for _, personId := range event.PersonIds {
 		var perData PersonData
-		per, _ := s.PersonsService.GetPersonById(personId)
-		perEv, _ := s.PersonsEventsService.GetByPersonId(personId)
+		per, err := s.PersonsService.GetPersonById(personId)
+		if err != nil {
+			return nil, err
+		}
+		perEv, err := s.PersonsEventsService.GetByPersonId(personId)
+		if err != nil {
+			return nil, err
+		}
 		perData.Name = per.Name
 		perData.Spent = perEv.Spent
 		perData.Factor = perEv.Factor
 		result.Persons = append(result.Persons, perData)
+		result.AllPersonsCount += perEv.Factor
+		result.TotalAmount += perEv.Spent
 	}
+	result.AverageAmount = result.TotalAmount / float64(result.AllPersonsCount)
 	return &result, nil
 }
 
@@ -101,12 +112,12 @@ func (ev *EventData) calculateOwes() {
 }
 
 func (s *CalcService) CalcPerson(perName, evName string) (PersonData, error) {
-	
+
 	return PersonData{}, nil
 }
 
-func (s *CalcService) CalcEvent(name string) (EventData, error) {
-	ed, err := s.createEventData(name)
+func (s *CalcService) CalcEvent(id int64) (EventData, error) {
+	ed, err := s.createEventData(id)
 	if err != nil {
 		return EventData{}, err
 	}

@@ -38,7 +38,7 @@ func (r *PersonRepository) GetById(id int64) (*domain.Person, error) {
 		return nil, err
 	}
 	rows, err := r.Db.DBPGX.Query(context.Background(),
-		`SELECT * FROM persons_events WHERE person_id=$1`, id)
+		`SELECT event_id FROM persons_events WHERE person_id=$1`, id)
 	if err != nil {
 		logger.Logger.Error("Failed take 'event_ids' from 'persons' table by id: ", zap.Error(err))
 		return nil, err
@@ -64,7 +64,7 @@ func (r *PersonRepository) GetByName(name string) (*domain.Person, error) {
 		return nil, err
 	}
 	rows, err := r.Db.DBPGX.Query(context.Background(),
-		`SELECT * FROM persons_events WHERE person_id=$1`, result.Id)
+		`SELECT event_id FROM persons_events WHERE person_id=$1`, result.Id)
 	if err != nil {
 		logger.Logger.Error("Failed take 'event_ids' from 'persons' by name: ", zap.Error(err))
 		return nil, err

@@ -3,12 +3,14 @@ CREATE TABLE IF NOT EXISTS persons (
 	name VARCHAR(30) NOT NULL
 );
 CREATE INDEX persons_name_idx ON persons (name);
+
 CREATE TABLE IF NOT EXISTS events (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
-	date DATE,
+	date DATE
 );
 CREATE INDEX events_name_idx ON events (name);
+
 CREATE TABLE IF NOT EXISTS persons_events (
 	id SERIAL PRIMARY KEY,
 	person_id INT,

@@ -25,25 +25,24 @@ func (h *PersEventsHandler) Add(ctx *gin.Context) {
 	}{}
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing spent: ": err})
+		ctx.JSON(http.StatusBadRequest, gin.H{"Incorrect request: ": err})
 		return
 	}
+	if req.Factor == 0 {
+		req.Factor = 1
+	}
+	id, err := h.service.AddPersonToPersEvent(req.PerId, req.EvId, req.Spent, req.Factor)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Error with parsing factor: ": err})
+		ctx.JSON(http.StatusNotModified, gin.H{"Failed Insert to 'persons_events' table: ": err})
 		return
 	}
-	err = h.service.AddPersonToPersEvent(req.PerId, req.EvId, req.Spent, req.Factor)
-	if err != nil {
-		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database: ": err})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"Person added to events with id: ": ""})
+	ctx.JSON(http.StatusOK, gin.H{"Person added to events with id: ": id})
 }
 
 func (h *PersEventsHandler) Get(ctx *gin.Context) {
 	req := struct {
-		PerId int64 `json:"id"`
-		EvId  int64 `json:"name"`
+		PerId int64 `json:"person_id"`
+		EvId  int64 `json:"event_id"`
 	}{}
 	err := ctx.ShouldBindJSON(&req)
 	var ev *domain.PersonsAndEvents
@@ -69,7 +68,6 @@ func (h *PersEventsHandler) Update(ctx *gin.Context) {
 		Factor int     `json:"factor"`
 	}{}
 	err := ctx.ShouldBindJSON(&req)
-
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return

@@ -22,12 +22,13 @@ func NewEventService(r EventRepository) *EventService {
 	return &EventService{repo: r}
 }
 
-func (p *EventService) NewEvent(name string, date time.Time) error {
-	err := p.repo.Add(&domain.Event{Name: name, Date: date})
+func (p *EventService) NewEvent(name string, date time.Time) (int64, error) {
+	ev := domain.Event{Name: name, Date: date}
+	err := p.repo.Add(&ev)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return ev.Id, nil
 }
 
 func (p *EventService) GetEventById(id int64) (*domain.Event, error) {
