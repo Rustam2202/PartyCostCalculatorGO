@@ -50,17 +50,13 @@ func (s *CalcService) createEventData(id int64) (*EventData, error) {
 	}
 	result.Name = event.Name
 	result.Date = event.Date
-	for _, personId := range event.PersonIds {
+	for _,p:=range event.Persons{
+		perEv, err := s.PersonsEventsService.GetByPersonId(p.Id)
+		if err != nil {
+			return nil, err
+		}
 		var perData PersonData
-		per, err := s.PersonsService.GetPersonById(personId)
-		if err != nil {
-			return nil, err
-		}
-		perEv, err := s.PersonsEventsService.GetByPersonId(personId)
-		if err != nil {
-			return nil, err
-		}
-		perData.Name = per.Name
+		perData.Name = p.Name
 		perData.Spent = perEv.Spent
 		perData.Factor = perEv.Factor
 		result.Persons = append(result.Persons, perData)
@@ -111,17 +107,12 @@ func (ev *EventData) calculateOwes() {
 	ev.Balances = nil
 }
 
-func (s *CalcService) CalcPerson(perName, evName string) (PersonData, error) {
-
-	return PersonData{}, nil
-}
-
-func (s *CalcService) CalcEvent(id int64) (EventData, error) {
+func (s *CalcService) CalcEvent(id int64) (*EventData, error) {
 	ed, err := s.createEventData(id)
 	if err != nil {
-		return EventData{}, err
+		return nil, err
 	}
 	ed.fillAndSortBalances()
 	ed.calculateOwes()
-	return *ed, nil
+	return ed, nil
 }

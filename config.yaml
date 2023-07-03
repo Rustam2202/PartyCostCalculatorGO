@@ -9,5 +9,19 @@ DatabaseConfig:
   password: password
   dbname: partycalc
 
-language: ENG
-roundRate: 1.0
+LoggerConfig:
+  encoding: json
+  level: 
+    default: info
+  outputPaths:
+    - stdout
+  errorOutputPaths:
+    - stderr
+  encoderConfig:
+    messageKey: message
+    levelKey: level
+    timeKey: time
+    encodeTime: ISO8601
+    encodeLevel: capital
+    encodeDuration: string
+    encodeCaller: short

@@ -6,6 +6,7 @@ import (
 	"party-calc/internal/domain"
 	"party-calc/internal/logger"
 
+	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
 )
 
@@ -29,56 +30,74 @@ func (r *PersonRepository) Create(per *domain.Person) error {
 	return nil
 }
 
-func (r *PersonRepository) GetById(id int64) (*domain.Person, error) {
+func (r *PersonRepository) get(id int64, name string) (*domain.Person, error) {
 	var result domain.Person
-	err := r.Db.DBPGX.QueryRow(context.Background(),
-		`SELECT * FROM persons WHERE id=$1`, id).Scan(&result.Id, &result.Name)
+	var row pgx.Row
+	// search by person Id or Name
+	if id != 0 {
+		row = r.Db.DBPGX.QueryRow(context.Background(),
+			`SELECT * FROM persons WHERE id=$1`, id)
+	} else if name != "" {
+		row = r.Db.DBPGX.QueryRow(context.Background(),
+			`SELECT * FROM persons WHERE name=$1`, name)
+	} else {
+
+	}
+	err := row.Scan(&result.Id, &result.Name)
 	if err != nil {
 		logger.Logger.Error("Failed Scan data from 'persons' by id: ", zap.Error(err))
 		return nil, err
 	}
+
+	// search events ids of person
 	rows, err := r.Db.DBPGX.Query(context.Background(),
 		`SELECT event_id FROM persons_events WHERE person_id=$1`, id)
 	if err != nil {
 		logger.Logger.Error("Failed take 'event_ids' from 'persons' table by id: ", zap.Error(err))
 		return nil, err
 	}
+	var eventIds []int64
 	for rows.Next() {
-		var eventId int64
-		err = rows.Scan(&eventId)
+		var evId int64
+		err = rows.Scan(&evId)
+		if err != nil {
+			return nil, err
+		}
+		eventIds = append(eventIds, evId)
+	}
+
+	// append events to Person model
+	rows, err = r.Db.DBPGX.Query(context.Background(),
+		`SELECT id, name, date FROM events WHERE id=ANY($1)`, eventIds)
+		if err != nil {
+			return nil, err
+		}
+	for rows.Next() {
+		var event domain.Event
+		err = rows.Scan(&event.Id, &event.Name, &event.Date)
 		if err != nil {
 			logger.Logger.Error("Failed scan 'event_id' from 'event_ids' rows: ", zap.Error(err))
 			return nil, err
 		}
-		result.EventIds = append(result.EventIds, eventId)
+		result.Events = append(result.Events, event)
 	}
 	return &result, nil
 }
 
+func (r *PersonRepository) GetById(id int64) (*domain.Person, error) {
+	result, err := r.get(id, "")
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (r *PersonRepository) GetByName(name string) (*domain.Person, error) {
-	var result domain.Person
-	err := r.Db.DBPGX.QueryRow(context.Background(),
-		`SELECT * FROM persons WHERE name=$1`, name).Scan(&result.Id, &result.Name)
+	result, err := r.get(0, name)
 	if err != nil {
-		logger.Logger.Error("Failed take 'event_ids' from 'persons' table by name: ", zap.Error(err))
 		return nil, err
 	}
-	rows, err := r.Db.DBPGX.Query(context.Background(),
-		`SELECT event_id FROM persons_events WHERE person_id=$1`, result.Id)
-	if err != nil {
-		logger.Logger.Error("Failed take 'event_ids' from 'persons' by name: ", zap.Error(err))
-		return nil, err
-	}
-	for rows.Next() {
-		var eventId int64
-		err = rows.Scan(&eventId)
-		if err != nil {
-			logger.Logger.Error("Failed scan 'event_id' from 'event_ids' rows: ", zap.Error(err))
-			return nil, err
-		}
-		result.EventIds = append(result.EventIds, eventId)
-	}
-	return &result, nil
+	return result, nil
 }
 
 func (r *PersonRepository) Update(per *domain.Person) error {

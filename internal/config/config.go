@@ -13,7 +13,7 @@ import (
 type Config struct {
 	ServerConfig   server.ServerConfig
 	DatabaseConfig database.DatabaseConfig
-	// RoundRate float64
+	LoggerConfig zap.Config
 }
 
 func LoadConfig() Config {

@@ -11,9 +11,8 @@ import (
 )
 
 func main() {
-	logger.IntializeLogger()
 	cfg := config.LoadConfig()
-
+	logger.IntializeLogger(&cfg.LoggerConfig)
 	db := database.NewPGX(cfg.DatabaseConfig)
 
 	personsRepo := repository.NewPersonRepository(db)
