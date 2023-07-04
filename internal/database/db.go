@@ -2,10 +2,9 @@ package database
 
 import (
 	"context"
+	"party-calc/internal/logger"
 	//	"database/sql"
 	"fmt"
-
-	"party-calc/internal/logger"
 
 	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"

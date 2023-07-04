@@ -11,8 +11,7 @@ DatabaseConfig:
 
 LoggerConfig:
   encoding: json
-  level: 
-    default: info
+  level: info
   outputPaths:
     - stdout
   errorOutputPaths:
@@ -21,7 +20,7 @@ LoggerConfig:
     messageKey: message
     levelKey: level
     timeKey: time
-    encodeTime: ISO8601
-    encodeLevel: capital
-    encodeDuration: string
-    encodeCaller: short
+    timeEncoder: ISO8601
+    levelEncoder: capital
+    durationEncoder: string
+    callerEncoder: short

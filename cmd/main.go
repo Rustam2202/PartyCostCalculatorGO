@@ -12,7 +12,7 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	logger.IntializeLogger(&cfg.LoggerConfig)
+	logger.IntializeLogger(cfg.LoggerConfig)
 	db := database.NewPGX(cfg.DatabaseConfig)
 
 	personsRepo := repository.NewPersonRepository(db)

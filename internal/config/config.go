@@ -13,7 +13,7 @@ import (
 type Config struct {
 	ServerConfig   server.ServerConfig
 	DatabaseConfig database.DatabaseConfig
-	LoggerConfig zap.Config
+	LoggerConfig   logger.LoggerConfig
 }
 
 func LoadConfig() Config {
@@ -34,6 +34,5 @@ func LoadConfig() Config {
 	if err != nil {
 		logger.Logger.Fatal("Can't unmarshal configs: ", zap.Error(err))
 	}
-
 	return cfg
 }
