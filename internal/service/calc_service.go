@@ -29,19 +29,18 @@ type EventData struct {
 }
 
 type CalcService struct {
-	PersonsService       *PersonService
 	EventsService        *EventService
 	PersonsEventsService *PersonsEventsService
 }
 
-func NewCalcService(ps *PersonService, es *EventService, pes *PersonsEventsService) *CalcService {
+func NewCalcService(es *EventService, pes *PersonsEventsService) *CalcService {
 	return &CalcService{
-		PersonsService:       ps,
 		EventsService:        es,
 		PersonsEventsService: pes,
 	}
 }
 
+// Create EventData and fill all fields but Balances
 func (s *CalcService) createEventData(id int64) (*EventData, error) {
 	var result EventData
 	event, err := s.EventsService.GetEventById(id)
@@ -50,7 +49,7 @@ func (s *CalcService) createEventData(id int64) (*EventData, error) {
 	}
 	result.Name = event.Name
 	result.Date = event.Date
-	for _,p:=range event.Persons{
+	for _, p := range event.Persons {
 		perEv, err := s.PersonsEventsService.GetByPersonId(p.Id)
 		if err != nil {
 			return nil, err
@@ -67,6 +66,8 @@ func (s *CalcService) createEventData(id int64) (*EventData, error) {
 	return &result, nil
 }
 
+// Fill Balances of Persons by them spents (taking into average) and
+// sorting from most indebted to most portable.
 func (ed *EventData) fillAndSortBalances() {
 	for i := 0; i < ed.AllPersonsCount-1; i++ {
 		ed.Balances = append(ed.Balances, PersonBalance{
@@ -79,9 +80,13 @@ func (ed *EventData) fillAndSortBalances() {
 	})
 }
 
+// Calculate owes of indepted to portable Persons by them Balances.
+// Calculation continues until all Balances are equal to zero.
 func (ev *EventData) calculateOwes() {
+	// i = most indepted Person, j = most portable Person
 	for i, j := 0, len(ev.Balances)-1; i < j; {
 		switch {
+		// if Balance of 'i' great them 'j' and the it's left to next 'j+1' Person
 		case ev.Balances[i].Balance+ev.Balances[j].Balance > 0:
 			if ev.Balances[i].Person.Owe == nil {
 				ev.Balances[i].Person.Owe = map[string]float64{}
@@ -90,6 +95,7 @@ func (ev *EventData) calculateOwes() {
 			ev.Balances[j].Balance += ev.Balances[i].Balance
 			ev.Balances[i].Balance = 0
 			i++
+			// if Balance of 'i' less them 'j' and 'j' should take from 'i+1' Person
 		case ev.Balances[i].Balance+ev.Balances[j].Balance <= 0:
 			if ev.Balances[i].Person.Owe == nil {
 				ev.Balances[i].Person.Owe = map[string]float64{}

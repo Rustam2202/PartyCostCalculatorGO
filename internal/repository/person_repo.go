@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"party-calc/internal/database"
 	"party-calc/internal/domain"
 	"party-calc/internal/logger"
@@ -41,7 +42,7 @@ func (r *PersonRepository) get(id int64, name string) (*domain.Person, error) {
 		row = r.Db.DBPGX.QueryRow(context.Background(),
 			`SELECT * FROM persons WHERE name=$1`, name)
 	} else {
-
+		return nil, errors.New("no match Id or Name of Person")
 	}
 	err := row.Scan(&result.Id, &result.Name)
 	if err != nil {
@@ -69,9 +70,9 @@ func (r *PersonRepository) get(id int64, name string) (*domain.Person, error) {
 	// append events to Person model
 	rows, err = r.Db.DBPGX.Query(context.Background(),
 		`SELECT id, name, date FROM events WHERE id=ANY($1)`, eventIds)
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
+	}
 	for rows.Next() {
 		var event domain.Event
 		err = rows.Scan(&event.Id, &event.Name, &event.Date)

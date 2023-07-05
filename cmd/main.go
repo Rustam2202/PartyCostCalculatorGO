@@ -3,8 +3,8 @@ package main
 import (
 	"party-calc/internal/config"
 	"party-calc/internal/database"
-	"party-calc/internal/database/repository"
 	"party-calc/internal/logger"
+	"party-calc/internal/repository"
 	"party-calc/internal/server"
 	"party-calc/internal/server/handlers"
 	"party-calc/internal/service"
@@ -22,7 +22,7 @@ func main() {
 	personService := service.NewPersonService(personsRepo)
 	eventService := service.NewEventService(eventsRepo)
 	persEventService := service.NewPersonsEventsService(persEventsRepo)
-	calcService := service.NewCalcService(personService, eventService, persEventService)
+	calcService := service.NewCalcService(eventService, persEventService)
 
 	personHandler := handlers.NewPersonHandler(personService)
 	eventHandler := handlers.NewEventHandler(eventService)
