@@ -6,7 +6,6 @@ import (
 	"party-calc/internal/domain"
 	"party-calc/internal/logger"
 
-	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
 )
 
@@ -18,7 +17,7 @@ func NewEventRepository(db *database.DataBase) *EventRepository {
 	return &EventRepository{Db: db}
 }
 
-func (r *EventRepository) Add(ev *domain.Event) error {
+func (r *EventRepository) Add(ctx context.Context, ev *domain.Event) error {
 	var lastInsertedId int64
 	err := r.Db.DBPGX.QueryRow(context.Background(),
 		`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id`,
@@ -31,27 +30,17 @@ func (r *EventRepository) Add(ev *domain.Event) error {
 	return nil
 }
 
-func (r *EventRepository) get(id int64, name string) (*domain.Event, error) {
+func (r *EventRepository) GetById(ctx context.Context, id int64) (*domain.Event, error) {
 	var result domain.Event
-	var row pgx.Row
-	// search event by Id or Name
-	if id != 0 {
-		row = r.Db.DBPGX.QueryRow(context.Background(),
-			`SELECT * FROM events WHERE id=$1`, id)
-	} else if name != "" {
-		row = r.Db.DBPGX.QueryRow(context.Background(),
-			`SELECT * FROM events WHERE name=$1`, name)
-	} else {
-
-	}
-	err := row.Scan(&result.Id, &result.Name, &result.Date)
+	err := r.Db.DBPGX.QueryRow(ctx,
+		`SELECT * FROM events WHERE id=$1`, id).Scan(&result.Id, &result.Name, &result.Date)
 	if err != nil {
 		logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
 		return nil, err
 	}
 
 	// search persons ids existed in event
-	rows, err := r.Db.DBPGX.Query(context.Background(),
+	rows, err := r.Db.DBPGX.Query(ctx,
 		`SELECT person_id FROM persons_events WHERE event_id=$1`, result.Id)
 	if err != nil {
 		logger.Logger.Error("Failed take 'persons_ids' from 'events' table by id: ", zap.Error(err))
@@ -68,11 +57,11 @@ func (r *EventRepository) get(id int64, name string) (*domain.Event, error) {
 	}
 
 	// append persons to event
-	rows, err = r.Db.DBPGX.Query(context.Background(),
+	rows, err = r.Db.DBPGX.Query(ctx,
 		`SELECT id, name FROM persons WHERE id=ANY($1)`, perIds)
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
+	}
 	for rows.Next() {
 		var per domain.Person
 		err = rows.Scan(&per.Id, &per.Name)
@@ -85,24 +74,52 @@ func (r *EventRepository) get(id int64, name string) (*domain.Event, error) {
 	return &result, nil
 }
 
-func (r *EventRepository) GetById(id int64) (*domain.Event, error) {
-	result, err := r.get(id, "")
+func (r *EventRepository) GetByName(ctx context.Context, name string) (*domain.Event, error) {
+	var result domain.Event
+	err := r.Db.DBPGX.QueryRow(ctx,
+			`SELECT * FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &result.Date)
+	if err != nil {
+		logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
+		return nil, err
+	}
+
+	// search persons ids existed in event
+	rows, err := r.Db.DBPGX.Query(ctx,
+		`SELECT person_id FROM persons_events WHERE event_id=$1`, result.Id)
+	if err != nil {
+		logger.Logger.Error("Failed take 'persons_ids' from 'events' table by id: ", zap.Error(err))
+		return nil, err
+	}
+	var perIds []int64
+	for rows.Next() {
+		var perId int64
+		err = rows.Scan(&perId)
+		if err != nil {
+			return nil, err
+		}
+		perIds = append(perIds, perId)
+	}
+
+	// append persons to event
+	rows, err = r.Db.DBPGX.Query(ctx,
+		`SELECT id, name FROM persons WHERE id=ANY($1)`, perIds)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
-}
-
-func (r *EventRepository) GetByName(name string) (*domain.Event, error) {
-	result, err := r.get(0, name)
-	if err != nil {
-		return nil, err
+	for rows.Next() {
+		var per domain.Person
+		err = rows.Scan(&per.Id, &per.Name)
+		if err != nil {
+			logger.Logger.Error("Failed scan 'person_id' from 'events' rows: ", zap.Error(err))
+			return nil, err
+		}
+		result.Persons = append(result.Persons, per)
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (r *EventRepository) Update(ev *domain.Event) error {
-	_, err := r.Db.DBPGX.Exec(context.Background(),
+func (r *EventRepository) Update(ctx context.Context, ev *domain.Event) error {
+	_, err := r.Db.DBPGX.Exec(ctx,
 		`UPDATE events SET name=$2, date=$3 WHERE id=$1`, ev.Id, ev.Name, ev.Date.Format("2006-01-02"))
 	if err != nil {
 		logger.Logger.Error("Failed Update in 'events' table: ", zap.Error(err))
@@ -111,8 +128,8 @@ func (r *EventRepository) Update(ev *domain.Event) error {
 	return nil
 }
 
-func (r *EventRepository) DeleteById(id int64) error {
-	_, err := r.Db.DBPGX.Exec(context.Background(),
+func (r *EventRepository) DeleteById(ctx context.Context, id int64) error {
+	_, err := r.Db.DBPGX.Exec(ctx,
 		`DELETE FROM events WHERE id=$1`, id)
 	if err != nil {
 		logger.Logger.Error("Failed Delete in 'events' table: ", zap.Error(err))
@@ -121,8 +138,8 @@ func (r *EventRepository) DeleteById(id int64) error {
 	return nil
 }
 
-func (r *EventRepository) DeleteByName(name string) error {
-	_, err := r.Db.DBPGX.Exec(context.Background(),
+func (r *EventRepository) DeleteByName(ctx context.Context, name string) error {
+	_, err := r.Db.DBPGX.Exec(ctx,
 		`DELETE FROM events WHERE name=$1`, name)
 	if err != nil {
 		logger.Logger.Error("Failed Delete in 'events' table: ", zap.Error(err))

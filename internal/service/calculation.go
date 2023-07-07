@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"sort"
 	"time"
 )
@@ -41,16 +42,16 @@ func NewCalcService(es *EventService, pes *PersonsEventsService) *CalcService {
 }
 
 // Create EventData and fill all fields but Balances
-func (s *CalcService) createEventData(id int64) (*EventData, error) {
+func (s *CalcService) createEventData(ctx context.Context, id int64) (*EventData, error) {
 	var result EventData
-	event, err := s.EventsService.GetEventById(id)
+	event, err := s.EventsService.GetEventById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	result.Name = event.Name
 	result.Date = event.Date
 	for _, p := range event.Persons {
-		perEv, err := s.PersonsEventsService.GetByPersonId(p.Id)
+		perEv, err := s.PersonsEventsService.GetByPersonId(ctx, p.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -113,8 +114,8 @@ func (ev *EventData) calculateOwes() {
 	ev.Balances = nil
 }
 
-func (s *CalcService) CalcEvent(id int64) (*EventData, error) {
-	ed, err := s.createEventData(id)
+func (s *CalcService) CalcEvent(ctx context.Context, id int64) (*EventData, error) {
+	ed, err := s.createEventData(ctx, id)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func (h *EventHandler) Add(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return
 	}
-	id, err := h.service.NewEvent(req.Name, date)
+	id, err := h.service.NewEvent(ctx, req.Name, date)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with added event to database:": err})
 		return
@@ -44,9 +44,9 @@ func (h *EventHandler) Get(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	var ev *domain.Event
 	if req.Id != 0 {
-		ev, err = h.service.GetEventById(req.Id)
+		ev, err = h.service.GetEventById(ctx, req.Id)
 	} else if req.Name != "" {
-		ev, err = h.service.GetEventByName(req.Name)
+		ev, err = h.service.GetEventByName(ctx, req.Name)
 	} else {
 	}
 	if err != nil {
@@ -69,7 +69,7 @@ func (h *EventHandler) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return
 	}
-	err = h.service.UpdateEvent(req.Id, req.Name, date)
+	err = h.service.UpdateEvent(ctx, req.Id, req.Name, date)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update event in database:": err})
 		return
@@ -85,9 +85,9 @@ func (h *EventHandler) Delete(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 
 	if req.Id != 0 {
-		err = h.service.DeleteEventById(req.Id)
+		err = h.service.DeleteEventById(ctx, req.Id)
 	} else if req.Name != "" {
-		err = h.service.DeleteEventByName(req.Name)
+		err = h.service.DeleteEventByName(ctx, req.Name)
 	} else {
 	}
 

@@ -31,7 +31,7 @@ func (h *PersEventsHandler) Add(ctx *gin.Context) {
 	if req.Factor == 0 {
 		req.Factor = 1
 	}
-	id, err := h.service.AddPersonToPersEvent(req.PerId, req.EvId, req.Spent, req.Factor)
+	id, err := h.service.AddPersonToPersEvent(ctx, req.PerId, req.EvId, req.Spent, req.Factor)
 	if err != nil {
 		ctx.JSON(http.StatusNotModified, gin.H{"Failed Insert to 'persons_events' table: ": err})
 		return
@@ -47,9 +47,9 @@ func (h *PersEventsHandler) Get(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	var ev *domain.PersonsAndEvents
 	if req.PerId != 0 {
-		ev, err = h.service.GetByPersonId(req.PerId)
+		ev, err = h.service.GetByPersonId(ctx, req.PerId)
 	} else if req.EvId != 0 {
-		ev, err = h.service.GetByEventId(req.EvId)
+		ev, err = h.service.GetByEventId(ctx, req.EvId)
 	} else {
 	}
 	if err != nil {
@@ -72,7 +72,7 @@ func (h *PersEventsHandler) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Error with date parsing :": err})
 		return
 	}
-	err = h.service.Update(req.Id, req.PerId, req.EvId, req.Spent, req.Factor)
+	err = h.service.Update(ctx, req.Id, req.PerId, req.EvId, req.Spent, req.Factor)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update event in database:": err})
 		return
@@ -86,7 +86,7 @@ func (h *PersEventsHandler) Delete(ctx *gin.Context) {
 	}{}
 	err := ctx.ShouldBindJSON(&req)
 	if req.Id != 0 {
-		err = h.service.Delete(req.Id)
+		err = h.service.Delete(ctx, req.Id)
 	}
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete event from database:": err})

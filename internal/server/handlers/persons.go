@@ -21,7 +21,7 @@ func (h *PersonHandler) Add(ctx *gin.Context) {
 		Name string `json:"name"`
 	}{}
 	err := ctx.ShouldBindJSON(&req)
-	id, err := h.service.NewPerson(req.Name)
+	id, err := h.service.NewPerson(ctx, req.Name)
 	if err != nil {
 		ctx.JSON(http.StatusNotModified, gin.H{"Error with added person to database: ": err})
 		return
@@ -37,9 +37,9 @@ func (h *PersonHandler) Get(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	var per *domain.Person
 	if req.Id != 0 {
-		per, err = h.service.GetPersonById(req.Id)
+		per, err = h.service.GetPersonById(ctx, req.Id)
 	} else if req.Name != "" {
-		per, err = h.service.GetPersonByName(req.Name)
+		per, err = h.service.GetPersonByName(ctx, req.Name)
 	} else {
 	}
 	if err != nil {
@@ -56,7 +56,7 @@ func (h *PersonHandler) Update(ctx *gin.Context) {
 	}{}
 	err := ctx.ShouldBindJSON(&per)
 
-	err = h.service.UpdatePerson(per.Id, per.Name)
+	err = h.service.UpdatePerson(ctx, per.Id, per.Name)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with update person in database: ": err})
 		return
@@ -71,16 +71,16 @@ func (h *PersonHandler) Delete(ctx *gin.Context) {
 	}{}
 	err := ctx.ShouldBindJSON(&per)
 	if per.Id != 0 {
-		err = h.service.DeletePersonById(per.Id)
+		err = h.service.DeletePersonById(ctx, per.Id)
 	} else if per.Name != "" {
-		err = h.service.DeletePersonByName(per.Name)
+		err = h.service.DeletePersonByName(ctx, per.Name)
 	} else {
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"Parsing JSON request error: ": err})
 			return
 		}
 	}
-	err = h.service.DeletePersonById(per.Id)
+	err = h.service.DeletePersonById(ctx, per.Id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person from database: ": err})
 		return

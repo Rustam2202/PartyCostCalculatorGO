@@ -20,7 +20,7 @@ func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 		EventId int64 `json:"event_id"`
 	}{}
 	err := ctx.ShouldBindJSON(&req)
-	result, err := s.service.CalcEvent(req.EventId)
+	result, err := s.service.CalcEvent(ctx, req.EventId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
 		return
