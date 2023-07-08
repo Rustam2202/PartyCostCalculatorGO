@@ -5,6 +5,9 @@ import (
 
 	"party-calc/internal/logger"
 	"party-calc/internal/server/handlers"
+	"party-calc/internal/server/handlers/events"
+	"party-calc/internal/server/handlers/persons"
+	"party-calc/internal/server/handlers/persons_events"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -12,17 +15,17 @@ import (
 
 type Server struct {
 	cfg               *ServerConfig
-	personHandler     handlers.PersonHandler
-	eventHandler      handlers.EventHandler
-	persEventsHandler handlers.PersEventsHandler
+	personHandler     persons.PersonHandler
+	eventHandler      events.EventHandler
+	persEventsHandler personsevents.PersEventsHandler
 	calcHandler       handlers.CalcHandler
 }
 
 func NewServer(
 	cfg ServerConfig,
-	ph *handlers.PersonHandler,
-	eh *handlers.EventHandler,
-	peh *handlers.PersEventsHandler,
+	ph *persons.PersonHandler,
+	eh *events.EventHandler,
+	peh *personsevents.PersEventsHandler,
 	ch *handlers.CalcHandler,
 ) *Server {
 	return &Server{
