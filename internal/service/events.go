@@ -7,7 +7,7 @@ import (
 )
 
 type EventRepository interface {
-	Add(ctx context.Context, ev *domain.Event) error
+	Create(ctx context.Context, ev *domain.Event) error
 	GetById(ctx context.Context, id int64) (*domain.Event, error)
 	GetByName(ctx context.Context, name string) (*domain.Event, error)
 	Update(ctx context.Context, ev *domain.Event) error
@@ -25,7 +25,7 @@ func NewEventService(r EventRepository) *EventService {
 
 func (p *EventService) NewEvent(ctx context.Context, name string, date time.Time) (int64, error) {
 	ev := domain.Event{Name: name, Date: date}
-	err := p.repo.Add(ctx, &ev)
+	err := p.repo.Create(ctx, &ev)
 	if err != nil {
 		return 0, err
 	}

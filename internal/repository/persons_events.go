@@ -15,7 +15,7 @@ type PersEventsRepository struct {
 	Db *database.DataBase
 }
 
-func NewPersEventsRepository(db *database.DataBase, pr *PersonRepository, evr *EventRepository) *PersEventsRepository {
+func NewPersonsEventsRepository(db *database.DataBase) *PersEventsRepository {
 	return &PersEventsRepository{Db: db}
 }
 

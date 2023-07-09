@@ -3,17 +3,29 @@ package database
 import (
 	"context"
 	"party-calc/internal/logger"
+
 	//	"database/sql"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 )
 
+type DBInterface interface {
+	Begin(context.Context) (pgx.Tx, error)
+	Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
+	QueryRow(context.Context, string, ...interface{}) pgx.Row
+	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
+	Ping(context.Context) error
+	Prepare(context.Context, string, string) (*pgconn.StatementDescription, error)
+	Close(context.Context) error
+}
+
 type DataBase struct {
 	//DB    *sql.DB
-	DBPGX *pgx.Conn
+	DBPGX DBInterface
 }
 
 // func New(cfg DatabaseConfig) *DataBase {

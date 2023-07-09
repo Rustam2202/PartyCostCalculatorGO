@@ -9,7 +9,7 @@ import (
 	"party-calc/internal/server/handlers"
 	"party-calc/internal/server/handlers/events"
 	"party-calc/internal/server/handlers/persons"
-	"party-calc/internal/server/handlers/persons_events"
+	personsevents "party-calc/internal/server/handlers/persons_events"
 	"party-calc/internal/service"
 )
 
@@ -20,7 +20,7 @@ func main() {
 
 	personsRepo := repository.NewPersonRepository(db)
 	eventsRepo := repository.NewEventRepository(db)
-	persEventsRepo := repository.NewPersEventsRepository(db, personsRepo, eventsRepo)
+	persEventsRepo := repository.NewPersonsEventsRepository(db)
 
 	personService := service.NewPersonService(personsRepo)
 	eventService := service.NewEventService(eventsRepo)

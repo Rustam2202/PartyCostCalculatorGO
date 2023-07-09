@@ -17,7 +17,7 @@ func NewEventRepository(db *database.DataBase) *EventRepository {
 	return &EventRepository{Db: db}
 }
 
-func (r *EventRepository) Add(ctx context.Context, ev *domain.Event) error {
+func (r *EventRepository) Create(ctx context.Context, ev *domain.Event) error {
 	var lastInsertedId int64
 	err := r.Db.DBPGX.QueryRow(context.Background(),
 		`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id`,
@@ -77,7 +77,7 @@ func (r *EventRepository) GetById(ctx context.Context, id int64) (*domain.Event,
 func (r *EventRepository) GetByName(ctx context.Context, name string) (*domain.Event, error) {
 	var result domain.Event
 	err := r.Db.DBPGX.QueryRow(ctx,
-			`SELECT * FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &result.Date)
+		`SELECT * FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &result.Date)
 	if err != nil {
 		logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
 		return nil, err
