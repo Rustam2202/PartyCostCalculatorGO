@@ -45,16 +45,17 @@ func TestGetPersonById(t *testing.T) {
 
 	mock.ExpectQuery("SELECT (.+) FROM persons").
 		WithArgs(int64(1)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).AddRows([]any{int64(1), "John Doe"}))
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).AddRow(int64(1), "John Doe"))
 
 	mock.ExpectQuery("SELECT event_id FROM persons_events").
 		WithArgs(int64(1)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRows([]any{int64(1)}))
+		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(2)))
 
 	mock.ExpectQuery("SELECT id, name, date FROM events").
-		WithArgs([]int64{1}).
+		WithArgs([]int64{1, 2}).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
-			AddRows([]any{int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
+			AddRow(int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)).
+			AddRow(int64(2), "Old New Year", time.Date(2022, 01, 14, 23, 59, 59, 0, time.Local)))
 
 	person := &domain.Person{}
 	person, err = repo.GetById(ctx, int64(1))
@@ -63,6 +64,8 @@ func TestGetPersonById(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 	assert.EqualValues(t, 1, person.Id)
 	assert.Equal(t, "John Doe", person.Name)
+	assert.Equal(t, 2, len(person.Events))
+	assert.Equal(t, "Old New Year", person.Events[1].Name)
 }
 
 func TestUpdatePerson(t *testing.T) {

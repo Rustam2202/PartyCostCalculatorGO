@@ -46,19 +46,28 @@ func TestGetEventById(t *testing.T) {
 
 	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
 
-	mock.ExpectQuery("SELECT (.+) FROM events").
+	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
 			AddRows([]any{int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
+	// mock.ExpectQuery("SELECT id, name, date FROM events").
+	// 	WithArgs(int64(2)).
+	// 	WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
+	// 		AddRow(int64(1), "Old New Year", time.Date(2022, 01, 14, 23, 59, 59, 0, time.Local))).RowsWillBeClosed()
 
 	mock.ExpectQuery("SELECT person_id FROM persons_events").
 		WithArgs(int64(1)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRows([]any{int64(1)}))
+		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(2)).AddRow(int64(3)))
+	// mock.ExpectQuery("SELECT person_id FROM persons_events").
+	// 	WithArgs(int64(2)).
+	// 	WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(3)).AddRow(int64(4)))
 
 	mock.ExpectQuery("SELECT id, name FROM persons").
-		WithArgs([]int64{1}).
+		WithArgs([]int64{1,2,3}).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
-			AddRows([]any{int64(1), "John Doe"}))
+			AddRow(int64(1), "Person 1").
+			AddRow(int64(2), "Person 2").
+			AddRow(int64(3), "Person 3"))
 
 	ev := &domain.Event{}
 
@@ -110,7 +119,7 @@ func TestDeleteEvent(t *testing.T) {
 		WillReturnResult(pgxmock.NewResult("DELETE", 1))
 
 	err = repo.DeleteById(ctx, int64(1))
-	
+
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
