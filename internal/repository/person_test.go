@@ -46,11 +46,9 @@ func TestGetPersonById(t *testing.T) {
 	mock.ExpectQuery("SELECT (.+) FROM persons").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).AddRow(int64(1), "John Doe"))
-
 	mock.ExpectQuery("SELECT event_id FROM persons_events").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(2)))
-
 	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs([]int64{1, 2}).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).

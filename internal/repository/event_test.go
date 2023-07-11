@@ -63,7 +63,7 @@ func TestGetEventById(t *testing.T) {
 	// 	WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(3)).AddRow(int64(4)))
 
 	mock.ExpectQuery("SELECT id, name FROM persons").
-		WithArgs([]int64{1,2,3}).
+		WithArgs([]int64{1, 2, 3}).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
 			AddRow(int64(1), "Person 1").
 			AddRow(int64(2), "Person 2").
@@ -78,6 +78,9 @@ func TestGetEventById(t *testing.T) {
 	assert.EqualValues(t, 1, ev.Id)
 	assert.Equal(t, "New Year", ev.Name)
 	assert.Equal(t, time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local), ev.Date)
+	assert.Equal(t, 3, len(ev.Persons))
+	assert.EqualValues(t, 3, ev.Persons[2].Id)
+	assert.Equal(t, "Person 2", ev.Persons[1].Name)
 }
 
 func TestUpdateEvent(t *testing.T) {

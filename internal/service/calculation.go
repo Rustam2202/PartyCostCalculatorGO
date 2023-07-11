@@ -70,7 +70,7 @@ func (s *CalcService) createEventData(ctx context.Context, id int64) (*EventData
 // Fill Balances of Persons by them spents (taking into average) and
 // sorting from most indebted to most portable.
 func (ed *EventData) fillAndSortBalances() {
-	for i := 0; i < ed.AllPersonsCount-1; i++ {
+	for i := 0; i < len(ed.Persons); i++ {
 		ed.Balances = append(ed.Balances, PersonBalance{
 			Person:  &ed.Persons[i],
 			Balance: ed.Persons[i].Spent - ed.AverageAmount*float64(ed.Persons[i].Factor),

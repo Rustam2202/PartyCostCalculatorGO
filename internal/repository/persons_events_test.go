@@ -49,17 +49,32 @@ func TestGetPersonsEventsByPersonId(t *testing.T) {
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
 			AddRow(int64(1), int64(2), int64(3), 9.8, 1))
 
-	perEv := &domain.PersonsAndEvents{}
+	perEv1 := &domain.PersonsAndEvents{}
 
-	perEv, err = repo.GetByPersonId(ctx, int64(1))
+	perEv1, err = repo.GetByPersonId(ctx, int64(1))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
-	assert.EqualValues(t, 1, perEv.Id)
-	assert.EqualValues(t, 2, perEv.PersonId)
-	assert.EqualValues(t, 3, perEv.EventId)
-	assert.EqualValues(t, 9.8, perEv.Spent)
-	assert.EqualValues(t, 1, perEv.Factor)
+	assert.EqualValues(t, 1, perEv1.Id)
+	assert.EqualValues(t, 2, perEv1.PersonId)
+	assert.EqualValues(t, 3, perEv1.EventId)
+	assert.EqualValues(t, 9.8, perEv1.Spent)
+	assert.EqualValues(t, 1, perEv1.Factor)
+
+	mock.ExpectQuery("SELECT (.+) FROM persons_events").
+		WithArgs(int64(2)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
+			AddRow(int64(2), int64(3), int64(3), 5.0, 2))
+
+	perEv2 := &domain.PersonsAndEvents{}
+	perEv2, err = repo.GetByPersonId(ctx, int64(2))
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.EqualValues(t, 2, perEv2.Id)
+	assert.EqualValues(t, 3, perEv2.PersonId)
+	assert.EqualValues(t, 3, perEv2.EventId)
+	assert.EqualValues(t, 5, perEv2.Spent)
+	assert.EqualValues(t, 2, perEv2.Factor)
 }
 
 func TestGetPersonsEventsByEventId(t *testing.T) {
@@ -78,17 +93,15 @@ func TestGetPersonsEventsByEventId(t *testing.T) {
 			AddRow(int64(1), int64(2), int64(3), 9.8, 1))
 
 	perEv := &domain.PersonsAndEvents{}
+	perEv, err = repo.GetByEventId(ctx, int64(1))
 
-	perEv, err = repo.GetByPersonId(ctx, int64(1))
-	if err != nil {
-		t.Errorf("Error occurred while creating person: %s", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("There were unfulfilled expectations: %s", err)
-	}
-	if perEv.Id != 1 {
-		t.Errorf("Expected person ID to be 1, got %d", perEv.Id)
-	}
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.EqualValues(t, 1, perEv.Id)
+	assert.EqualValues(t, 2, perEv.PersonId)
+	assert.EqualValues(t, 3, perEv.EventId)
+	assert.EqualValues(t, 9.8, perEv.Spent)
+	assert.EqualValues(t, 1, perEv.Factor)
 }
 
 func TestUpdatePersonsEvents(t *testing.T) {

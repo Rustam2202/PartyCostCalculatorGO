@@ -14,7 +14,7 @@ import (
 func TestCalcEvent(t *testing.T) {
 	var ctx context.Context = context.TODO()
 	mock, err := pgxmock.NewConn()
-	
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,46 +25,202 @@ func TestCalcEvent(t *testing.T) {
 	repoPerEv := repository.NewPersonsEventsRepository(&database.DataBase{DBPGX: mock})
 
 	// Get from events
-	mock.ExpectQuery("SELECT (.+) FROM events").
+	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
-			AddRow(int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)))
-	mock.ExpectQuery("SELECT (.+) FROM events").
-		WithArgs(int64(2)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
-			AddRow(int64(1), "Old New Year", time.Date(2022, 01, 14, 23, 59, 59, 0, time.Local)))
-
+			AddRows([]any{int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
 	mock.ExpectQuery("SELECT person_id FROM persons_events").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(2)).AddRow(int64(3)))
-	mock.ExpectQuery("SELECT person_id FROM persons_events").
-		WithArgs(int64(2)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(3)).AddRow(int64(4)))
-
 	mock.ExpectQuery("SELECT id, name FROM persons").
-		WithArgs([]int64{1}).
+		WithArgs([]int64{1, 2, 3}).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
-			AddRows([]any{int64(1), "John Doe"}))
+			AddRow(int64(1), "Person 1").
+			AddRow(int64(2), "Person 2").
+			AddRow(int64(3), "Person 3"))
 
 	// Get PersonsEvents
+	mock.ExpectQuery("SELECT (.+) FROM persons_events").
+		WithArgs(int64(1)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
+			AddRow(int64(1), int64(1), int64(1), 18.0, 3))
+	mock.ExpectQuery("SELECT (.+) FROM persons_events").
+		WithArgs(int64(2)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
+			AddRow(int64(2), int64(2), int64(1), 3.0, 1))
+	mock.ExpectQuery("SELECT (.+) FROM persons_events").
+		WithArgs(int64(3)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
+			AddRow(int64(3), int64(3), int64(1), 0.0, 2))
 
 	servCalc := NewCalcService(NewEventService(repoEv), NewPersonsEventsService(repoPerEv))
-
 	result, err := servCalc.CalcEvent(ctx, 1)
+
 	assert.NoError(t, err)
-	assert.Equal(t, nil, result.Balances)
+	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.Equal(t, 3, len(result.Persons))
+	assert.EqualValues(t, 6, result.AllPersonsCount)
+	assert.EqualValues(t, 3.5, result.AverageAmount)
+	assert.EqualValues(t, 6, result.AllPersonsCount)
+	assert.EqualValues(t, 21, result.TotalAmount)
+
+	assert.Equal(t, map[string]float64(map[string]float64(nil)), result.Persons[0].Owe)
+	assert.Equal(t, map[string]float64{"Person 1": 0.5}, result.Persons[1].Owe)
+	assert.Equal(t, map[string]float64{"Person 1": 7.0}, result.Persons[2].Owe)
 }
 
 func TestEventData_fillAndSortBalances(t *testing.T) {
 	tests := []struct {
-		name string
-		ed   *EventData
+		name   string
+		ed     *EventData
+		expect []PersonBalance
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Test 1",
+			ed: &EventData{
+				Name: "",
+				Date: time.Time{},
+				Persons: []PersonData{
+					{
+						Id:     1,
+						Spent:  100,
+						Factor: 1,
+					},
+					{
+						Id:     2,
+						Spent:  50,
+						Factor: 1,
+					},
+					{
+						Id:     3,
+						Spent:  0,
+						Factor: 1,
+					},
+				},
+				AllPersonsCount: 3,
+				AverageAmount:   50,
+				TotalAmount:     150,
+			},
+			expect: []PersonBalance{
+				{
+					Person:  &PersonData{Id: 3},
+					Balance: -50,
+				},
+				{
+					Person:  &PersonData{Id: 2},
+					Balance: 0,
+				},
+				{
+					Person:  &PersonData{Id: 1},
+					Balance: 50,
+				},
+			},
+		},
+		{
+			name: "Test 2",
+			ed: &EventData{
+				Name: "",
+				Date: time.Time{},
+				Persons: []PersonData{
+					{
+						Id:     1,
+						Spent:  0,
+						Factor: 3,
+					},
+					{
+						Id:     2,
+						Spent:  100,
+						Factor: 1,
+					},
+					{
+						Id:     3,
+						Spent:  50,
+						Factor: 1,
+					},
+				},
+				AllPersonsCount: 5,
+				AverageAmount:   30,
+				TotalAmount:     150,
+			},
+			expect: []PersonBalance{
+				{
+					Person:  &PersonData{Id: 1},
+					Balance: -90,
+				},
+				{
+					Person:  &PersonData{Id: 3},
+					Balance: 20,
+				},
+				{
+					Person:  &PersonData{Id: 2},
+					Balance: 70,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.ed.fillAndSortBalances()
+			for i := 0; i < len(tt.expect); i++ {
+				assert.EqualValues(t, tt.expect[i].Person.Id, tt.ed.Balances[i].Person.Id)
+				assert.EqualValues(t, tt.expect[i].Balance, tt.ed.Balances[i].Balance)
+			}
+		},
+		)
+	}
+}
+
+func TestEventData_calculateOwes(t *testing.T) {
+	tests := []struct {
+		name    string
+		ev      *EventData
+		expect  []PersonData
+	}{
+		{
+			name: "Test 1",
+			ev: &EventData{
+				Persons: []PersonData{
+					{Id: 1, Name: "Person 1"},
+					{Id: 2, Name: "Person 2"},
+					{Id: 3, Name: "Person 3"},
+				},
+				Balances: []PersonBalance{
+					{
+						Person:  &PersonData{Id: 3, Name: "Person 3"},
+						Balance: -50,
+					},
+					{
+						Person:  &PersonData{Id: 2, Name: "Person 2"},
+						Balance: 0,
+					},
+					{
+						Person:  &PersonData{Id: 1, Name: "Person 1"},
+						Balance: 50,
+					},
+				},
+			},
+			expect: []PersonData{
+				{
+					Id:  1,
+					Owe: map[string]float64(map[string]float64(nil)),
+				},
+				{
+					Id:  2,
+					Owe: map[string]float64(map[string]float64(nil)),
+				},
+				{
+					Id:  3,
+					Owe: map[string]float64{"Person 1": 50},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.ev.calculateOwes()
+			for i := 0; i < len(tt.expect); i++ {
+				assert.EqualValues(t, tt.expect[i].Owe, tt.ev.Persons[i].Owe)
+			}
 		})
 	}
 }
