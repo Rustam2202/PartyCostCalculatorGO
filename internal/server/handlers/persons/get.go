@@ -3,6 +3,7 @@ package persons
 import (
 	"net/http"
 	"party-calc/internal/domain"
+	"party-calc/internal/server/handlers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,17 +13,22 @@ type GetPersonRequest struct {
 	Name string `json:"name"`
 }
 
-// @Summary Get a Person
-// @Description get a Person model by ID or NAME
-// @Accept  json
-// @Produce  json
+// @Summary Get a person
+// @Description Get a person from database
+// @Tags Person
+// @Accept json
+// @Produce json
+// @Param request body GetPersonRequest true "Get Person Request"
 // @Success 200 {object} domain.Person
+// @Failure 400 {object} handlers.ErrorResponce
+// @Failure 500 {object} handlers.ErrorResponce
 // @Router /person [get]
 func (h *PersonHandler) GetById(ctx *gin.Context) {
 	var req GetPersonRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Failed parse request:": err})
+		ctx.JSON(http.StatusBadRequest, 
+			handlers.ErrorResponce{Message: "Failed parse request", Error: err})
 		return
 	}
 	var per *domain.Person
@@ -31,11 +37,13 @@ func (h *PersonHandler) GetById(ctx *gin.Context) {
 	} else if req.Name != "" {
 		per, err = h.service.GetPersonByName(ctx, req.Name)
 	} else {
-		ctx.JSON(http.StatusBadRequest, "Id=0 or empty Name in request")
+		ctx.JSON(http.StatusBadRequest,
+			handlers.ErrorResponce{Message: "Id=0 or empty Name in request", Error: err})
 		return
 	}
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
+		ctx.JSON(http.StatusInternalServerError,
+			handlers.ErrorResponce{Message: "Error with getting person from database", Error: err})
 		return
 	}
 	ctx.JSON(http.StatusOK, per)

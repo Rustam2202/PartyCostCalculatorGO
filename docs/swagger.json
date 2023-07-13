@@ -19,50 +19,180 @@
     "paths": {
         "/person": {
             "get": {
-                "description": "get a Person model by ID or NAME",
+                "description": "Get a person from database",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get a Person",
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Get a person",
+                "parameters": [
+                    {
+                        "description": "Get Person Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/persons.GetPersonRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/domain.Person"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
                     }
                 }
             },
-            "post": {
+            "put": {
+                "description": "Update a person in database",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Add a Person",
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Update a person",
+                "parameters": [
+                    {
+                        "description": "Update Person Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/persons.UpdatePersonRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Person"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new person to database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Add a person",
+                "parameters": [
+                    {
+                        "description": "Add Person Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/persons.AddPersonRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/persons.AddPersonResponse"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a person from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Delete a person",
+                "parameters": [
+                    {
+                        "description": "Delete Person Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/persons.DeletePersonRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
                     }
                 }
-            },
-            "delete": {
-                "description": "get string by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Delete a Person",
-                "responses": {}
             }
         }
     },
@@ -99,6 +229,67 @@
                         "$ref": "#/definitions/domain.Event"
                     }
                 },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ErrorResponce": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "persons.AddPersonRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "persons.AddPersonResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "persons.DeletePersonRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "persons.GetPersonRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "persons.UpdatePersonRequest": {
+            "type": "object",
+            "properties": {
                 "id": {
                     "type": "integer"
                 },

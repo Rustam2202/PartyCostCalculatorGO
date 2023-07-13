@@ -11,11 +11,15 @@ type DeletePersonRequest struct {
 	Name string `json:"name"`
 }
 
-// @Summary Delete a Person
-// @Description get string by ID
-// @Accept  json
-// @Produce  json
-// Success 200 {object} int64
+// @Summary Delete a person
+// @Description Delete a person from database
+// @Tags Person
+// @Accept json
+// @Produce json
+// @Param request body DeletePersonRequest true "Delete Person Request"
+// @Success 200 {object} int64
+// @Failure 304 {object} handlers.ErrorResponce
+// @Failure 400 {object} handlers.ErrorResponce
 // @Router /person [delete]
 func (h *PersonHandler) Delete(ctx *gin.Context) {
 	var req DeletePersonRequest

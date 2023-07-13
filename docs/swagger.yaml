@@ -26,6 +26,45 @@ definitions:
       name:
         type: string
     type: object
+  handlers.ErrorResponce:
+    properties:
+      error: {}
+      message:
+        type: string
+    type: object
+  persons.AddPersonRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  persons.AddPersonResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  persons.DeletePersonRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  persons.GetPersonRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  persons.UpdatePersonRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -47,26 +86,14 @@ paths:
     delete:
       consumes:
       - application/json
-      description: get string by ID
-      produces:
-      - application/json
-      responses: {}
-      summary: Delete a Person
-    get:
-      consumes:
-      - application/json
-      description: get a Person model by ID or NAME
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/domain.Person'
-      summary: Get a Person
-    post:
-      consumes:
-      - application/json
+      description: Delete a person from database
+      parameters:
+      - description: Delete Person Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/persons.DeletePersonRequest'
       produces:
       - application/json
       responses:
@@ -74,7 +101,104 @@ paths:
           description: OK
           schema:
             type: integer
-      summary: Add a Person
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Delete a person
+      tags:
+      - Person
+    get:
+      consumes:
+      - application/json
+      description: Get a person from database
+      parameters:
+      - description: Get Person Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/persons.GetPersonRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Person'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Get a person
+      tags:
+      - Person
+    post:
+      consumes:
+      - application/json
+      description: Add a new person to database
+      parameters:
+      - description: Add Person Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/persons.AddPersonRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/persons.AddPersonResponse'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Add a person
+      tags:
+      - Person
+    put:
+      consumes:
+      - application/json
+      description: Update a person in database
+      parameters:
+      - description: Update Person Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/persons.UpdatePersonRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Person'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Update a person
+      tags:
+      - Person
 securityDefinitions:
   BasicAuth:
     type: basic
