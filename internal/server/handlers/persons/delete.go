@@ -11,6 +11,12 @@ type DeletePersonRequest struct {
 	Name string `json:"name"`
 }
 
+// @Summary Delete a Person
+// @Description get string by ID
+// @Accept  json
+// @Produce  json
+// Success 200 {object} int64
+// @Router /person [delete]
 func (h *PersonHandler) Delete(ctx *gin.Context) {
 	var req DeletePersonRequest
 	err := ctx.ShouldBindJSON(&req)
@@ -23,12 +29,9 @@ func (h *PersonHandler) Delete(ctx *gin.Context) {
 	} else if req.Name != "" {
 		err = h.service.DeletePersonByName(ctx, req.Name)
 	} else {
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"Parsing JSON request error: ": err})
-			return
-		}
+		ctx.JSON(http.StatusBadRequest, "Id=0 or empty Name in request")
+		return
 	}
-	err = h.service.DeletePersonById(ctx, req.Id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person from database: ": err})
 		return

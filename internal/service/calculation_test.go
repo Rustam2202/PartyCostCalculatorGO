@@ -171,56 +171,84 @@ func TestEventData_fillAndSortBalances(t *testing.T) {
 }
 
 func TestEventData_calculateOwes(t *testing.T) {
-	tests := []struct {
-		name    string
-		ev      *EventData
-		expect  []PersonData
-	}{
-		{
-			name: "Test 1",
-			ev: &EventData{
-				Persons: []PersonData{
-					{Id: 1, Name: "Person 1"},
-					{Id: 2, Name: "Person 2"},
-					{Id: 3, Name: "Person 3"},
+	// Test 1
+	{
+		persons := []PersonData{
+			{Id: 1, Name: "Person 1"},
+			{Id: 2, Name: "Person 2"},
+			{Id: 3, Name: "Person 3"},
+		}
+		evData := EventData{
+			Persons: persons,
+			Balances: []PersonBalance{
+				{
+					Person:  &persons[2],
+					Balance: -50,
 				},
-				Balances: []PersonBalance{
-					{
-						Person:  &PersonData{Id: 3, Name: "Person 3"},
-						Balance: -50,
-					},
-					{
-						Person:  &PersonData{Id: 2, Name: "Person 2"},
-						Balance: 0,
-					},
-					{
-						Person:  &PersonData{Id: 1, Name: "Person 1"},
-						Balance: 50,
-					},
+				{
+					Person:  &persons[1],
+					Balance: 10,
+				},
+				{
+					Person:  &persons[0],
+					Balance: 40,
 				},
 			},
-			expect: []PersonData{
-				{
-					Id:  1,
-					Owe: map[string]float64(map[string]float64(nil)),
-				},
-				{
-					Id:  2,
-					Owe: map[string]float64(map[string]float64(nil)),
-				},
-				{
-					Id:  3,
-					Owe: map[string]float64{"Person 1": 50},
-				},
+		}
+		expect := []PersonData{
+			{
+				Id:  3,
+				Owe: map[string]float64{"Person 1": 50, "Person 2": 10},
 			},
-		},
+		}
+
+		evData.calculateOwes()
+		assert.EqualValues(t, evData.Persons[2].Owe, expect[0].Owe, "Test 1 failed")
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.ev.calculateOwes()
-			for i := 0; i < len(tt.expect); i++ {
-				assert.EqualValues(t, tt.expect[i].Owe, tt.ev.Persons[i].Owe)
-			}
-		})
+
+	// Test 2
+	{
+		persons := []PersonData{
+			{Id: 1, Name: "Person 1"},
+			{Id: 2, Name: "Person 2"},
+			{Id: 3, Name: "Person 3"},
+			{Id: 4, Name: "Person 4"},
+		}
+		evData := EventData{
+			Persons: persons,
+			Balances: []PersonBalance{
+				{
+					Person:  &persons[0],
+					Balance: -100,
+				},
+				{
+					Person:  &persons[1],
+					Balance: -100,
+				},
+				{
+					Person:  &persons[2],
+					Balance: 50,
+				},
+				{
+					Person:  &persons[3],
+					Balance: 150,
+				},
+			},
+		}
+		expect := []PersonData{
+			{
+				Id:  1,
+				Owe: map[string]float64{"Person 4": 100},
+			},
+			{
+				Id:  2,
+				Owe: map[string]float64{"Person 3": 50, "Person 4": 50},
+			},
+		}
+		evData.calculateOwes()
+		// for i, v := range evData.Persons {
+
+		// }
+		assert.EqualValues(t, evData.Persons[2].Owe, expect[0].Owe)
 	}
 }

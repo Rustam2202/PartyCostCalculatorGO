@@ -12,6 +12,7 @@ type GetEventRequest struct {
 	Name string `json:"name"`
 }
 
+// @Router /person [get]
 func (h *EventHandler) Get(ctx *gin.Context) {
 	var req GetEventRequest
 	err := ctx.ShouldBindJSON(&req)

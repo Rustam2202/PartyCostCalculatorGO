@@ -1,9 +1,10 @@
-package repository
+package service
 
 import (
 	"context"
 	"party-calc/internal/database"
 	"party-calc/internal/domain"
+	"party-calc/internal/repository"
 	"testing"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddEvent(t *testing.T) {
+func TestNewEvent(t *testing.T) {
 	var ctx context.Context = context.TODO()
 	mock, err := pgxmock.NewConn()
 	if err != nil {
@@ -19,21 +20,18 @@ func TestAddEvent(t *testing.T) {
 	}
 	defer mock.Close(ctx)
 
-	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
+	repo := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectQuery("INSERT INTO events").
 		WithArgs("New Year", "2021-12-31").
 		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)))
 
-	ev := &domain.Event{Name: "New Year", Date: time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}
-
-	err = repo.Create(ctx, ev)
+	serv := NewEventService(repo)
+	id, err := serv.NewEvent(ctx, "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
-	assert.EqualValues(t, 1, ev.Id)
-	assert.Equal(t, "New Year", ev.Name)
-	assert.Equal(t, time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local), ev.Date)
+	assert.EqualValues(t, 1, id)
 }
 
 func TestGetEventById(t *testing.T) {
@@ -44,7 +42,7 @@ func TestGetEventById(t *testing.T) {
 	}
 	defer mock.Close(ctx)
 
-	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
+	repo := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs(int64(1)).
@@ -53,7 +51,8 @@ func TestGetEventById(t *testing.T) {
 
 	mock.ExpectQuery("SELECT person_id FROM persons_events").
 		WithArgs(int64(1)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(2)).AddRow(int64(3)))
+		WillReturnRows(pgxmock.NewRows([]string{"Id"}).
+			AddRow(int64(1)).AddRow(int64(2)).AddRow(int64(3)))
 
 	mock.ExpectQuery("SELECT id, name FROM persons").
 		WithArgs([]int64{1, 2, 3}).
@@ -63,8 +62,8 @@ func TestGetEventById(t *testing.T) {
 			AddRow(int64(3), "Person 3"))
 
 	ev := &domain.Event{}
-
-	ev, err = repo.GetById(ctx, int64(1))
+	serv := NewEventService(repo)
+	ev, err = serv.GetEventById(ctx, 1)
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -84,7 +83,7 @@ func TestGetEventByName(t *testing.T) {
 	}
 	defer mock.Close(ctx)
 
-	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
+	repo := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs("New Year").
@@ -93,7 +92,8 @@ func TestGetEventByName(t *testing.T) {
 
 	mock.ExpectQuery("SELECT person_id FROM persons_events").
 		WithArgs(int64(1)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)).AddRow(int64(2)).AddRow(int64(3)))
+		WillReturnRows(pgxmock.NewRows([]string{"Id"}).
+			AddRow(int64(1)).AddRow(int64(2)).AddRow(int64(3)))
 
 	mock.ExpectQuery("SELECT id, name FROM persons").
 		WithArgs([]int64{1, 2, 3}).
@@ -103,8 +103,8 @@ func TestGetEventByName(t *testing.T) {
 			AddRow(int64(3), "Person 3"))
 
 	ev := &domain.Event{}
-
-	ev, err = repo.GetByName(ctx, "New Year")
+	serv := NewEventService(repo)
+	ev, err = serv.GetEventByName(ctx, "New Year")
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -123,19 +123,14 @@ func TestUpdateEvent(t *testing.T) {
 		t.Fatalf("error creating mock database connection: %s", err)
 	}
 
-	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
-
-	ev := &domain.Event{
-		Id:   1,
-		Name: "New Year",
-		Date: time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local),
-	}
+	repo := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectExec("UPDATE events").
 		WithArgs(int64(1), "New Year", "2021-12-31").
 		WillReturnResult(pgxmock.NewResult("UPDATE", 1))
 
-	err = repo.Update(ctx, ev)
+	serv := NewEventService(repo)
+	err = serv.UpdateEvent(ctx, 1, "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -148,13 +143,14 @@ func TestDeleteEventById(t *testing.T) {
 		t.Fatalf("error creating mock database connection: %s", err)
 	}
 
-	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
+	repo := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectExec("DELETE FROM events").
 		WithArgs(int64(1)).
 		WillReturnResult(pgxmock.NewResult("DELETE", 1))
 
-	err = repo.DeleteById(ctx, int64(1))
+	serv := NewEventService(repo)
+	err = serv.DeleteEventById(ctx, 1)
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -167,13 +163,14 @@ func TestDeleteEventByName(t *testing.T) {
 		t.Fatalf("error creating mock database connection: %s", err)
 	}
 
-	repo := NewEventRepository(&database.DataBase{DBPGX: mock})
+	repo := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectExec("DELETE FROM events").
 		WithArgs("New Year").
 		WillReturnResult(pgxmock.NewResult("DELETE", 1))
 
-	err = repo.DeleteByName(ctx, "New Year")
+	serv := NewEventService(repo)
+	err = serv.DeleteEventByName(ctx, "New Year")
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())

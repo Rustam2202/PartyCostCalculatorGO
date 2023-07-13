@@ -10,6 +10,12 @@ type AddPersonRequest struct {
 	Name string `json:"name"`
 }
 
+// @Summary Add a Person
+// @Description 
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} int64
+// @Router /person [post]
 func (h *PersonHandler) Add(ctx *gin.Context) {
 	var req AddPersonRequest
 	err := ctx.ShouldBindJSON(&req)

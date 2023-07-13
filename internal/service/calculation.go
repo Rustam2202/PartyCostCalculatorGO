@@ -97,7 +97,8 @@ func (ev *EventData) calculateOwes() {
 			ev.Balances[i].Balance = 0
 			i++
 			// if Balance of 'i' less them 'j' and 'j' should take from 'i+1' Person
-		case ev.Balances[i].Balance+ev.Balances[j].Balance <= 0:
+		case ev.Balances[i].Balance+ev.Balances[j].Balance <= 0 &&
+			(ev.Balances[i].Balance != 0 && ev.Balances[j].Balance != 0):
 			if ev.Balances[i].Person.Owe == nil {
 				ev.Balances[i].Person.Owe = map[string]float64{}
 			}

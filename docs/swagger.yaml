@@ -1,0 +1,81 @@
+definitions:
+  domain.Event:
+    properties:
+      date:
+        description: 'postgres format: `YYYY-MM-DD`'
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      persons:
+        description: PersonIds []int64
+        items:
+          $ref: '#/definitions/domain.Person'
+        type: array
+    type: object
+  domain.Person:
+    properties:
+      events:
+        description: EventIds []int64
+        items:
+          $ref: '#/definitions/domain.Event'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Party Cost Calculator API
+  version: "1.0"
+paths:
+  /person:
+    delete:
+      consumes:
+      - application/json
+      description: get string by ID
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete a Person
+    get:
+      consumes:
+      - application/json
+      description: get a Person model by ID or NAME
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Person'
+      summary: Get a Person
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Add a Person
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

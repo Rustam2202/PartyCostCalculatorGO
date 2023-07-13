@@ -17,4 +17,7 @@ compose:
 	docker-compose up
 
 test:
-	
+	go test ./...
+
+swag:
+	swag init -g ./internal/server/server.go

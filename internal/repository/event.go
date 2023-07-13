@@ -77,7 +77,7 @@ func (r *EventRepository) GetById(ctx context.Context, id int64) (*domain.Event,
 func (r *EventRepository) GetByName(ctx context.Context, name string) (*domain.Event, error) {
 	var result domain.Event
 	err := r.Db.DBPGX.QueryRow(ctx,
-		`SELECT * FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &result.Date)
+		`SELECT id, name, date FROM events WHERE name=$1`, name).Scan(&result.Id, &result.Name, &result.Date)
 	if err != nil {
 		logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
 		return nil, err
