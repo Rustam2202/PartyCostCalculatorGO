@@ -12,6 +12,16 @@ type GetPersonEventRequest struct {
 	EvId  int64 `json:"event_id"`
 }
 
+//	@Summary		Get a person-event
+//	@Description	Get a record of peson existed in event by Id from database
+//	@Tags			Person-Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		GetPersonEventRequest	true	"Get Person-Event Request"
+//	@Success		200		{object}	domain.PersonsAndEvents
+//	@Failure		304		{object}	handlers.ErrorResponce
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Router			/persEvents [get]
 func (h *PersEventsHandler) Get(ctx *gin.Context) {
 	var req GetPersonEventRequest
 	err := ctx.ShouldBindJSON(&req)
@@ -30,5 +40,5 @@ func (h *PersEventsHandler) Get(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting event from database:": err})
 		return
 	}
-	ctx.JSON(http.StatusOK, *ev)
+	ctx.JSON(http.StatusOK, ev)
 }

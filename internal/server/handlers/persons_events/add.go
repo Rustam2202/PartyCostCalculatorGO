@@ -13,6 +13,16 @@ type AddPersonEventRequest struct {
 	Factor int     `json:"factor"`
 }
 
+//	@Summary		Add a person-event
+//	@Description	Add a new record of peson existed in event by Id to database
+//	@Tags			Person-Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		AddPersonEventRequest	true	"Add Person-Event Request"
+//	@Success		200		{object}	int64
+//	@Failure		304		{object}	handlers.ErrorResponce
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Router			/persEvents [post]
 func (h *PersEventsHandler) Add(ctx *gin.Context) {
 	var req AddPersonEventRequest
 	err := ctx.ShouldBindJSON(&req)

@@ -20,7 +20,7 @@ func TestCalcEvent(t *testing.T) {
 	}
 	defer mock.Close(ctx)
 
-	//repoPer := repository.NewPersonRepository(&database.DataBase{DBPGX: mock})
+	repoPer := repository.NewPersonRepository(&database.DataBase{DBPGX: mock})
 	repoEv := repository.NewEventRepository(&database.DataBase{DBPGX: mock})
 	repoPerEv := repository.NewPersonsEventsRepository(&database.DataBase{DBPGX: mock})
 
@@ -53,7 +53,7 @@ func TestCalcEvent(t *testing.T) {
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
 			AddRow(int64(3), int64(3), int64(1), 0.0, 2))
 
-	servCalc := NewCalcService(NewEventService(repoEv), NewPersonsEventsService(repoPerEv))
+	servCalc := NewCalcService(NewPersonService(repoPer), NewEventService(repoEv), NewPersonsEventsService(repoPerEv))
 	result, err := servCalc.CalcEvent(ctx, 1)
 
 	assert.NoError(t, err)

@@ -1,22 +1,416 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server celler server.",
+        "description": "This is a sample app server.",
         "title": "Party Cost Calculator API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
+        "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "s.cfg.Host:s.cfg.Port",
+    "basePath": "/",
     "paths": {
+        "/calcEvent": {
+            "get": {
+                "description": "Calculate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calculate"
+                ],
+                "summary": "Calculate event data by Id",
+                "parameters": [
+                    {
+                        "description": "Calculate Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/calculate.calculateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.EventData"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/event": {
+            "get": {
+                "description": "Get a event from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get a event",
+                "parameters": [
+                    {
+                        "description": "Get Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/events.GetEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Event"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a event in database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Update a event",
+                "parameters": [
+                    {
+                        "description": "Update Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/events.UpdateEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Event"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new event to database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Add a event",
+                "parameters": [
+                    {
+                        "description": "Add Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/events.AddEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/events.AddEventResponse"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a event from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Delete a event",
+                "parameters": [
+                    {
+                        "description": "Delete Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/events.DeleteEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/persEvents": {
+            "get": {
+                "description": "Get a record of peson existed in event by Id from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person-Event"
+                ],
+                "summary": "Get a person-event",
+                "parameters": [
+                    {
+                        "description": "Get Person-Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/personsevents.GetPersonEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.PersonsAndEvents"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a record of peson existed in event by Id from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person-Event"
+                ],
+                "summary": "Update a person-event",
+                "parameters": [
+                    {
+                        "description": "Update Person-Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/personsevents.UpdatePersonEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new record of peson existed in event by Id to database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person-Event"
+                ],
+                "summary": "Add a person-event",
+                "parameters": [
+                    {
+                        "description": "Add Person-Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/personsevents.AddPersonEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a record of peson existed in event by Id from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person-Event"
+                ],
+                "summary": "Delete a person-event",
+                "parameters": [
+                    {
+                        "description": "Delete Person-Event Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/personsevents.DeletePersonEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
         "/person": {
             "get": {
                 "description": "Get a person from database",
@@ -197,6 +591,14 @@
         }
     },
     "definitions": {
+        "calculate.calculateRequest": {
+            "type": "object",
+            "properties": {
+                "event_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.Event": {
             "type": "object",
             "properties": {
@@ -228,6 +630,93 @@
                     "items": {
                         "$ref": "#/definitions/domain.Event"
                     }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.PersonsAndEvents": {
+            "type": "object",
+            "properties": {
+                "event": {
+                    "$ref": "#/definitions/domain.Event"
+                },
+                "eventId": {
+                    "type": "integer"
+                },
+                "factor": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "person": {
+                    "$ref": "#/definitions/domain.Person"
+                },
+                "personId": {
+                    "type": "integer"
+                },
+                "spent": {
+                    "type": "number"
+                }
+            }
+        },
+        "events.AddEventRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "events.AddEventResponse": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "events.DeleteEventRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "events.GetEventRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "events.UpdateEventRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -297,15 +786,128 @@
                     "type": "string"
                 }
             }
+        },
+        "personsevents.AddPersonEventRequest": {
+            "type": "object",
+            "properties": {
+                "event_id": {
+                    "type": "integer"
+                },
+                "factor": {
+                    "type": "integer"
+                },
+                "person_id": {
+                    "type": "integer"
+                },
+                "spent": {
+                    "type": "number"
+                }
+            }
+        },
+        "personsevents.DeletePersonEventRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "personsevents.GetPersonEventRequest": {
+            "type": "object",
+            "properties": {
+                "event_id": {
+                    "type": "integer"
+                },
+                "person_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "personsevents.UpdatePersonEventRequest": {
+            "type": "object",
+            "properties": {
+                "event_id": {
+                    "type": "integer"
+                },
+                "factor": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "person_id": {
+                    "type": "integer"
+                },
+                "spent": {
+                    "type": "number"
+                }
+            }
+        },
+        "service.EventData": {
+            "type": "object",
+            "properties": {
+                "allPersonsCount": {
+                    "type": "integer"
+                },
+                "averageAmount": {
+                    "type": "number"
+                },
+                "balances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.PersonBalance"
+                    }
+                },
+                "date": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "persons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.PersonData"
+                    }
+                },
+                "totalAmount": {
+                    "type": "number"
+                }
+            }
+        },
+        "service.PersonBalance": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "person": {
+                    "$ref": "#/definitions/service.PersonData"
+                }
+            }
+        },
+        "service.PersonData": {
+            "type": "object",
+            "properties": {
+                "factor": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owe": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                },
+                "spent": {
+                    "type": "number"
+                }
+            }
         }
-    },
-    "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
-        }
-    },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
     }
 }

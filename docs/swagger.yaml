@@ -1,4 +1,10 @@
+basePath: /
 definitions:
+  calculate.calculateRequest:
+    properties:
+      event_id:
+        type: integer
+    type: object
   domain.Event:
     properties:
       date:
@@ -21,6 +27,62 @@ definitions:
         items:
           $ref: '#/definitions/domain.Event'
         type: array
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  domain.PersonsAndEvents:
+    properties:
+      event:
+        $ref: '#/definitions/domain.Event'
+      eventId:
+        type: integer
+      factor:
+        type: integer
+      id:
+        type: integer
+      person:
+        $ref: '#/definitions/domain.Person'
+      personId:
+        type: integer
+      spent:
+        type: number
+    type: object
+  events.AddEventRequest:
+    properties:
+      date:
+        type: string
+      name:
+        type: string
+    type: object
+  events.AddEventResponse:
+    properties:
+      date:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  events.DeleteEventRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  events.GetEventRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  events.UpdateEventRequest:
+    properties:
+      date:
+        type: string
       id:
         type: integer
       name:
@@ -65,23 +127,356 @@ definitions:
       name:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
-host: localhost:8080
+  personsevents.AddPersonEventRequest:
+    properties:
+      event_id:
+        type: integer
+      factor:
+        type: integer
+      person_id:
+        type: integer
+      spent:
+        type: number
+    type: object
+  personsevents.DeletePersonEventRequest:
+    properties:
+      id:
+        type: integer
+    type: object
+  personsevents.GetPersonEventRequest:
+    properties:
+      event_id:
+        type: integer
+      person_id:
+        type: integer
+    type: object
+  personsevents.UpdatePersonEventRequest:
+    properties:
+      event_id:
+        type: integer
+      factor:
+        type: integer
+      id:
+        type: integer
+      person_id:
+        type: integer
+      spent:
+        type: number
+    type: object
+  service.EventData:
+    properties:
+      allPersonsCount:
+        type: integer
+      averageAmount:
+        type: number
+      balances:
+        items:
+          $ref: '#/definitions/service.PersonBalance'
+        type: array
+      date:
+        type: string
+      name:
+        type: string
+      persons:
+        items:
+          $ref: '#/definitions/service.PersonData'
+        type: array
+      totalAmount:
+        type: number
+    type: object
+  service.PersonBalance:
+    properties:
+      balance:
+        type: number
+      person:
+        $ref: '#/definitions/service.PersonData'
+    type: object
+  service.PersonData:
+    properties:
+      factor:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      owe:
+        additionalProperties:
+          type: number
+        type: object
+      spent:
+        type: number
+    type: object
+host: s.cfg.Host:s.cfg.Port
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server celler server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
+  contact: {}
+  description: This is a sample app server.
   title: Party Cost Calculator API
   version: "1.0"
 paths:
+  /calcEvent:
+    get:
+      consumes:
+      - application/json
+      description: Calculate
+      parameters:
+      - description: Calculate Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/calculate.calculateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.EventData'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Calculate event data by Id
+      tags:
+      - Calculate
+  /event:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a event from database
+      parameters:
+      - description: Delete Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/events.DeleteEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Delete a event
+      tags:
+      - Event
+    get:
+      consumes:
+      - application/json
+      description: Get a event from database
+      parameters:
+      - description: Get Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/events.GetEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Get a event
+      tags:
+      - Event
+    post:
+      consumes:
+      - application/json
+      description: Add a new event to database
+      parameters:
+      - description: Add Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/events.AddEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/events.AddEventResponse'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Add a event
+      tags:
+      - Event
+    put:
+      consumes:
+      - application/json
+      description: Update a event in database
+      parameters:
+      - description: Update Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/events.UpdateEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Update a event
+      tags:
+      - Event
+  /persEvents:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a record of peson existed in event by Id from database
+      parameters:
+      - description: Delete Person-Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/personsevents.DeletePersonEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Delete a person-event
+      tags:
+      - Person-Event
+    get:
+      consumes:
+      - application/json
+      description: Get a record of peson existed in event by Id from database
+      parameters:
+      - description: Get Person-Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/personsevents.GetPersonEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PersonsAndEvents'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Get a person-event
+      tags:
+      - Person-Event
+    post:
+      consumes:
+      - application/json
+      description: Add a new record of peson existed in event by Id to database
+      parameters:
+      - description: Add Person-Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/personsevents.AddPersonEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Add a person-event
+      tags:
+      - Person-Event
+    put:
+      consumes:
+      - application/json
+      description: Update a record of peson existed in event by Id from database
+      parameters:
+      - description: Update Person-Event Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/personsevents.UpdatePersonEventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Update a person-event
+      tags:
+      - Person-Event
   /person:
     delete:
       consumes:
@@ -199,7 +594,4 @@ paths:
       summary: Update a person
       tags:
       - Person
-securityDefinitions:
-  BasicAuth:
-    type: basic
 swagger: "2.0"

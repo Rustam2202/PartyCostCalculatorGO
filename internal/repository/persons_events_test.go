@@ -49,9 +49,7 @@ func TestGetPersonsEventsByPersonId(t *testing.T) {
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
 			AddRow(int64(1), int64(2), int64(3), 9.8, 1))
 
-	perEv1 := &domain.PersonsAndEvents{}
-
-	perEv1, err = repo.GetByPersonId(ctx, int64(1))
+	perEv1, err := repo.GetByPersonId(ctx, int64(1))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -66,8 +64,7 @@ func TestGetPersonsEventsByPersonId(t *testing.T) {
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
 			AddRow(int64(2), int64(3), int64(3), 5.0, 2))
 
-	perEv2 := &domain.PersonsAndEvents{}
-	perEv2, err = repo.GetByPersonId(ctx, int64(2))
+	perEv2, err := repo.GetByPersonId(ctx, int64(2))
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 	assert.EqualValues(t, 2, perEv2.Id)
@@ -88,20 +85,25 @@ func TestGetPersonsEventsByEventId(t *testing.T) {
 	repo := NewPersonsEventsRepository(&database.DataBase{DBPGX: mock})
 
 	mock.ExpectQuery("SELECT (.+) FROM persons_events").
-		WithArgs(int64(1)).
+		WithArgs(int64(3)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
-			AddRow(int64(1), int64(2), int64(3), 9.8, 1))
+			AddRow(int64(4), int64(2), int64(3), 9.8, 1).
+			AddRow(int64(8), int64(3), int64(3), 0.5, 2))
 
-	perEv := &domain.PersonsAndEvents{}
-	perEv, err = repo.GetByEventId(ctx, int64(1))
+	perEv, err := repo.GetByEventId(ctx, int64(3))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
-	assert.EqualValues(t, 1, perEv.Id)
+	assert.EqualValues(t, 4, perEv.Id)
 	assert.EqualValues(t, 2, perEv.PersonId)
 	assert.EqualValues(t, 3, perEv.EventId)
 	assert.EqualValues(t, 9.8, perEv.Spent)
 	assert.EqualValues(t, 1, perEv.Factor)
+	assert.EqualValues(t, 8, perEv.Id)
+	assert.EqualValues(t, 3, perEv.PersonId)
+	assert.EqualValues(t, 3, perEv.EventId)
+	assert.EqualValues(t, 0.5, perEv.Spent)
+	assert.EqualValues(t, 2, perEv.Factor)
 }
 
 func TestUpdatePersonsEvents(t *testing.T) {

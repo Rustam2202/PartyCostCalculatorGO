@@ -30,12 +30,14 @@ type EventData struct {
 }
 
 type CalcService struct {
+	PersonService *PersonService
 	EventsService        *EventService
 	PersonsEventsService *PersonsEventsService
 }
 
-func NewCalcService(es *EventService, pes *PersonsEventsService) *CalcService {
+func NewCalcService(ps*PersonService, es *EventService, pes *PersonsEventsService) *CalcService {
 	return &CalcService{
+		PersonService: ps,
 		EventsService:        es,
 		PersonsEventsService: pes,
 	}

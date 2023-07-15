@@ -11,16 +11,16 @@ type DeletePersonRequest struct {
 	Name string `json:"name"`
 }
 
-// @Summary Delete a person
-// @Description Delete a person from database
-// @Tags Person
-// @Accept json
-// @Produce json
-// @Param request body DeletePersonRequest true "Delete Person Request"
-// @Success 200 {object} int64
-// @Failure 304 {object} handlers.ErrorResponce
-// @Failure 400 {object} handlers.ErrorResponce
-// @Router /person [delete]
+//	@Summary		Delete a person
+//	@Description	Delete a person from database
+//	@Tags			Person
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		DeletePersonRequest	true	"Delete Person Request"
+//	@Success		200		{object}	int64
+//	@Failure		304		{object}	handlers.ErrorResponce
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Router			/person [delete]
 func (h *PersonHandler) Delete(ctx *gin.Context) {
 	var req DeletePersonRequest
 	err := ctx.ShouldBindJSON(&req)
@@ -40,5 +40,5 @@ func (h *PersonHandler) Delete(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete person from database: ": err})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"Person deleted: ": req.Id})
+	ctx.JSON(http.StatusOK,gin.H{"Person deleted: ": req.Id})
 }

@@ -11,7 +11,16 @@ type DeleteEventRequest struct {
 	Name string `json:"name"`
 }
 
-// @Router /person [delete]
+//	@Summary		Delete a event
+//	@Description	Delete a event from database
+//	@Tags			Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		DeleteEventRequest	true	"Delete Event Request"
+//	@Success		200		{object}	int64
+//	@Failure		304		{object}	handlers.ErrorResponce
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Router			/event [delete]
 func (h *EventHandler) Delete(ctx *gin.Context) {
 	var req DeleteEventRequest
 	err := ctx.ShouldBindJSON(&req)

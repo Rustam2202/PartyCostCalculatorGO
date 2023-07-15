@@ -13,17 +13,17 @@ type GetPersonRequest struct {
 	Name string `json:"name"`
 }
 
-// @Summary Get a person
-// @Description Get a person from database
-// @Tags Person
-// @Accept json
-// @Produce json
-// @Param request body GetPersonRequest true "Get Person Request"
-// @Success 200 {object} domain.Person
-// @Failure 400 {object} handlers.ErrorResponce
-// @Failure 500 {object} handlers.ErrorResponce
-// @Router /person [get]
-func (h *PersonHandler) GetById(ctx *gin.Context) {
+//	@Summary		Get a person
+//	@Description	Get a person from database
+//	@Tags			Person
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		GetPersonRequest	true	"Get Person Request"
+//	@Success		200		{object}	domain.Person
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Failure		500		{object}	handlers.ErrorResponce
+//	@Router			/person [get]
+func (h *PersonHandler) Get(ctx *gin.Context) {
 	var req GetPersonRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -43,7 +43,7 @@ func (h *PersonHandler) GetById(ctx *gin.Context) {
 	}
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError,
-			handlers.ErrorResponce{Message: "Error with getting person from database", Error: err})
+			handlers.ErrorResponce{Message: "Failed to get a person from database", Error: err})
 		return
 	}
 	ctx.JSON(http.StatusOK, per)

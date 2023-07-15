@@ -50,21 +50,53 @@ func (r *PersEventsRepository) GetByPersonId(ctx context.Context, id int64) (*do
 	return &result, nil
 }
 
-func (r *PersEventsRepository) GetByEventId(ctx context.Context, id int64) (*domain.PersonsAndEvents, error) {
-	var row pgx.Row
-	if id != 0 {
-		row = r.Db.DBPGX.QueryRow(ctx,
-			`SELECT * FROM persons_events WHERE event_id=$1`, id)
-	} else {
-		return nil, errors.New("incorrect input, 'Event Id' mustn't be zero")
+func (r *PersEventsRepository) GetByEventId(ctx context.Context, eventId int64) (*domain.PersonsAndEvents, error) {
+	var row pgx.Rows
+	var err error
+	row, err = r.Db.DBPGX.Query(ctx,
+		`SELECT * FROM persons_events WHERE event_id=$1`, eventId)
+	if err != nil {
+		return nil, err
 	}
-	var result domain.PersonsAndEvents
-	err := row.Scan(&result.Id, &result.PersonId, &result.EventId, &result.Spent, &result.Factor)
+
+	 var result *domain.PersonsAndEvents
+
+	// for rows.Next() {
+	// 	var perEv domain.PersonsAndEvents
+	// 	err = rows.Scan(&perEv.Id, &perEv.PersonId, &perEv.EventId, &perEv.Spent, &perEv.Factor)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	var per domain.Person
+	// 	err := r.Db.DBPGX.QueryRow(ctx,
+	// 		`SELECT * FROM persons WHERE id=$1`, perEv.PersonId).
+	// 		Scan(&per.Id, &per.Name)
+	// 	if err != nil {
+	// 		logger.Logger.Error("Failed Scan data from 'persons' by id: ", zap.Error(err))
+	// 		return nil, err
+	// 	}
+	// 	perEv.Person = per
+
+	// 	var ev domain.Event
+	// 	err = r.Db.DBPGX.QueryRow(ctx,
+	// 		`SELECT id, name, date FROM events WHERE id=$1`, perEv.EventId).
+	// 		Scan(&ev.Id, &ev.Name, &ev.Date)
+	// 	if err != nil {
+	// 		logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
+	// 		return nil, err
+	// 	}
+	// 	perEv.Event = ev
+
+	// 	result = append(result, perEv)
+	// }
+
+	err = row.Scan(&result.Id, &result.PersonId, &result.EventId, &result.Spent, &result.Factor)
 	if err != nil {
 		logger.Logger.Error("Failed to Scan data from 'persons_events' table: ", zap.Error(err))
 		return nil, err
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (r *PersEventsRepository) Update(ctx context.Context, pe *domain.PersonsAndEvents) error {

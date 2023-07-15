@@ -5,7 +5,7 @@ import (
 
 	"party-calc/docs"
 	"party-calc/internal/logger"
-	"party-calc/internal/server/handlers"
+	"party-calc/internal/server/handlers/calculate"
 	"party-calc/internal/server/handlers/events"
 	"party-calc/internal/server/handlers/persons"
 	personsevents "party-calc/internal/server/handlers/persons_events"
@@ -22,7 +22,7 @@ type Server struct {
 	personHandler     persons.PersonHandler
 	eventHandler      events.EventHandler
 	persEventsHandler personsevents.PersEventsHandler
-	calcHandler       handlers.CalcHandler
+	calcHandler       calculate.CalcHandler
 }
 
 func NewServer(
@@ -30,7 +30,7 @@ func NewServer(
 	ph *persons.PersonHandler,
 	eh *events.EventHandler,
 	peh *personsevents.PersEventsHandler,
-	ch *handlers.CalcHandler,
+	ch *calculate.CalcHandler,
 ) *Server {
 	return &Server{
 		cfg:               &cfg,
@@ -41,59 +41,25 @@ func NewServer(
 	}
 }
 
-// @title           Party Cost Calculator API
-// @version         1.0
-// @description     This is a sample server celler server.
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// BasePath  /
-// query.collection.format multi
-
-// @securityDefinitions.basic  BasicAuth
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
+//	@title			Party Cost Calculator API
+//	@version		1.0
+//	@description	This is a sample app server.
+//	@host			s.cfg.Host:s.cfg.Port
+//	@BasePath		/
 func (s *Server) Start() {
 	router := gin.Default()
 
 	docs.SwaggerInfo.BasePath = "/"
 
-	v1 := router.Group("/persons")
-	//	v1.GET("/person", s.personHandler.Add)
+	router.POST("/person", s.personHandler.Add)
+	router.GET("/person", s.personHandler.Get)
+	router.PUT("/person", s.personHandler.Update)
+	router.DELETE("/person", s.personHandler.Delete)
 
-	{
-		per := v1.Group("person")
-		{
-			per.POST("/person", s.personHandler.Add)
-			per.GET("/person", s.personHandler.GetById)
-			per.PUT("/person", s.personHandler.Update)
-			per.DELETE("/person", s.personHandler.Delete)
-
-		}
-	}
-
-	v1.POST("/event", s.eventHandler.Add)
-	v1.GET("/event", s.eventHandler.Get)
-	v1.PUT("/event", s.eventHandler.Update)
-	v1.DELETE("/event", s.eventHandler.Delete)
-
-	// router.POST("/person", s.personHandler.Add)
-	// router.GET("/person", s.personHandler.Get)
-	// router.PUT("/person", s.personHandler.Update)
-	// router.DELETE("/person", s.personHandler.Delete)
-
-	// router.POST("/event", s.eventHandler.Add)
-	// router.GET("/event", s.eventHandler.Get)
-	// router.PUT("/event", s.eventHandler.Update)
-	// router.DELETE("/event", s.eventHandler.Delete)
+	router.POST("/event", s.eventHandler.Add)
+	router.GET("/event", s.eventHandler.Get)
+	router.PUT("/event", s.eventHandler.Update)
+	router.DELETE("/event", s.eventHandler.Delete)
 
 	router.POST("/persEvents", s.persEventsHandler.Add)
 	router.GET("/persEvents", s.persEventsHandler.Get)
@@ -102,7 +68,7 @@ func (s *Server) Start() {
 
 	router.GET("/calcEvent", s.calcHandler.GetEvent)
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	err := router.Run(fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))
 	if err != nil {
