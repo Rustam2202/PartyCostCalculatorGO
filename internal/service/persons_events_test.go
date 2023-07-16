@@ -50,8 +50,7 @@ func TestGetPersonsEventsByPersonId(t *testing.T) {
 			AddRow(int64(1), int64(2), int64(3), 9.8, 1))
 
 	serv := NewPersonsEventsService(repo)
-	perEv1 := &domain.PersonsAndEvents{}
-	perEv1, err = serv.GetByPersonId(ctx, 1)
+	perEv1, err := serv.GetByPersonId(ctx, 1)
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -66,8 +65,7 @@ func TestGetPersonsEventsByPersonId(t *testing.T) {
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
 			AddRow(int64(2), int64(3), int64(3), 5.0, 2))
 
-	perEv2 := &domain.PersonsAndEvents{}
-	perEv2, err = repo.GetByPersonId(ctx, int64(2))
+	perEv2, err := repo.GetByPersonId(ctx, int64(2))
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 	assert.EqualValues(t, 2, perEv2.Id)

@@ -21,19 +21,19 @@ type balance struct {
 	balance float64
 }
 
-func (s *CalcService) createResponse(ctx context.Context, id int64) (Response, []balance, error) {
+func (s *CalcService) createResponse(ctx context.Context, eventId int64) (Response, []balance, error) {
 	var result Response
-	perEvs, _ := s.PersonsEventsService.GetByEventId(ctx, id)
-	result.Name = perEvs[0].Event.Name
-	result.Date = perEvs[0].Event.Date
-	for _, pe := range perEvs {
+	perEvsArr, _ := s.PersonsEventsService.GetByEventId(ctx, eventId)
+	result.Name = perEvsArr[0].Event.Name
+	result.Date = perEvsArr[0].Event.Date
+	for _, pe := range perEvsArr {
 		result.Total += pe.Spent
 		result.Count += pe.Factor
 	}
 	result.Average = result.Total / float64(result.Count)
 
 	var balances []balance
-	for _, pe := range perEvs {
+	for _, pe := range perEvsArr {
 		balances = append(balances,
 			balance{perId: pe.PersonId, perName: pe.Person.Name, balance: pe.Spent - result.Average})
 	}

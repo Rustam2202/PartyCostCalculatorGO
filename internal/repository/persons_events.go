@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"party-calc/internal/database"
 	"party-calc/internal/domain"
 	"party-calc/internal/logger"
@@ -33,6 +32,68 @@ func (r *PersEventsRepository) Create(ctx context.Context, pe *domain.PersonsAnd
 	return nil
 }
 
+func (r *PersEventsRepository) fillPersonAndEventsArrayForGet(ctx context.Context, rows pgx.Rows) ([]domain.PersonsAndEvents, error) {
+	var result []domain.PersonsAndEvents
+	for rows.Next() {
+		var perEv domain.PersonsAndEvents
+		err := rows.Scan(&perEv.Id, &perEv.PersonId, &perEv.EventId, &perEv.Spent, &perEv.Factor)
+		if err != nil {
+			return nil, err
+		}
+		var per domain.Person
+		err = r.Db.DBPGX.QueryRow(ctx,
+			`SELECT * FROM persons WHERE id=$1`, perEv.PersonId).
+			Scan(&per.Id, &per.Name)
+		if err != nil {
+			logger.Logger.Error("Failed Scan data from 'persons' by id: ", zap.Error(err))
+			return nil, err
+		}
+		perEv.Person = per
+		var ev domain.Event
+		err = r.Db.DBPGX.QueryRow(ctx,
+			`SELECT id, name, date FROM events WHERE id=$1`, perEv.EventId).
+			Scan(&ev.Id, &ev.Name, &ev.Date)
+		if err != nil {
+			logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
+			return nil, err
+		}
+		perEv.Event = ev
+		result = append(result, perEv)
+	}
+	return result, nil
+}
+
+func (r *PersEventsRepository) GetByPersonId(ctx context.Context, personId int64) ([]domain.PersonsAndEvents, error) {
+	var rows pgx.Rows
+	var err error
+	rows, err = r.Db.DBPGX.Query(ctx,
+		`SELECT * FROM persons_events WHERE person_id=$1`, personId)
+	if err != nil {
+		return nil, err
+	}
+	result, err := r.fillPersonAndEventsArrayForGet(ctx, rows)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r *PersEventsRepository) GetByEventId(ctx context.Context, eventId int64) ([]domain.PersonsAndEvents, error) {
+	var rows pgx.Rows
+	var err error
+	rows, err = r.Db.DBPGX.Query(ctx,
+		`SELECT * FROM persons_events WHERE event_id=$1`, eventId)
+	if err != nil {
+		return nil, err
+	}
+	result, err := r.fillPersonAndEventsArrayForGet(ctx, rows)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+/*
 func (r *PersEventsRepository) GetByPersonId(ctx context.Context, id int64) (*domain.PersonsAndEvents, error) {
 	var row pgx.Row
 	if id != 0 {
@@ -98,6 +159,7 @@ func (r *PersEventsRepository) GetByEventId(ctx context.Context, eventId int64) 
 	}
 	return result, nil
 }
+*/
 
 func (r *PersEventsRepository) Update(ctx context.Context, pe *domain.PersonsAndEvents) error {
 	_, err := r.Db.DBPGX.Exec(ctx,
