@@ -7,27 +7,26 @@ import (
 	"time"
 )
 
-type PersonData struct {
-	Id     int64
-	Name   string
-	Spent  float64
-	Factor int
-	Owe    map[string]float64
-}
-
-type PersonBalance struct {
-	Person  *PersonData
-	Balance float64
-}
+// type (
+// 	debetor   string
+// 	recepient string
+// 	owes      map[recepient]float64
+// )
 
 type EventData struct {
-	Name            string
-	Date            time.Time
-	Persons         []PersonData
-	AllPersonsCount int
-	AverageAmount   float64
-	TotalAmount     float64
-	Balances        []PersonBalance
+	Name         string
+	Date         time.Time
+	AverageSpent float64
+	TotalSpent   float64
+	PersonsCount int
+	//PersonsOwes    map[debetor]owes
+	PersonsOwes map[string]map[string]float64 // map[debetor]map[recepient]float64
+}
+
+type balance struct {
+	perId   int64
+	perName string
+	balance float64
 }
 
 type CalcService struct {
@@ -44,35 +43,20 @@ func NewCalcService(ps *PersonService, es *EventService, pes *PersonsEventsServi
 	}
 }
 
-type Response struct {
-	Name    string
-	Date    time.Time
-	Average float64
-	Total   float64
-	Count   int
-	Owes    map[string]map[string]float64
-}
-
-type balance struct {
-	perId   int64
-	perName string
-	balance float64
-}
-
-func (s *CalcService) createResponse(ctx context.Context, eventId int64) (Response, []balance, error) {
-	var result Response
+func (s *CalcService) createResponse(ctx context.Context, eventId int64) (EventData, []balance, error) {
+	var result EventData
 	perEvsArr, _ := s.PersonsEventsService.GetByEventId(ctx, eventId)
 	result.Name = perEvsArr[0].Event.Name
 	result.Date = perEvsArr[0].Event.Date
 	for _, pe := range perEvsArr {
-		result.Total += pe.Spent
-		result.Count += pe.Factor
+		result.TotalSpent += pe.Spent
+		result.PersonsCount += pe.Factor
 	}
-	result.Average = result.Total / float64(result.Count)
+	result.AverageSpent = result.TotalSpent / float64(result.PersonsCount)
 	var balances []balance
 	for _, pe := range perEvsArr {
 		balances = append(balances,
-			balance{perId: pe.PersonId, perName: pe.Person.Name, balance: pe.Spent - result.Average*float64(pe.Factor)})
+			balance{perId: pe.PersonId, perName: pe.Person.Name, balance: pe.Spent - result.AverageSpent*float64(pe.Factor)})
 	}
 	sort.SliceStable(balances, func(i, j int) bool {
 		return balances[i].balance < balances[j].balance
@@ -80,35 +64,35 @@ func (s *CalcService) createResponse(ctx context.Context, eventId int64) (Respon
 	return result, balances, nil
 }
 
-func (r *Response) calculateBalances(balances []balance) {
+func (r *EventData) calculateBalances(balances []balance) {
 	// i = most indepted Person, j = most portable Person
 	for i, j := 0, len(balances)-1; i < j; {
 		switch {
 		// if Balance of 'i' great them 'j' and the it's left to next 'j+1' Person
 		case balances[i].balance+balances[j].balance < 0:
-			if r.Owes[balances[i].perName] == nil {
-				r.Owes = make(map[string]map[string]float64)
+			if r.PersonsOwes[balances[i].perName] == nil {
+				r.PersonsOwes = make(map[string]map[string]float64)
 			}
-			if r.Owes[balances[i].perName] == nil {
-				r.Owes[balances[i].perName] = make(map[string]float64)
+			if r.PersonsOwes[balances[i].perName] == nil {
+				r.PersonsOwes[balances[i].perName] = make(map[string]float64)
 			}
-			r.Owes[balances[i].perName][balances[j].perName] = math.Abs(balances[j].balance)
+			r.PersonsOwes[balances[i].perName][balances[j].perName] = math.Abs(balances[j].balance)
 			balances[i].balance += balances[j].balance
 			balances[j].balance = 0
-			i++
+			j--
 		// if Balance of 'i' less them 'j' and 'j' should take from 'i+1' Person
 		case balances[i].balance+balances[j].balance >= 0 &&
 			(balances[i].balance != 0 && balances[j].balance != 0):
-			if r.Owes[balances[i].perName] == nil {
-				r.Owes = make(map[string]map[string]float64)
+			if r.PersonsOwes[balances[i].perName] == nil {
+				r.PersonsOwes = make(map[string]map[string]float64)
 			}
-			if r.Owes[balances[i].perName] == nil {
-				r.Owes[balances[i].perName] = make(map[string]float64)
+			if r.PersonsOwes[balances[i].perName] == nil {
+				r.PersonsOwes[balances[i].perName] = make(map[string]float64)
 			}
-			r.Owes[balances[i].perName][balances[j].perName] = math.Abs(balances[i].balance)
+			r.PersonsOwes[balances[i].perName][balances[j].perName] = math.Abs(balances[i].balance)
 			balances[j].balance += balances[i].balance
 			balances[i].balance = 0
-			j--
+			i++
 		case balances[i].balance == 0:
 			i++
 		case balances[j].balance == 0:
@@ -117,7 +101,7 @@ func (r *Response) calculateBalances(balances []balance) {
 	}
 }
 
-func (s *CalcService) CalculateEvent(ctx context.Context, eventId int64) (Response, error) {
+func (s *CalcService) CalculateEvent(ctx context.Context, eventId int64) (EventData, error) {
 	result, balances, _ := s.createResponse(ctx, eventId)
 	result.calculateBalances(balances)
 	return result, nil

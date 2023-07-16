@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/calculate.calculateRequest"
+                            "$ref": "#/definitions/calculation.GetEventRequest"
                         }
                     }
                 ],
@@ -598,7 +598,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "calculate.calculateRequest": {
+        "calculation.GetEventRequest": {
             "type": "object",
             "properties": {
                 "event_id": {
@@ -853,17 +853,8 @@ const docTemplate = `{
         "service.EventData": {
             "type": "object",
             "properties": {
-                "allPersonsCount": {
-                    "type": "integer"
-                },
-                "averageAmount": {
+                "averageSpent": {
                     "type": "number"
-                },
-                "balances": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonBalance"
-                    }
                 },
                 "date": {
                     "type": "string"
@@ -871,47 +862,20 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "persons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonData"
-                    }
-                },
-                "totalAmount": {
-                    "type": "number"
-                }
-            }
-        },
-        "service.PersonBalance": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "number"
-                },
-                "person": {
-                    "$ref": "#/definitions/service.PersonData"
-                }
-            }
-        },
-        "service.PersonData": {
-            "type": "object",
-            "properties": {
-                "factor": {
+                "personsCount": {
                     "type": "integer"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owe": {
+                "personsOwes": {
+                    "description": "PersonsOwes    map[debetor]owes",
                     "type": "object",
                     "additionalProperties": {
-                        "type": "number"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        }
                     }
                 },
-                "spent": {
+                "totalSpent": {
                     "type": "number"
                 }
             }
