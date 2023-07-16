@@ -29,7 +29,7 @@ func (h *PersEventsHandler) Get(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"Failed parse request: ": err})
 		return
 	}
-	var ev *domain.PersonsAndEvents
+	var ev []domain.PersonsAndEvents
 	if req.PerId != 0 {
 		ev, err = h.service.GetByPersonId(ctx, req.PerId)
 	} else if req.EvId != 0 {

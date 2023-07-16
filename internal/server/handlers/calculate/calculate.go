@@ -20,25 +20,25 @@ type CalculateRequest struct {
 	EventId int64 `json:"event_id"`
 }
 
-//	@Summary		Calculate event data by Id
-//	@Description	Calculate
-//	@Tags			Calculate
-//	@Accept			json
-//	@Produce		json
-//	@Param			request	body		CalculateRequest	true	"Calculate Event Request"
-//	@Success		200		{object}	service.EventData
-//	@Failure		304		{object}	handlers.ErrorResponce
-//	@Failure		400		{object}	handlers.ErrorResponce
-//	@Router			/calcEvent [get]
+// @Summary		Calculate event data by Id
+// @Description	Calculate
+// @Tags			Calculate
+// @Accept			json
+// @Produce		json
+// @Param			request	body		CalculateRequest	true	"Calculate Event Request"
+// @Success		200		{object}	service.EventData
+// @Failure		304		{object}	handlers.ErrorResponce
+// @Failure		400		{object}	handlers.ErrorResponce
+// @Router			/calcEvent [get]
 func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 	var req CalculateRequest
 	err := ctx.ShouldBindJSON(&req)
-		if err != nil {
-		ctx.JSON(http.StatusBadRequest, 
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest,
 			handlers.ErrorResponce{Message: "Failed parse request", Error: err})
 		return
 	}
-	result, err := s.service.CalcEvent(ctx, req.EventId)
+	result, err := s.service.CalculateEvent(ctx, req.EventId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
 		return

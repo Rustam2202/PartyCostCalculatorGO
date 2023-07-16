@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"math"
 	"sort"
 	"time"
 )
@@ -30,99 +31,94 @@ type EventData struct {
 }
 
 type CalcService struct {
-	PersonService *PersonService
+	PersonService        *PersonService
 	EventsService        *EventService
 	PersonsEventsService *PersonsEventsService
 }
 
-func NewCalcService(ps*PersonService, es *EventService, pes *PersonsEventsService) *CalcService {
+func NewCalcService(ps *PersonService, es *EventService, pes *PersonsEventsService) *CalcService {
 	return &CalcService{
-		PersonService: ps,
+		PersonService:        ps,
 		EventsService:        es,
 		PersonsEventsService: pes,
 	}
 }
 
-// Create EventData and fill all fields but Balances
-func (s *CalcService) createEventData(ctx context.Context, id int64) (*EventData, error) {
-	var result EventData
-	event, err := s.EventsService.GetEventById(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	result.Name = event.Name
-	result.Date = event.Date
-	for _, p := range event.Persons {
-		perEv, err := s.PersonsEventsService.GetByPersonId(ctx, p.Id)
-		if err != nil {
-			return nil, err
-		}
-		var perData PersonData
-		perData.Name = p.Name
-		perData.Spent = perEv.Spent
-		perData.Factor = perEv.Factor
-		result.Persons = append(result.Persons, perData)
-		result.AllPersonsCount += perEv.Factor
-		result.TotalAmount += perEv.Spent
-	}
-	result.AverageAmount = result.TotalAmount / float64(result.AllPersonsCount)
-	return &result, nil
+type Response struct {
+	Name    string
+	Date    time.Time
+	Average float64
+	Total   float64
+	Count   int
+	Owes    map[string]map[string]float64
 }
 
-// Fill Balances of Persons by them spents (taking into average) and
-// sorting from most indebted to most portable.
-func (ed *EventData) fillAndSortBalances() {
-	for i := 0; i < len(ed.Persons); i++ {
-		ed.Balances = append(ed.Balances, PersonBalance{
-			Person:  &ed.Persons[i],
-			Balance: ed.Persons[i].Spent - ed.AverageAmount*float64(ed.Persons[i].Factor),
-		})
+type balance struct {
+	perId   int64
+	perName string
+	balance float64
+}
+
+func (s *CalcService) createResponse(ctx context.Context, eventId int64) (Response, []balance, error) {
+	var result Response
+	perEvsArr, _ := s.PersonsEventsService.GetByEventId(ctx, eventId)
+	result.Name = perEvsArr[0].Event.Name
+	result.Date = perEvsArr[0].Event.Date
+	for _, pe := range perEvsArr {
+		result.Total += pe.Spent
+		result.Count += pe.Factor
 	}
-	sort.SliceStable(ed.Balances, func(i, j int) bool {
-		return ed.Balances[i].Balance < ed.Balances[j].Balance
+	result.Average = result.Total / float64(result.Count)
+	var balances []balance
+	for _, pe := range perEvsArr {
+		balances = append(balances,
+			balance{perId: pe.PersonId, perName: pe.Person.Name, balance: pe.Spent - result.Average*float64(pe.Factor)})
+	}
+	sort.SliceStable(balances, func(i, j int) bool {
+		return balances[i].balance < balances[j].balance
 	})
+	return result, balances, nil
 }
 
-// Calculate owes of indepted to portable Persons by them Balances.
-// Calculation continues until all Balances are equal to zero.
-func (ev *EventData) calculateOwes() {
+func (r *Response) calculateBalances(balances []balance) {
 	// i = most indepted Person, j = most portable Person
-	for i, j := 0, len(ev.Balances)-1; i < j; {
+	for i, j := 0, len(balances)-1; i < j; {
 		switch {
 		// if Balance of 'i' great them 'j' and the it's left to next 'j+1' Person
-		case ev.Balances[i].Balance+ev.Balances[j].Balance > 0:
-			if ev.Balances[i].Person.Owe == nil {
-				ev.Balances[i].Person.Owe = map[string]float64{}
+		case balances[i].balance+balances[j].balance < 0:
+			if r.Owes[balances[i].perName] == nil {
+				r.Owes = make(map[string]map[string]float64)
 			}
-			ev.Balances[i].Person.Owe[ev.Balances[j].Person.Name] = -ev.Balances[i].Balance
-			ev.Balances[j].Balance += ev.Balances[i].Balance
-			ev.Balances[i].Balance = 0
+			if r.Owes[balances[i].perName] == nil {
+				r.Owes[balances[i].perName] = make(map[string]float64)
+			}
+			r.Owes[balances[i].perName][balances[j].perName] = math.Abs(balances[j].balance)
+			balances[i].balance += balances[j].balance
+			balances[j].balance = 0
 			i++
-			// if Balance of 'i' less them 'j' and 'j' should take from 'i+1' Person
-		case ev.Balances[i].Balance+ev.Balances[j].Balance <= 0 &&
-			(ev.Balances[i].Balance != 0 && ev.Balances[j].Balance != 0):
-			if ev.Balances[i].Person.Owe == nil {
-				ev.Balances[i].Person.Owe = map[string]float64{}
+		// if Balance of 'i' less them 'j' and 'j' should take from 'i+1' Person
+		case balances[i].balance+balances[j].balance >= 0 &&
+			(balances[i].balance != 0 && balances[j].balance != 0):
+			if r.Owes[balances[i].perName] == nil {
+				r.Owes = make(map[string]map[string]float64)
 			}
-			ev.Balances[i].Person.Owe[ev.Balances[j].Person.Name] = ev.Balances[j].Balance
-			ev.Balances[i].Balance += ev.Balances[j].Balance
-			ev.Balances[j].Balance = 0
+			if r.Owes[balances[i].perName] == nil {
+				r.Owes[balances[i].perName] = make(map[string]float64)
+			}
+			r.Owes[balances[i].perName][balances[j].perName] = math.Abs(balances[i].balance)
+			balances[j].balance += balances[i].balance
+			balances[i].balance = 0
 			j--
-		case ev.Balances[i].Balance == 0:
+		case balances[i].balance == 0:
 			i++
-		case ev.Balances[j].Balance == 0:
+		case balances[j].balance == 0:
 			j--
 		}
 	}
-	ev.Balances = nil
 }
 
-func (s *CalcService) CalcEvent(ctx context.Context, id int64) (*EventData, error) {
-	ed, err := s.createEventData(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	ed.fillAndSortBalances()
-	ed.calculateOwes()
-	return ed, nil
+func (s *CalcService) CalculateEvent(ctx context.Context, eventId int64) (Response, error) {
+	result, balances, _ := s.createResponse(ctx, eventId)
+	result.calculateBalances(balances)
+	return result, nil
 }
