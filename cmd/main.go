@@ -6,7 +6,7 @@ import (
 	"party-calc/internal/logger"
 	"party-calc/internal/repository"
 	"party-calc/internal/server"
-	"party-calc/internal/server/handlers/calculation"
+	"party-calc/internal/server/handlers/calculate"
 	"party-calc/internal/server/handlers/events"
 	"party-calc/internal/server/handlers/persons"
 	personsevents "party-calc/internal/server/handlers/persons_events"
@@ -30,7 +30,7 @@ func main() {
 	personHandler := persons.NewPersonHandler(personService)
 	eventHandler := events.NewEventHandler(eventService)
 	persEventHandler := personsevents.NewPersEventsHandler(persEventService)
-	calcHandler := calculation.NewCalcHandler(calcService)
+	calcHandler := calculate.NewCalcHandler(calcService)
 
 	srv := server.NewServer(cfg.ServerConfig, personHandler, eventHandler, persEventHandler, calcHandler)
 	srv.Start()

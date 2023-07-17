@@ -7,20 +7,13 @@ import (
 	"time"
 )
 
-// type (
-// 	debetor   string
-// 	recepient string
-// 	owes      map[recepient]float64
-// )
-
 type EventData struct {
-	Name         string
-	Date         time.Time
-	AverageSpent float64
-	TotalSpent   float64
-	PersonsCount int
-	//PersonsOwes    map[debetor]owes
-	PersonsOwes map[string]map[string]float64 // map[debetor]map[recepient]float64
+	Name    string
+	Date    time.Time
+	Average float64
+	Total   float64
+	Count   int
+	Owes    map[string]map[string]float64
 }
 
 type balance struct {
@@ -49,19 +42,26 @@ func (s *CalcService) createResponse(ctx context.Context, eventId int64) (EventD
 	result.Name = perEvsArr[0].Event.Name
 	result.Date = perEvsArr[0].Event.Date
 	for _, pe := range perEvsArr {
-		result.TotalSpent += pe.Spent
-		result.PersonsCount += pe.Factor
+		result.Total += pe.Spent
+		result.Count += pe.Factor
 	}
-	result.AverageSpent = result.TotalSpent / float64(result.PersonsCount)
+	result.Average = result.Total / float64(result.Count)
 	var balances []balance
 	for _, pe := range perEvsArr {
 		balances = append(balances,
-			balance{perId: pe.PersonId, perName: pe.Person.Name, balance: pe.Spent - result.AverageSpent*float64(pe.Factor)})
+			balance{
+				perId:   pe.PersonId,
+				perName: pe.Person.Name,
+				balance: pe.Spent - result.Average*float64(pe.Factor)})
 	}
 	sort.SliceStable(balances, func(i, j int) bool {
 		return balances[i].balance < balances[j].balance
 	})
 	return result, balances, nil
+}
+
+func roundAndAbs(n float64) float64 {
+	return math.Abs(math.Round(n*100) / 100)
 }
 
 func (r *EventData) calculateBalances(balances []balance) {
@@ -70,26 +70,26 @@ func (r *EventData) calculateBalances(balances []balance) {
 		switch {
 		// if Balance of 'i' great them 'j' and the it's left to next 'j+1' Person
 		case balances[i].balance+balances[j].balance < 0:
-			if r.PersonsOwes[balances[i].perName] == nil {
-				r.PersonsOwes = make(map[string]map[string]float64)
+			if r.Owes == nil {
+				r.Owes = make(map[string]map[string]float64)
 			}
-			if r.PersonsOwes[balances[i].perName] == nil {
-				r.PersonsOwes[balances[i].perName] = make(map[string]float64)
+			if r.Owes[balances[i].perName] == nil {
+				r.Owes[balances[i].perName] = make(map[string]float64)
 			}
-			r.PersonsOwes[balances[i].perName][balances[j].perName] = math.Abs(balances[j].balance)
+			r.Owes[balances[i].perName][balances[j].perName] = roundAndAbs(balances[j].balance) // math.Abs(balances[j].balance)
 			balances[i].balance += balances[j].balance
 			balances[j].balance = 0
 			j--
 		// if Balance of 'i' less them 'j' and 'j' should take from 'i+1' Person
 		case balances[i].balance+balances[j].balance >= 0 &&
 			(balances[i].balance != 0 && balances[j].balance != 0):
-			if r.PersonsOwes[balances[i].perName] == nil {
-				r.PersonsOwes = make(map[string]map[string]float64)
+			if r.Owes == nil {
+				r.Owes = make(map[string]map[string]float64)
 			}
-			if r.PersonsOwes[balances[i].perName] == nil {
-				r.PersonsOwes[balances[i].perName] = make(map[string]float64)
+			if r.Owes[balances[i].perName] == nil {
+				r.Owes[balances[i].perName] = make(map[string]float64)
 			}
-			r.PersonsOwes[balances[i].perName][balances[j].perName] = math.Abs(balances[i].balance)
+			r.Owes[balances[i].perName][balances[j].perName] = roundAndAbs(balances[i].balance) //math.Abs(balances[i].balance)
 			balances[j].balance += balances[i].balance
 			balances[i].balance = 0
 			i++

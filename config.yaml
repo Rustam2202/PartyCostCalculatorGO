@@ -1,6 +1,7 @@
 ServerConfig:
   host: localhost
   port: 8080
+  roundrate: 1.0
   
 DatabaseConfig:
   host: localhost

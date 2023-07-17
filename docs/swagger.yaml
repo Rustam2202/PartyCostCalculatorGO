@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  calculation.GetEventRequest:
+  calculate.calculateRequest:
     properties:
       event_id:
         type: integer
@@ -165,22 +165,45 @@ definitions:
     type: object
   service.EventData:
     properties:
-      averageSpent:
+      allPersonsCount:
+        type: integer
+      averageAmount:
         type: number
+      balances:
+        items:
+          $ref: '#/definitions/service.PersonBalance'
+        type: array
       date:
         type: string
       name:
         type: string
-      personsCount:
+      persons:
+        items:
+          $ref: '#/definitions/service.PersonData'
+        type: array
+      totalAmount:
+        type: number
+    type: object
+  service.PersonBalance:
+    properties:
+      balance:
+        type: number
+      person:
+        $ref: '#/definitions/service.PersonData'
+    type: object
+  service.PersonData:
+    properties:
+      factor:
         type: integer
-      personsOwes:
+      id:
+        type: integer
+      name:
+        type: string
+      owe:
         additionalProperties:
-          additionalProperties:
-            type: number
-          type: object
-        description: PersonsOwes    map[debetor]owes
+          type: number
         type: object
-      totalSpent:
+      spent:
         type: number
     type: object
 host: s.cfg.Host:s.cfg.Port
@@ -201,7 +224,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculation.GetEventRequest'
+          $ref: '#/definitions/calculate.calculateRequest'
       produces:
       - application/json
       responses:
