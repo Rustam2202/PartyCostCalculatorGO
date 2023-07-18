@@ -5,7 +5,7 @@ import (
 
 	"party-calc/docs"
 	"party-calc/internal/logger"
-	"party-calc/internal/server/handlers/calculate"
+	"party-calc/internal/server/handlers/calculation"
 	"party-calc/internal/server/handlers/events"
 	"party-calc/internal/server/handlers/persons"
 	personsevents "party-calc/internal/server/handlers/persons_events"
@@ -22,7 +22,7 @@ type Server struct {
 	personHandler     persons.PersonHandler
 	eventHandler      events.EventHandler
 	persEventsHandler personsevents.PersEventsHandler
-	calcHandler       calculate.CalcHandler
+	calcHandler       calculation.CalcHandler
 }
 
 func NewServer(
@@ -30,7 +30,7 @@ func NewServer(
 	ph *persons.PersonHandler,
 	eh *events.EventHandler,
 	peh *personsevents.PersEventsHandler,
-	ch *calculate.CalcHandler,
+	ch *calculation.CalcHandler,
 ) *Server {
 	return &Server{
 		cfg:               &cfg,

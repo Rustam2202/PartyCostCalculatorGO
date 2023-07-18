@@ -29,7 +29,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/calculate.calculateRequest"
+                            "$ref": "#/definitions/calculation.CalculateRequest"
                         }
                     }
                 ],
@@ -591,11 +591,14 @@
         }
     },
     "definitions": {
-        "calculate.calculateRequest": {
+        "calculation.CalculateRequest": {
             "type": "object",
             "properties": {
                 "event_id": {
                     "type": "integer"
+                },
+                "round_rate": {
+                    "type": "number"
                 }
             }
         },
@@ -613,7 +616,6 @@
                     "type": "string"
                 },
                 "persons": {
-                    "description": "PersonIds []int64",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Person"
@@ -625,7 +627,6 @@
             "type": "object",
             "properties": {
                 "events": {
-                    "description": "EventIds []int64",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Event"
@@ -846,17 +847,11 @@
         "service.EventData": {
             "type": "object",
             "properties": {
-                "allPersonsCount": {
-                    "type": "integer"
-                },
-                "averageAmount": {
+                "average": {
                     "type": "number"
                 },
-                "balances": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonBalance"
-                    }
+                "count": {
+                    "type": "integer"
                 },
                 "date": {
                     "type": "string"
@@ -864,47 +859,19 @@
                 "name": {
                     "type": "string"
                 },
-                "persons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonData"
-                    }
-                },
-                "totalAmount": {
-                    "type": "number"
-                }
-            }
-        },
-        "service.PersonBalance": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "number"
-                },
-                "person": {
-                    "$ref": "#/definitions/service.PersonData"
-                }
-            }
-        },
-        "service.PersonData": {
-            "type": "object",
-            "properties": {
-                "factor": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owe": {
+                "owes": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "number"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        }
                     }
                 },
-                "spent": {
+                "roundRate": {
+                    "type": "number"
+                },
+                "total": {
                     "type": "number"
                 }
             }

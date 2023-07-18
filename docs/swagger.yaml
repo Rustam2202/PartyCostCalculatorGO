@@ -1,9 +1,11 @@
 basePath: /
 definitions:
-  calculate.calculateRequest:
+  calculation.CalculateRequest:
     properties:
       event_id:
         type: integer
+      round_rate:
+        type: number
     type: object
   domain.Event:
     properties:
@@ -15,7 +17,6 @@ definitions:
       name:
         type: string
       persons:
-        description: PersonIds []int64
         items:
           $ref: '#/definitions/domain.Person'
         type: array
@@ -23,7 +24,6 @@ definitions:
   domain.Person:
     properties:
       events:
-        description: EventIds []int64
         items:
           $ref: '#/definitions/domain.Event'
         type: array
@@ -165,45 +165,23 @@ definitions:
     type: object
   service.EventData:
     properties:
-      allPersonsCount:
-        type: integer
-      averageAmount:
+      average:
         type: number
-      balances:
-        items:
-          $ref: '#/definitions/service.PersonBalance'
-        type: array
+      count:
+        type: integer
       date:
         type: string
       name:
         type: string
-      persons:
-        items:
-          $ref: '#/definitions/service.PersonData'
-        type: array
-      totalAmount:
-        type: number
-    type: object
-  service.PersonBalance:
-    properties:
-      balance:
-        type: number
-      person:
-        $ref: '#/definitions/service.PersonData'
-    type: object
-  service.PersonData:
-    properties:
-      factor:
-        type: integer
-      id:
-        type: integer
-      name:
-        type: string
-      owe:
+      owes:
         additionalProperties:
-          type: number
+          additionalProperties:
+            type: number
+          type: object
         type: object
-      spent:
+      roundRate:
+        type: number
+      total:
         type: number
     type: object
 host: s.cfg.Host:s.cfg.Port
@@ -224,7 +202,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculate.calculateRequest'
+          $ref: '#/definitions/calculation.CalculateRequest'
       produces:
       - application/json
       responses:

@@ -1,4 +1,4 @@
-package calculate
+package calculation
 
 import (
 	"net/http"
@@ -17,7 +17,8 @@ func NewCalcHandler(s *service.CalcService) *CalcHandler {
 }
 
 type CalculateRequest struct {
-	EventId int64 `json:"event_id"`
+	EventId   int64   `json:"event_id"`
+	RoundRate float64 `json:"round_rate"`
 }
 
 // @Summary		Calculate event data by Id
@@ -38,7 +39,7 @@ func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 			handlers.ErrorResponce{Message: "Failed parse request", Error: err})
 		return
 	}
-	result, err := s.service.CalculateEvent(ctx, req.EventId)
+	result, err := s.service.CalculateEvent(ctx, req.EventId, req.RoundRate)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
 		return

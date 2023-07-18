@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/calculate.calculateRequest"
+                            "$ref": "#/definitions/calculation.CalculateRequest"
                         }
                     }
                 ],
@@ -598,11 +598,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "calculate.calculateRequest": {
+        "calculation.CalculateRequest": {
             "type": "object",
             "properties": {
                 "event_id": {
                     "type": "integer"
+                },
+                "round_rate": {
+                    "type": "number"
                 }
             }
         },
@@ -620,7 +623,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "persons": {
-                    "description": "PersonIds []int64",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Person"
@@ -632,7 +634,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "events": {
-                    "description": "EventIds []int64",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Event"
@@ -853,17 +854,11 @@ const docTemplate = `{
         "service.EventData": {
             "type": "object",
             "properties": {
-                "allPersonsCount": {
-                    "type": "integer"
-                },
-                "averageAmount": {
+                "average": {
                     "type": "number"
                 },
-                "balances": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonBalance"
-                    }
+                "count": {
+                    "type": "integer"
                 },
                 "date": {
                     "type": "string"
@@ -871,47 +866,19 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "persons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonData"
-                    }
-                },
-                "totalAmount": {
-                    "type": "number"
-                }
-            }
-        },
-        "service.PersonBalance": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "number"
-                },
-                "person": {
-                    "$ref": "#/definitions/service.PersonData"
-                }
-            }
-        },
-        "service.PersonData": {
-            "type": "object",
-            "properties": {
-                "factor": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owe": {
+                "owes": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "number"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        }
                     }
                 },
-                "spent": {
+                "roundRate": {
+                    "type": "number"
+                },
+                "total": {
                     "type": "number"
                 }
             }
