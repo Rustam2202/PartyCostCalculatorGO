@@ -604,7 +604,7 @@ const docTemplate = `{
                 "event_id": {
                     "type": "integer"
                 },
-                "round_rate": {
+                "round": {
                     "type": "number"
                 }
             }
