@@ -8,6 +8,7 @@ import (
 )
 
 type EventData struct {
+<<<<<<< HEAD
 	Name      string
 	Date      time.Time
 	Average   float64
@@ -15,6 +16,14 @@ type EventData struct {
 	Count     int
 	RoundRate float64
 	Owes      map[string]map[string]float64
+=======
+	Name    string
+	Date    time.Time
+	Average float64
+	Total   float64
+	Count   int
+	Owes    map[string]map[string]float64
+>>>>>>> 022187aa445799eefcb15af7505c10bc949a342a
 }
 
 type balance struct {
@@ -37,7 +46,11 @@ func NewCalcService(ps *PersonService, es *EventService, pes *PersonsEventsServi
 	}
 }
 
+<<<<<<< HEAD
 func (s *CalcService) createEventData(ctx context.Context, eventId int64, roundFactor float64) (EventData, []balance, error) {
+=======
+func (s *CalcService) createResponse(ctx context.Context, eventId int64) (EventData, []balance, error) {
+>>>>>>> 022187aa445799eefcb15af7505c10bc949a342a
 	var result EventData
 	perEvsArr, _ := s.PersonsEventsService.GetByEventId(ctx, eventId)
 	result.Name = perEvsArr[0].Event.Name
@@ -62,8 +75,13 @@ func (s *CalcService) createEventData(ctx context.Context, eventId int64, roundF
 	return result, balances, nil
 }
 
+<<<<<<< HEAD
 func roundAndAbs(numb, roundFactor float64) float64 {
 	return math.Abs(math.Round(numb/roundFactor) * roundFactor)
+=======
+func roundAndAbs(n float64) float64 {
+	return math.Abs(math.Round(n*100) / 100)
+>>>>>>> 022187aa445799eefcb15af7505c10bc949a342a
 }
 
 func (r *EventData) calculateBalances(balances []balance) {
@@ -78,7 +96,11 @@ func (r *EventData) calculateBalances(balances []balance) {
 			if r.Owes[balances[i].perName] == nil {
 				r.Owes[balances[i].perName] = make(map[string]float64)
 			}
+<<<<<<< HEAD
 			r.Owes[balances[i].perName][balances[j].perName] = roundAndAbs(balances[j].balance, r.RoundRate) // math.Abs(balances[j].balance)
+=======
+			r.Owes[balances[i].perName][balances[j].perName] = roundAndAbs(balances[j].balance) // math.Abs(balances[j].balance)
+>>>>>>> 022187aa445799eefcb15af7505c10bc949a342a
 			balances[i].balance += balances[j].balance
 			balances[j].balance = 0
 			j--
@@ -91,7 +113,11 @@ func (r *EventData) calculateBalances(balances []balance) {
 			if r.Owes[balances[i].perName] == nil {
 				r.Owes[balances[i].perName] = make(map[string]float64)
 			}
+<<<<<<< HEAD
 			r.Owes[balances[i].perName][balances[j].perName] = roundAndAbs(balances[i].balance, r.RoundRate) //math.Abs(balances[i].balance)
+=======
+			r.Owes[balances[i].perName][balances[j].perName] = roundAndAbs(balances[i].balance) //math.Abs(balances[i].balance)
+>>>>>>> 022187aa445799eefcb15af7505c10bc949a342a
 			balances[j].balance += balances[i].balance
 			balances[i].balance = 0
 			i++
@@ -103,8 +129,13 @@ func (r *EventData) calculateBalances(balances []balance) {
 	}
 }
 
+<<<<<<< HEAD
 func (s *CalcService) CalculateEvent(ctx context.Context, eventId int64, roundFactor float64) (EventData, error) {
 	result, balances, _ := s.createEventData(ctx, eventId, roundFactor)
+=======
+func (s *CalcService) CalculateEvent(ctx context.Context, eventId int64) (EventData, error) {
+	result, balances, _ := s.createResponse(ctx, eventId)
+>>>>>>> 022187aa445799eefcb15af7505c10bc949a342a
 	result.calculateBalances(balances)
 	return result, nil
 }
