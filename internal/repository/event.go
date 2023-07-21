@@ -19,7 +19,7 @@ func NewEventRepository(db *database.DataBase) *EventRepository {
 
 func (r *EventRepository) Create(ctx context.Context, ev *domain.Event) error {
 	var lastInsertedId int64
-	err := r.Db.DBPGX.QueryRow(context.Background(),
+	err := r.Db.DBPGX.QueryRow(ctx,
 		`INSERT INTO events (name, date) VALUES($1,$2) RETURNING Id`,
 		ev.Name, ev.Date.Format("2006-01-02")).Scan(&lastInsertedId)
 	if err != nil {

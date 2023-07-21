@@ -1,4 +1,4 @@
-package calculate
+package calculation
 
 import (
 	"net/http"
@@ -17,18 +17,19 @@ func NewCalcHandler(s *service.CalcService) *CalcHandler {
 }
 
 type CalculateRequest struct {
-	EventId int64 `json:"event_id"`
+	EventId   int64   `json:"event_id" default:"987654321"`
+	RoundRate float64 `json:"round_rate" default:"1.0"`
 }
 
 // @Summary		Calculate event data by Id
-// @Description	Calculate
+// @Description
 // @Tags			Calculate
 // @Accept			json
 // @Produce		json
 // @Param			request	body		CalculateRequest	true	"Calculate Event Request"
 // @Success		200		{object}	service.EventData
-// @Failure		304		{object}	handlers.ErrorResponce
 // @Failure		400		{object}	handlers.ErrorResponce
+// @Failure		500		{object}	handlers.ErrorResponce
 // @Router			/calcEvent [get]
 func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 	var req CalculateRequest
@@ -38,9 +39,10 @@ func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 			handlers.ErrorResponce{Message: "Failed parse request", Error: err})
 		return
 	}
-	result, err := s.service.CalculateEvent(ctx, req.EventId)
+	result, err := s.service.CalculateEvent(ctx, req.EventId, req.RoundRate)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting person from database: ": err})
+		ctx.JSON(http.StatusInternalServerError,
+			handlers.ErrorResponce{Message: "Failed to calculate event data", Error: err})
 		return
 	}
 	ctx.JSON(http.StatusOK, result)
