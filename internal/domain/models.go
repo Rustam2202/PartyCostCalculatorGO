@@ -3,6 +3,7 @@ package domain
 import "time"
 
 type Person struct {
+<<<<<<< HEAD
 	Id     int64  `json:"id" default:"123456789"`
 	Name   string `json:"name" default:"Some Person name"`
 	Events []Event
@@ -13,6 +14,18 @@ type Event struct {
 	Name    string    `json:"name" default:"Some Event name"`
 	Date    time.Time `json:"date" default:"2020-12-31"`
 	Persons []Person
+=======
+	Id       int64
+	Name     string
+	Events   []Event
+}
+
+type Event struct {
+	Id        int64
+	Name      string
+	Date      time.Time // postgres format: `YYYY-MM-DD`
+	Persons   []Person
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
 }
 
 type PersonsAndEvents struct {

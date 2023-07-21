@@ -591,12 +591,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "event_id": {
+<<<<<<< HEAD
                     "type": "integer",
                     "default": 987654321
                 },
                 "round_rate": {
                     "type": "number",
                     "default": 1
+=======
+                    "type": "integer"
+                },
+                "round": {
+                    "type": "number"
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
                 }
             }
         },
@@ -779,6 +786,7 @@ const docTemplate = `{
         "service.EventData": {
             "type": "object",
             "properties": {
+<<<<<<< HEAD
                 "all_persons_count": {
                     "type": "integer",
                     "default": 3
@@ -790,11 +798,24 @@ const docTemplate = `{
                 "event_date": {
                     "type": "string",
                     "default": "2020-12-31"
+=======
+                "average": {
+                    "type": "number"
+                },
+                "count": {
+                    "type": "integer"
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
                 },
                 "event_name": {
                     "type": "string",
                     "default": "Some Event name"
                 },
+<<<<<<< HEAD
+=======
+                "name": {
+                    "type": "string"
+                },
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
                 "owes": {
                     "type": "object",
                     "additionalProperties": {
@@ -804,6 +825,7 @@ const docTemplate = `{
                         }
                     }
                 },
+<<<<<<< HEAD
                 "round_rate": {
                     "type": "number",
                     "default": 0.01
@@ -811,6 +833,13 @@ const docTemplate = `{
                 "total_spent": {
                     "type": "number",
                     "default": 100
+=======
+                "roundRate": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
                 }
             }
         }

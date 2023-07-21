@@ -80,11 +80,19 @@ func (c *calculationTestCases) assertCheck(t *testing.T, result *EventData, err 
 		fmt.Sprintf("Some error in %s", c.testCase.testName))
 	assert.NoError(t, c.mock.ExpectationsWereMet(),
 		fmt.Sprintf("Some error with mock in %s", c.testCase.testName))
+<<<<<<< HEAD
 	assert.EqualValues(t, c.testCase.exp.total, result.TotalSpent,
 		fmt.Sprintf("Totals not equal in %s", c.testCase.testName))
 	assert.EqualValues(t, c.testCase.exp.count, result.AllPeronsCount,
 		fmt.Sprintf("Counts not equal in %s", c.testCase.testName))
 	assert.EqualValues(t, c.testCase.exp.average, roundAndAbs(result.AverageSpent, result.RoundRate),
+=======
+	assert.EqualValues(t, c.testCase.exp.total, result.Total,
+		fmt.Sprintf("Totals not equal in %s", c.testCase.testName))
+	assert.EqualValues(t, c.testCase.exp.count, result.Count,
+		fmt.Sprintf("Counts not equal in %s", c.testCase.testName))
+	assert.EqualValues(t, c.testCase.exp.average, roundAndAbs(result.Average, result.RoundRate),
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
 		fmt.Sprintf("Averages not equal in %s", c.testCase.testName))
 	assert.Equal(t, c.testCase.exp.owes, result.Owes,
 		fmt.Sprintf("Owes not equal in %s", c.testCase.testName))

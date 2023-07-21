@@ -8,6 +8,7 @@ import (
 )
 
 type EventData struct {
+<<<<<<< HEAD
 	Name           string    `json:"event_name" default:"Some Event name"`
 	Date           time.Time `json:"event_date" default:"2020-12-31"`
 	AverageSpent   float64   `json:"average_spent" default:"33.33"`
@@ -15,6 +16,15 @@ type EventData struct {
 	AllPeronsCount int      `json:"all_persons_count" default:"3"`
 	RoundRate      float64   `json:"round_rate" default:"0.01"`
 	Owes           map[string]map[string]float64
+=======
+	Name      string
+	Date      time.Time
+	Average   float64
+	Total     float64
+	Count     int
+	RoundRate float64
+	Owes      map[string]map[string]float64
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
 }
 
 type balance struct {
@@ -54,7 +64,11 @@ func (s *CalcService) createEventData(ctx context.Context, eventId int64, roundF
 			balance{
 				perId:   pe.PersonId,
 				perName: pe.Person.Name,
+<<<<<<< HEAD
 				balance: pe.Spent - result.AverageSpent*float64(pe.Factor)})
+=======
+				balance: pe.Spent - result.Average*float64(pe.Factor)})
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
 	}
 	sort.SliceStable(balances, func(i, j int) bool {
 		return balances[i].balance < balances[j].balance

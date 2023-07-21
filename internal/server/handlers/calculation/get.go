@@ -17,8 +17,13 @@ func NewCalcHandler(s *service.CalcService) *CalcHandler {
 }
 
 type CalculateRequest struct {
+<<<<<<< HEAD
 	EventId   int64   `json:"event_id" default:"987654321"`
 	RoundRate float64 `json:"round_rate" default:"1.0"`
+=======
+	EventId   int64   `json:"event_id"`
+	RoundRate float64 `json:"round_rate"`
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
 }
 
 // @Summary		Calculate event data by Id

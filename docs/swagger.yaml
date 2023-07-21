@@ -5,8 +5,12 @@ definitions:
       event_id:
         default: 987654321
         type: integer
+<<<<<<< HEAD
       round_rate:
         default: 1
+=======
+      round:
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
         type: number
     type: object
   domain.Event:
@@ -133,6 +137,7 @@ definitions:
     type: object
   service.EventData:
     properties:
+<<<<<<< HEAD
       all_persons_count:
         default: 3
         type: integer
@@ -141,6 +146,13 @@ definitions:
         type: number
       event_date:
         default: "2020-12-31"
+=======
+      average:
+        type: number
+      count:
+        type: integer
+      date:
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
         type: string
       event_name:
         default: Some Event name
@@ -151,11 +163,17 @@ definitions:
             type: number
           type: object
         type: object
+<<<<<<< HEAD
       round_rate:
         default: 0.01
         type: number
       total_spent:
         default: 100
+=======
+      roundRate:
+        type: number
+      total:
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
         type: number
     type: object
 info:
