@@ -2,42 +2,35 @@ package events
 
 import (
 	"net/http"
+	"party-calc/internal/server/handlers"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type DeleteEventRequest struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-}
-
-//	@Summary		Delete a event
-//	@Description	Delete a event from database
-//	@Tags			Event
-//	@Accept			json
-//	@Produce		json
-//	@Param			request	body		DeleteEventRequest	true	"Delete Event Request"
-//	@Success		200		{object}	int64
-//	@Failure		304		{object}	handlers.ErrorResponce
-//	@Failure		400		{object}	handlers.ErrorResponce
-//	@Router			/event [delete]
+// @Summary		Delete a event
+// @Description	Delete a event from database
+// @Tags			Event
+// @Accept			json
+// @Produce		json
+// @Param			id     path    int     true        "Event Id"
+// @Success		200
+// @Failure		400		{object}	handlers.ErrorResponce
+// @Failure		500		{object}	handlers.ErrorResponce
+// @Router			/event/{id} [delete]
 func (h *EventHandler) Delete(ctx *gin.Context) {
-	var req DeleteEventRequest
-	err := ctx.ShouldBindJSON(&req)
+	req := ctx.Param("id")
+	id, err := strconv.ParseInt(req, 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Failed parse request:": err})
+		ctx.JSON(http.StatusBadRequest,
+			handlers.ErrorResponce{Message: "Failed to parse request", Error: err})
 		return
 	}
-	if req.Id != 0 {
-		err = h.service.DeleteEventById(ctx, req.Id)
-	} else if req.Name != "" {
-		err = h.service.DeleteEventByName(ctx, req.Name)
-	} else {
-	}
-
+	err = h.service.DeleteEventById(ctx, id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with delete event from database:": err})
+		ctx.JSON(http.StatusInternalServerError,
+			handlers.ErrorResponce{Message: "Failed to delete a event from database", Error: err})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"Event deleted:": req.Id})
+	ctx.Status(http.StatusOK)
 }

@@ -2,42 +2,34 @@ package personsevents
 
 import (
 	"net/http"
-	"party-calc/internal/domain"
+	"party-calc/internal/server/handlers"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type GetPersonEventRequest struct {
-	PerId int64 `json:"person_id"`
-	EvId  int64 `json:"event_id"`
-}
-
-//	@Summary		Get a person-event
-//	@Description	Get a record of peson existed in event by Id from database
-//	@Tags			Person-Event
-//	@Accept			json
-//	@Produce		json
-//	@Param			request	body		GetPersonEventRequest	true	"Get Person-Event Request"
-//	@Success		200		{object}	domain.PersonsAndEvents
-//	@Failure		304		{object}	handlers.ErrorResponce
-//	@Failure		400		{object}	handlers.ErrorResponce
-//	@Router			/persEvents [get]
+// @Summary		Get a persons-event
+// @Description	Get an array of peson-event records by EventId
+// @Tags			Person-Event
+// @Accept			json
+// @Produce		json
+// @Param			event_id     path    int     true        "Event Id"
+// @Success		200		{object}	[]domain.PersonsAndEvents
+// @Failure		400		{object}	handlers.ErrorResponce
+// @Failure		500		{object}	handlers.ErrorResponce
+// @Router			/persEvents/{event_id} [get]
 func (h *PersEventsHandler) Get(ctx *gin.Context) {
-	var req GetPersonEventRequest
-	err := ctx.ShouldBindJSON(&req)
+	req := ctx.Param("person_id")
+	perId, err := strconv.ParseInt(req, 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"Failed parse request: ": err})
+		ctx.JSON(http.StatusBadRequest,
+			handlers.ErrorResponce{Message: "Failed to parse request", Error: err})
 		return
 	}
-	var ev []domain.PersonsAndEvents
-	if req.PerId != 0 {
-		ev, err = h.service.GetByPersonId(ctx, req.PerId)
-	} else if req.EvId != 0 {
-		ev, err = h.service.GetByEventId(ctx, req.EvId)
-	} else {
-	}
+	ev, err := h.service.GetByEventId(ctx, perId)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error with getting event from database:": err})
+		ctx.JSON(http.StatusInternalServerError,
+			handlers.ErrorResponce{Message: "Failed to get a persons-event data from database", Error: err})
 		return
 	}
 	ctx.JSON(http.StatusOK, ev)

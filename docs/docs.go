@@ -18,7 +18,6 @@ const docTemplate = `{
     "paths": {
         "/calcEvent": {
             "get": {
-                "description": "Calculate",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/calculate.calculateRequest"
+                            "$ref": "#/definitions/calculation.CalculateRequest"
                         }
                     }
                 ],
@@ -45,52 +44,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/service.EventData"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    }
-                }
-            }
-        },
-        "/event": {
-            "get": {
-                "description": "Get a event from database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Event"
-                ],
-                "summary": "Get a event",
-                "parameters": [
-                    {
-                        "description": "Get Event Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/events.GetEventRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Event"
                         }
                     },
                     "400": {
@@ -106,7 +59,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/event": {
             "put": {
                 "description": "Update a event in database",
                 "consumes": [
@@ -134,7 +89,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Event"
+                            "$ref": "#/definitions/events.UpdateEventRequest"
                         }
                     },
                     "400": {
@@ -175,20 +130,64 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/events.AddEventResponse"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
+                            "$ref": "#/definitions/domain.Event"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/event/{id}": {
+            "get": {
+                "description": "Get a event from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Event"
+                ],
+                "summary": "Get a event",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Event Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Event"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
@@ -209,30 +208,25 @@ const docTemplate = `{
                 "summary": "Delete a event",
                 "parameters": [
                     {
-                        "description": "Delete Event Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/events.DeleteEventRequest"
-                        }
+                        "type": "integer",
+                        "description": "Event Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "description": "OK"
                     },
-                    "304": {
-                        "description": "Not Modified",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
@@ -241,52 +235,8 @@ const docTemplate = `{
             }
         },
         "/persEvents": {
-            "get": {
-                "description": "Get a record of peson existed in event by Id from database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Person-Event"
-                ],
-                "summary": "Get a person-event",
-                "parameters": [
-                    {
-                        "description": "Get Person-Event Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/personsevents.GetPersonEventRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/domain.PersonsAndEvents"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    }
-                }
-            },
             "put": {
-                "description": "Update a record of peson existed in event by Id from database",
+                "description": "Update a record of peson-event data",
                 "consumes": [
                     "application/json"
                 ],
@@ -312,13 +262,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
+                            "$ref": "#/definitions/personsevents.UpdatePersonEventRequest"
                         }
                     },
                     "400": {
@@ -326,11 +270,17 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
                     }
                 }
             },
             "post": {
-                "description": "Add a new record of peson existed in event by Id to database",
+                "description": "Add a new record of peson existed in event to database",
                 "consumes": [
                     "application/json"
                 ],
@@ -353,100 +303,10 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a record of peson existed in event by Id from database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Person-Event"
-                ],
-                "summary": "Delete a person-event",
-                "parameters": [
-                    {
-                        "description": "Delete Person-Event Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/personsevents.DeletePersonEventRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
-                        }
-                    }
-                }
-            }
-        },
-        "/person": {
-            "get": {
-                "description": "Get a person from database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Person"
-                ],
-                "summary": "Get a person",
-                "parameters": [
-                    {
-                        "description": "Get Person Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/persons.GetPersonRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Person"
+                            "$ref": "#/definitions/domain.PersonsAndEvents"
                         }
                     },
                     "400": {
@@ -462,7 +322,97 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/persEvents/{event_id}": {
+            "get": {
+                "description": "Get an array of peson-event records by EventId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person-Event"
+                ],
+                "summary": "Get a persons-event",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Event Id",
+                        "name": "event_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.PersonsAndEvents"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/persEvents/{id}": {
+            "delete": {
+                "description": "Delete a record of peson existed in event by Id from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person-Event"
+                ],
+                "summary": "Delete a person-event",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Event Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/person": {
             "put": {
                 "description": "Update a person in database",
                 "consumes": [
@@ -490,7 +440,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Person"
+                            "$ref": "#/definitions/persons.UpdatePersonRequest"
                         }
                     },
                     "400": {
@@ -531,20 +481,64 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/persons.AddPersonResponse"
-                        }
-                    },
-                    "304": {
-                        "description": "Not Modified",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponce"
+                            "$ref": "#/definitions/domain.Person"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/person/{id}": {
+            "get": {
+                "description": "Get a person from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Get a person",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Person Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Person"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
@@ -565,30 +559,25 @@ const docTemplate = `{
                 "summary": "Delete a person",
                 "parameters": [
                     {
-                        "description": "Delete Person Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/persons.DeletePersonRequest"
-                        }
+                        "type": "integer",
+                        "description": "Person Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "description": "OK"
                     },
-                    "304": {
-                        "description": "Not Modified",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
@@ -598,11 +587,16 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "calculate.calculateRequest": {
+        "calculation.CalculateRequest": {
             "type": "object",
             "properties": {
                 "event_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 987654321
+                },
+                "round_rate": {
+                    "type": "number",
+                    "default": 1
                 }
             }
         },
@@ -610,17 +604,18 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "date": {
-                    "description": "postgres format: ` + "`" + `YYYY-MM-DD` + "`" + `",
-                    "type": "string"
+                    "type": "string",
+                    "default": "2020-12-31"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 987654321
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some Event name"
                 },
                 "persons": {
-                    "description": "PersonIds []int64",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Person"
@@ -632,17 +627,18 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "events": {
-                    "description": "EventIds []int64",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Event"
                     }
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 123456789
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some Person name"
                 }
             }
         },
@@ -652,23 +648,28 @@ const docTemplate = `{
                 "event": {
                     "$ref": "#/definitions/domain.Event"
                 },
-                "eventId": {
-                    "type": "integer"
+                "event_id": {
+                    "type": "integer",
+                    "default": 987654321
                 },
                 "factor": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 1
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 9223372036854775807
                 },
                 "person": {
                     "$ref": "#/definitions/domain.Person"
                 },
-                "personId": {
-                    "type": "integer"
+                "person_id": {
+                    "type": "integer",
+                    "default": 123456789
                 },
                 "spent": {
-                    "type": "number"
+                    "type": "number",
+                    "default": 123.45
                 }
             }
         },
@@ -676,46 +677,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "date": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "2020-12-31"
                 },
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "events.AddEventResponse": {
-            "type": "object",
-            "properties": {
-                "date": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "events.DeleteEventRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "events.GetEventRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some Event name"
                 }
             }
         },
@@ -723,13 +690,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "date": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "2020-11-30"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 9876543212
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some new Event name"
                 }
             }
         },
@@ -746,40 +716,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "persons.AddPersonResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "persons.DeletePersonRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "persons.GetPersonRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some Person name"
                 }
             }
         },
@@ -787,10 +725,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 123456789
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some Person name"
                 }
             }
         },
@@ -798,35 +738,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "event_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 987654321
                 },
                 "factor": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 1
                 },
                 "person_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 123456789
                 },
                 "spent": {
-                    "type": "number"
-                }
-            }
-        },
-        "personsevents.DeletePersonEventRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "personsevents.GetPersonEventRequest": {
-            "type": "object",
-            "properties": {
-                "event_id": {
-                    "type": "integer"
-                },
-                "person_id": {
-                    "type": "integer"
+                    "type": "number",
+                    "default": 10.25
                 }
             }
         },
@@ -837,7 +762,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "factor": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 1
                 },
                 "id": {
                     "type": "integer"
@@ -853,66 +779,38 @@ const docTemplate = `{
         "service.EventData": {
             "type": "object",
             "properties": {
-                "allPersonsCount": {
-                    "type": "integer"
+                "all_persons_count": {
+                    "type": "integer",
+                    "default": 3
                 },
-                "averageAmount": {
-                    "type": "number"
+                "average_spent": {
+                    "type": "number",
+                    "default": 33.33
                 },
-                "balances": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonBalance"
-                    }
+                "event_date": {
+                    "type": "string",
+                    "default": "2020-12-31"
                 },
-                "date": {
-                    "type": "string"
+                "event_name": {
+                    "type": "string",
+                    "default": "Some Event name"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "persons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.PersonData"
-                    }
-                },
-                "totalAmount": {
-                    "type": "number"
-                }
-            }
-        },
-        "service.PersonBalance": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "number"
-                },
-                "person": {
-                    "$ref": "#/definitions/service.PersonData"
-                }
-            }
-        },
-        "service.PersonData": {
-            "type": "object",
-            "properties": {
-                "factor": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owe": {
+                "owes": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "number"
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        }
                     }
                 },
-                "spent": {
-                    "type": "number"
+                "round_rate": {
+                    "type": "number",
+                    "default": 0.01
+                },
+                "total_spent": {
+                    "type": "number",
+                    "default": 100
                 }
             }
         }
@@ -922,7 +820,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "s.cfg.Host:s.cfg.Port",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Party Cost Calculator API",

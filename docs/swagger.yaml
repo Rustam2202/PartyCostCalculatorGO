@@ -1,21 +1,26 @@
 basePath: /
 definitions:
-  calculate.calculateRequest:
+  calculation.CalculateRequest:
     properties:
       event_id:
+        default: 987654321
         type: integer
+      round_rate:
+        default: 1
+        type: number
     type: object
   domain.Event:
     properties:
       date:
-        description: 'postgres format: `YYYY-MM-DD`'
+        default: "2020-12-31"
         type: string
       id:
+        default: 987654321
         type: integer
       name:
+        default: Some Event name
         type: string
       persons:
-        description: PersonIds []int64
         items:
           $ref: '#/definitions/domain.Person'
         type: array
@@ -23,69 +28,57 @@ definitions:
   domain.Person:
     properties:
       events:
-        description: EventIds []int64
         items:
           $ref: '#/definitions/domain.Event'
         type: array
       id:
+        default: 123456789
         type: integer
       name:
+        default: Some Person name
         type: string
     type: object
   domain.PersonsAndEvents:
     properties:
       event:
         $ref: '#/definitions/domain.Event'
-      eventId:
+      event_id:
+        default: 987654321
         type: integer
       factor:
+        default: 1
         type: integer
       id:
+        default: 9223372036854775807
         type: integer
       person:
         $ref: '#/definitions/domain.Person'
-      personId:
+      person_id:
+        default: 123456789
         type: integer
       spent:
+        default: 123.45
         type: number
     type: object
   events.AddEventRequest:
     properties:
       date:
+        default: "2020-12-31"
         type: string
       name:
-        type: string
-    type: object
-  events.AddEventResponse:
-    properties:
-      date:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  events.DeleteEventRequest:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  events.GetEventRequest:
-    properties:
-      id:
-        type: integer
-      name:
+        default: Some Event name
         type: string
     type: object
   events.UpdateEventRequest:
     properties:
       date:
+        default: "2020-11-30"
         type: string
       id:
+        default: 9876543212
         type: integer
       name:
+        default: Some new Event name
         type: string
     type: object
   handlers.ErrorResponce:
@@ -97,64 +90,39 @@ definitions:
   persons.AddPersonRequest:
     properties:
       name:
-        type: string
-    type: object
-  persons.AddPersonResponse:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  persons.DeletePersonRequest:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  persons.GetPersonRequest:
-    properties:
-      id:
-        type: integer
-      name:
+        default: Some Person name
         type: string
     type: object
   persons.UpdatePersonRequest:
     properties:
       id:
+        default: 123456789
         type: integer
       name:
+        default: Some Person name
         type: string
     type: object
   personsevents.AddPersonEventRequest:
     properties:
       event_id:
+        default: 987654321
         type: integer
       factor:
+        default: 1
         type: integer
       person_id:
+        default: 123456789
         type: integer
       spent:
+        default: 10.25
         type: number
-    type: object
-  personsevents.DeletePersonEventRequest:
-    properties:
-      id:
-        type: integer
-    type: object
-  personsevents.GetPersonEventRequest:
-    properties:
-      event_id:
-        type: integer
-      person_id:
-        type: integer
     type: object
   personsevents.UpdatePersonEventRequest:
     properties:
       event_id:
         type: integer
       factor:
+        default: 1
         type: integer
       id:
         type: integer
@@ -165,48 +133,31 @@ definitions:
     type: object
   service.EventData:
     properties:
-      allPersonsCount:
+      all_persons_count:
+        default: 3
         type: integer
-      averageAmount:
+      average_spent:
+        default: 33.33
         type: number
-      balances:
-        items:
-          $ref: '#/definitions/service.PersonBalance'
-        type: array
-      date:
+      event_date:
+        default: "2020-12-31"
         type: string
-      name:
+      event_name:
+        default: Some Event name
         type: string
-      persons:
-        items:
-          $ref: '#/definitions/service.PersonData'
-        type: array
-      totalAmount:
-        type: number
-    type: object
-  service.PersonBalance:
-    properties:
-      balance:
-        type: number
-      person:
-        $ref: '#/definitions/service.PersonData'
-    type: object
-  service.PersonData:
-    properties:
-      factor:
-        type: integer
-      id:
-        type: integer
-      name:
-        type: string
-      owe:
+      owes:
         additionalProperties:
-          type: number
+          additionalProperties:
+            type: number
+          type: object
         type: object
-      spent:
+      round_rate:
+        default: 0.01
+        type: number
+      total_spent:
+        default: 100
         type: number
     type: object
-host: s.cfg.Host:s.cfg.Port
 info:
   contact: {}
   description: This is a sample app server.
@@ -217,14 +168,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: Calculate
       parameters:
       - description: Calculate Event Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculate.calculateRequest'
+          $ref: '#/definitions/calculation.CalculateRequest'
       produces:
       - application/json
       responses:
@@ -232,65 +182,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/service.EventData'
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Calculate event data by Id
-      tags:
-      - Calculate
-  /event:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a event from database
-      parameters:
-      - description: Delete Event Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/events.DeleteEventRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Delete a event
-      tags:
-      - Event
-    get:
-      consumes:
-      - application/json
-      description: Get a event from database
-      parameters:
-      - description: Get Event Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/events.GetEventRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/domain.Event'
         "400":
           description: Bad Request
           schema:
@@ -299,9 +190,10 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Get a event
+      summary: Calculate event data by Id
       tags:
-      - Event
+      - Calculate
+  /event:
     post:
       consumes:
       - application/json
@@ -316,16 +208,16 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/events.AddEventResponse'
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
+            $ref: '#/definitions/domain.Event'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
       summary: Add a event
@@ -348,7 +240,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Event'
+            $ref: '#/definitions/events.UpdateEventRequest'
         "400":
           description: Bad Request
           schema:
@@ -360,69 +252,66 @@ paths:
       summary: Update a event
       tags:
       - Event
-  /persEvents:
+  /event/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete a record of peson existed in event by Id from database
+      description: Delete a event from database
       parameters:
-      - description: Delete Person-Event Request
-        in: body
-        name: request
+      - description: Event Id
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/personsevents.DeletePersonEventRequest'
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          schema:
-            type: integer
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Delete a person-event
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Delete a event
       tags:
-      - Person-Event
+      - Event
     get:
       consumes:
       - application/json
-      description: Get a record of peson existed in event by Id from database
+      description: Get a event from database
       parameters:
-      - description: Get Person-Event Request
-        in: body
-        name: request
+      - description: Event Id
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/personsevents.GetPersonEventRequest'
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.PersonsAndEvents'
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
+            $ref: '#/definitions/domain.Event'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Get a person-event
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Get a event
       tags:
-      - Person-Event
+      - Event
+  /persEvents:
     post:
       consumes:
       - application/json
-      description: Add a new record of peson existed in event by Id to database
+      description: Add a new record of peson existed in event to database
       parameters:
       - description: Add Person-Event Request
         in: body
@@ -433,16 +322,16 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            type: integer
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
+            $ref: '#/definitions/domain.PersonsAndEvents'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
       summary: Add a person-event
@@ -451,7 +340,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update a record of peson existed in event by Id from database
+      description: Update a record of peson-event data
       parameters:
       - description: Update Person-Event Request
         in: body
@@ -465,66 +354,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: integer
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Update a person-event
-      tags:
-      - Person-Event
-  /person:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a person from database
-      parameters:
-      - description: Delete Person Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/persons.DeletePersonRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Delete a person
-      tags:
-      - Person
-    get:
-      consumes:
-      - application/json
-      description: Get a person from database
-      parameters:
-      - description: Get Person Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/persons.GetPersonRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/domain.Person'
+            $ref: '#/definitions/personsevents.UpdatePersonEventRequest'
         "400":
           description: Bad Request
           schema:
@@ -533,9 +363,68 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
-      summary: Get a person
+      summary: Update a person-event
       tags:
-      - Person
+      - Person-Event
+  /persEvents/{event_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get an array of peson-event records by EventId
+      parameters:
+      - description: Event Id
+        in: path
+        name: event_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.PersonsAndEvents'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Get a persons-event
+      tags:
+      - Person-Event
+  /persEvents/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a record of peson existed in event by Id from database
+      parameters:
+      - description: Event Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Delete a person-event
+      tags:
+      - Person-Event
+  /person:
     post:
       consumes:
       - application/json
@@ -550,16 +439,16 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/persons.AddPersonResponse'
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
+            $ref: '#/definitions/domain.Person'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
       summary: Add a person
@@ -582,7 +471,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Person'
+            $ref: '#/definitions/persons.UpdatePersonRequest'
         "400":
           description: Bad Request
           schema:
@@ -592,6 +481,61 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ErrorResponce'
       summary: Update a person
+      tags:
+      - Person
+  /person/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a person from database
+      parameters:
+      - description: Person Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Delete a person
+      tags:
+      - Person
+    get:
+      consumes:
+      - application/json
+      description: Get a person from database
+      parameters:
+      - description: Person Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Person'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponce'
+      summary: Get a person
       tags:
       - Person
 swagger: "2.0"
