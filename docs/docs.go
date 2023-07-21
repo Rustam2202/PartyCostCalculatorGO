@@ -498,6 +498,56 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponce"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    }
+                }
+            }
+        },
+        "/person/{id}": {
+            "get": {
+                "description": "Get a person from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Get a person",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Person Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Person"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponce"
+                        }
                     }
                 }
             }
@@ -591,12 +641,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "event_id": {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                     "type": "integer",
                     "default": 987654321
                 },
                 "round_rate": {
                     "type": "number",
                     "default": 1
+<<<<<<< HEAD
+=======
+=======
+                    "type": "integer"
+                },
+                "round": {
+                    "type": "number"
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 }
             }
         },
@@ -677,10 +740,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "date": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "2020-12-31"
                 },
                 "name": {
+<<<<<<< HEAD
                     "type": "string"
+=======
+                    "type": "string",
+                    "default": "Some Event name"
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 }
             }
         },
@@ -688,13 +757,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "date": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "2020-11-30"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 9876543212
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some new Event name"
                 }
             }
         },
@@ -712,7 +784,11 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "type": "string",
+<<<<<<< HEAD
                     "default": "Test Name"
+=======
+                    "default": "Some Person name"
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 }
             }
         },
@@ -720,10 +796,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 123456789
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "Some Person name"
                 }
             }
         },
@@ -731,17 +809,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "event_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 987654321
                 },
                 "factor": {
                     "type": "integer",
                     "default": 1
                 },
                 "person_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 123456789
                 },
                 "spent": {
+<<<<<<< HEAD
                     "type": "number"
+=======
+                    "type": "number",
+                    "default": 10.25
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 }
             }
         },
@@ -752,7 +837,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "factor": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 1
                 },
                 "id": {
                     "type": "integer"
@@ -768,6 +854,10 @@ const docTemplate = `{
         "service.EventData": {
             "type": "object",
             "properties": {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 "all_persons_count": {
                     "type": "integer",
                     "default": 3
@@ -775,15 +865,38 @@ const docTemplate = `{
                 "average_spent": {
                     "type": "number",
                     "default": 33.33
+<<<<<<< HEAD
                 },
                 "event_date": {
                     "type": "string",
                     "default": "2020-12-31"
+=======
+                },
+                "event_date": {
+                    "type": "string",
+                    "default": "2020-12-31"
+=======
+                "average": {
+                    "type": "number"
+                },
+                "count": {
+                    "type": "integer"
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 },
                 "event_name": {
                     "type": "string",
                     "default": "Some Event name"
                 },
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                "name": {
+                    "type": "string"
+                },
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 "owes": {
                     "type": "object",
                     "additionalProperties": {
@@ -793,6 +906,10 @@ const docTemplate = `{
                         }
                     }
                 },
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 "round_rate": {
                     "type": "number",
                     "default": 0.01
@@ -800,6 +917,16 @@ const docTemplate = `{
                 "total_spent": {
                     "type": "number",
                     "default": 100
+<<<<<<< HEAD
+=======
+=======
+                "roundRate": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+>>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
                 }
             }
         }

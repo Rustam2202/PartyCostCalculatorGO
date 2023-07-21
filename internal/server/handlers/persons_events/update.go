@@ -12,7 +12,7 @@ type UpdatePersonEventRequest struct {
 	PerId  int64   `json:"person_id"`
 	EvId   int64   `json:"event_id"`
 	Spent  float64 `json:"spent"`
-	Factor uint    `json:"factor" default:"1"`
+	Factor int    `json:"factor" default:"1"`
 }
 
 // @Summary		Update a person-event

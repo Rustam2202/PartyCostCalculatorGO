@@ -22,7 +22,11 @@ func NewPersonsEventsService(r PersonsEventsRepository) *PersonsEventsService {
 }
 
 func (p *PersonsEventsService) AddPersonToPersEvent(ctx context.Context,
+<<<<<<< HEAD
 	personId, eventId int64, spent float64, factor uint) (int64, error) {
+=======
+	personId, eventId int64, spent float64, factor int) (int64, error) {
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
 	perEv := domain.PersonsAndEvents{
 		PersonId: personId,
 		EventId:  eventId,
@@ -53,7 +57,11 @@ func (p *PersonsEventsService) GetByEventId(ctx context.Context, id int64) ([]do
 }
 
 func (p *PersonsEventsService) Update(ctx context.Context, 
+<<<<<<< HEAD
 	id, personId, eventId int64, spent float64, factor uint) error {
+=======
+	id, personId, eventId int64, spent float64, factor int) error {
+>>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
 	err := p.repo.Update(ctx, &domain.PersonsAndEvents{
 		Id:       id,
 		PersonId: personId,

@@ -20,7 +20,7 @@ type PersonsAndEvents struct {
 	PersonId int64   `json:"person_id" default:"123456789"`
 	EventId  int64   `json:"event_id" default:"987654321"`
 	Spent    float64 `json:"spent" default:"123.45"`
-	Factor   uint    `json:"factor" default:"1"`
+	Factor   int     `json:"factor" default:"1"`
 	Person   Person
 	Event    Event
 }
