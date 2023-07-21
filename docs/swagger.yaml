@@ -5,17 +5,8 @@ definitions:
       event_id:
         default: 987654321
         type: integer
-<<<<<<< HEAD
       round_rate:
         default: 1
-=======
-<<<<<<< HEAD
-      round_rate:
-        default: 1
-=======
-      round:
->>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
         type: number
     type: object
   domain.Event:
@@ -75,10 +66,7 @@ definitions:
         default: "2020-12-31"
         type: string
       name:
-<<<<<<< HEAD
-=======
         default: Some Event name
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
         type: string
     type: object
   events.UpdateEventRequest:
@@ -102,11 +90,7 @@ definitions:
   persons.AddPersonRequest:
     properties:
       name:
-<<<<<<< HEAD
-        default: Test Name
-=======
         default: Some Person name
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
         type: string
     type: object
   persons.UpdatePersonRequest:
@@ -149,10 +133,6 @@ definitions:
     type: object
   service.EventData:
     properties:
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
       all_persons_count:
         default: 3
         type: integer
@@ -161,16 +141,6 @@ definitions:
         type: number
       event_date:
         default: "2020-12-31"
-<<<<<<< HEAD
-=======
-=======
-      average:
-        type: number
-      count:
-        type: integer
-      date:
->>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
         type: string
       event_name:
         default: Some Event name
@@ -181,23 +151,11 @@ definitions:
             type: number
           type: object
         type: object
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
       round_rate:
         default: 0.01
         type: number
       total_spent:
         default: 100
-<<<<<<< HEAD
-=======
-=======
-      roundRate:
-        type: number
-      total:
->>>>>>> 9a4ae566fa2b8141fcb08531d73bacef0f5edb34
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
         type: number
     type: object
 info:
@@ -485,13 +443,6 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/domain.Person'
-<<<<<<< HEAD
-        "304":
-          description: Not Modified
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponce'
-=======
->>>>>>> 6ac41b8b2df6ba7d50fe6a89162d1df4f6235a25
         "400":
           description: Bad Request
           schema:
