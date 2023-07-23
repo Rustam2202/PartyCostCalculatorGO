@@ -7,7 +7,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/pashagolub/pgxmock/v2 v2.8.0
 	github.com/spf13/viper v1.15.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/swag v1.16.1
 	go.uber.org/zap v1.24.0
@@ -28,8 +28,9 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
+	golang.org/x/sync v0.2.0 // indirect
+	golang.org/x/tools v0.9.3 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 

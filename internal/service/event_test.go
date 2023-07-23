@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"party-calc/internal/database"
-	"party-calc/internal/domain"
 	"party-calc/internal/repository"
 	"testing"
 	"time"
@@ -61,9 +60,8 @@ func TestGetEventById(t *testing.T) {
 			AddRow(int64(2), "Person 2").
 			AddRow(int64(3), "Person 3"))
 
-	ev := &domain.Event{}
 	serv := NewEventService(repo)
-	ev, err = serv.GetEventById(ctx, 1)
+	ev, err := serv.GetEventById(ctx, 1)
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -102,9 +100,8 @@ func TestGetEventByName(t *testing.T) {
 			AddRow(int64(2), "Person 2").
 			AddRow(int64(3), "Person 3"))
 
-	ev := &domain.Event{}
 	serv := NewEventService(repo)
-	ev, err = serv.GetEventByName(ctx, "New Year")
+	ev, err := serv.GetEventByName(ctx, "New Year")
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())

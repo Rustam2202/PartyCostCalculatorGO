@@ -12,7 +12,7 @@ type EventData struct {
 	Date           time.Time `json:"event_date" default:"2020-12-31"`
 	AverageSpent   float64   `json:"average_spent" default:"33.33"`
 	TotalSpent     float64   `json:"total_spent" default:"100"`
-	AllPeronsCount int      `json:"all_persons_count" default:"3"`
+	AllPeronsCount int       `json:"all_persons_count" default:"3"`
 	RoundRate      float64   `json:"round_rate" default:"0.01"`
 	Owes           map[string]map[string]float64
 }

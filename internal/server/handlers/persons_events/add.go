@@ -12,7 +12,7 @@ type AddPersonEventRequest struct {
 	PerId  int64   `json:"person_id" default:"123456789"`
 	EvId   int64   `json:"event_id" default:"987654321"`
 	Spent  float64 `json:"spent" default:"10.25"`
-	Factor int    `json:"factor" default:"1"`
+	Factor int     `json:"factor" default:"1"`
 }
 
 // @Summary		Add a person-event

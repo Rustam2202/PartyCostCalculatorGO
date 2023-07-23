@@ -55,8 +55,7 @@ func TestGetPersonById(t *testing.T) {
 			AddRow(int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)).
 			AddRow(int64(2), "Old New Year", time.Date(2022, 01, 14, 23, 59, 59, 0, time.Local)))
 
-	person := &domain.Person{}
-	person, err = repo.GetById(ctx, int64(1))
+	person, err := repo.GetById(ctx, int64(1))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())

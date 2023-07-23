@@ -52,7 +52,7 @@ func (p *PersonsEventsService) GetByEventId(ctx context.Context, id int64) ([]do
 	return result, nil
 }
 
-func (p *PersonsEventsService) Update(ctx context.Context, 
+func (p *PersonsEventsService) Update(ctx context.Context,
 	id, personId, eventId int64, spent float64, factor int) error {
 	err := p.repo.Update(ctx, &domain.PersonsAndEvents{
 		Id:       id,

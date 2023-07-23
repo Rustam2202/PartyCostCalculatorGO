@@ -62,9 +62,7 @@ func TestGetEventById(t *testing.T) {
 			AddRow(int64(2), "Person 2").
 			AddRow(int64(3), "Person 3"))
 
-	ev := &domain.Event{}
-
-	ev, err = repo.GetById(ctx, int64(1))
+	ev, err := repo.GetById(ctx, int64(1))
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -102,9 +100,7 @@ func TestGetEventByName(t *testing.T) {
 			AddRow(int64(2), "Person 2").
 			AddRow(int64(3), "Person 3"))
 
-	ev := &domain.Event{}
-
-	ev, err = repo.GetByName(ctx, "New Year")
+	ev, err := repo.GetByName(ctx, "New Year")
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
