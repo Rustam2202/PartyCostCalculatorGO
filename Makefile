@@ -13,7 +13,10 @@ compose:
 	docker-compose up
 
 test:
-	go test ./...
+	go test ./... -cover
+test-cover-report:
+	go tool cover -html=coverage.out
+
 swag:
 	swag init -g ./internal/server/server.go
 lint:

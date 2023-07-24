@@ -10,14 +10,15 @@ import (
 	"time"
 
 	"github.com/pashagolub/pgxmock/v2"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
 type expect struct {
-	total   float64
+	total   decimal.Decimal
 	count   int
-	average float64
-	owes    map[string]map[string]float64
+	average decimal.Decimal
+	owes    debtors
 }
 
 type testCase struct {
@@ -25,7 +26,7 @@ type testCase struct {
 	persons       []domain.Person
 	events        []domain.Event
 	personsEvents []domain.PersonsAndEvents
-	roundFactor   float64
+	RoundRate     int32
 	exp           expect
 }
 
@@ -80,14 +81,22 @@ func (c *calculationTestCases) assertCheck(t *testing.T, result *EventData, err 
 		fmt.Sprintf("Some error in %s", c.testCase.testName))
 	assert.NoError(t, c.mock.ExpectationsWereMet(),
 		fmt.Sprintf("Some error with mock in %s", c.testCase.testName))
-	assert.EqualValues(t, c.testCase.exp.total, result.TotalSpent,
-		fmt.Sprintf("Totals not equal in %s", c.testCase.testName))
 	assert.EqualValues(t, c.testCase.exp.count, result.AllPeronsCount,
 		fmt.Sprintf("Counts not equal in %s", c.testCase.testName))
-	assert.EqualValues(t, c.testCase.exp.average, roundAndAbs(result.AverageSpent, result.RoundRate),
-		fmt.Sprintf("Averages not equal in %s", c.testCase.testName))
-	assert.Equal(t, c.testCase.exp.owes, result.Owes,
-		fmt.Sprintf("Owes not equal in %s", c.testCase.testName))
+	assert.True(t, c.testCase.exp.total.Equal(result.TotalSpent),
+		fmt.Sprintf("Totals not equal in \"%s\"", c.testCase.testName))
+	assert.True(t, c.testCase.exp.average.Equal(result.AverageSpent.Round(c.testCase.RoundRate)),
+		fmt.Sprintf("Averages not equal in \"%s\": %s != %s",
+			c.testCase.testName, c.testCase.exp.average.String(), result.AverageSpent.String()))
+
+	for k, v := range c.testCase.exp.owes {
+		for k1, v1 := range v {
+			//	fmt.Println(result.Owes[k][k1].Round(2))
+			assert.True(t, result.Owes[k][k1].Round(c.testCase.RoundRate).Equal(v1),
+				fmt.Sprintf("Owe not equal in \"%s\": %s != %s",
+					c.testCase.testName, v1.String(), result.Owes[k][k1].String()))
+		}
+	}
 }
 
 func createTestCases() []func() *testCase {
@@ -107,7 +116,8 @@ func TestRun(t *testing.T) {
 	for _, tc := range cases {
 		c.testCase = tc()
 		c.fillMock()
-		result, err := c.serv.CalculateEvent(c.ctx, 1, c.testCase.roundFactor)
+		result, err := c.serv.CalculateEvent(c.ctx, 1, c.testCase.RoundRate)
+		//	fmt.Println(result.Owes, c.testCase.exp.owes)
 		c.assertCheck(t, &result, err)
 	}
 }
@@ -156,12 +166,12 @@ func testCase1() *testCase {
 			Event:    tc.events[0],
 		},
 	}
-	tc.roundFactor = 1
+	tc.RoundRate = 1
 	tc.exp = expect{
-		total:   24,
+		total:   decimal.NewFromFloat(24),
 		count:   6,
-		average: 4,
-		owes:    map[string]map[string]float64{"Person 8": {"Person 4": 2.0, "Person 6": 10.0}},
+		average: decimal.NewFromFloat(4),
+		owes:    debtors{"Person 8": {"Person 4": decimal.NewFromFloat(2.0), "Person 6": decimal.NewFromFloat(10.0)}},
 	}
 	return &tc
 }
@@ -210,14 +220,14 @@ func testCase2() *testCase {
 			Event:    tc.events[0],
 		},
 	}
-	tc.roundFactor = 1
+	tc.RoundRate = 1
 	tc.exp = expect{
-		total:   24,
+		total:   decimal.NewFromFloat(24),
 		count:   6,
-		average: 4,
-		owes: map[string]map[string]float64{
-			"Person 4": {"Person 8": 4.0},
-			"Person 6": {"Person 8": 2.0},
+		average: decimal.NewFromFloat(4),
+		owes: debtors{
+			"Person 4": {"Person 8": decimal.NewFromFloat(4.0)},
+			"Person 6": {"Person 8": decimal.NewFromFloat(2.0)},
 		},
 	}
 	return &tc
@@ -267,11 +277,11 @@ func testCase3() *testCase {
 			Event:    tc.events[0],
 		},
 	}
-	tc.roundFactor = 1
+	tc.RoundRate = 1
 	tc.exp = expect{
-		total:   36,
+		total:   decimal.NewFromFloat(36),
 		count:   6,
-		average: 6,
+		average: decimal.NewFromFloat(6),
 		owes:    nil,
 	}
 	return &tc
@@ -321,11 +331,11 @@ func testCase4() *testCase {
 			Event:    tc.events[0],
 		},
 	}
-	tc.roundFactor = 1
+	tc.RoundRate = 1
 	tc.exp = expect{
-		total:   0,
+		total:   decimal.Zero,
 		count:   6,
-		average: 0,
+		average: decimal.Zero,
 		owes:    nil,
 	}
 	return &tc
@@ -385,16 +395,16 @@ func testCase5() *testCase {
 			Event:    tc.events[0],
 		},
 	}
-	tc.roundFactor = 0.01
+	tc.RoundRate = 2
 	tc.exp = expect{
-		total:   135,
+		total:   decimal.NewFromFloat(135),
 		count:   7,
-		average: 19.29,
-		owes: map[string]map[string]float64{
-			"Person 4": {"Person 9": 38.57},
+		average: decimal.NewFromFloat(19.29),
+		owes: debtors{
+			"Person 4": {"Person 9": decimal.NewFromFloat(38.57)},
 			"Person 8": {
-				"Person 9": 32.14,
-				"Person 6": 6.43,
+				"Person 9": decimal.NewFromFloat(32.14),
+				"Person 6": decimal.NewFromFloat(6.43),
 			},
 		},
 	}

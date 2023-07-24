@@ -26,14 +26,12 @@ type DataBase struct {
 	DBPGX DBInterface
 }
 
-func NewPGX(cfg DatabaseConfig) *DataBase {
+func NewPGX(cfg DatabaseConfig) (*DataBase, error) {
 	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
 	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
-		logger.Logger.Error("Can't open database: ", zap.Error(err))
-		return nil
+		logger.Logger.Error("Failed to open database: ", zap.Error(err))
+		return nil, err
 	}
-	//defer conn.Close(context.Background())
-
-	return &DataBase{DBPGX: conn}
+	return &DataBase{DBPGX: conn}, nil
 }

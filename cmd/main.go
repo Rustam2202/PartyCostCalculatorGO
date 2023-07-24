@@ -16,7 +16,10 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	logger.IntializeLogger(cfg.LoggerConfig)
-	db := database.NewPGX(cfg.DatabaseConfig)
+	db, err := database.NewPGX(cfg.DatabaseConfig)
+	if err != nil {
+		return
+	}
 
 	personsRepo := repository.NewPersonRepository(db)
 	eventsRepo := repository.NewEventRepository(db)

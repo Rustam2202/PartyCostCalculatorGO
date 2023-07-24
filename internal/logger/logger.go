@@ -1,16 +1,17 @@
 package logger
 
 import (
+	"log"
+
 	"go.uber.org/zap"
 )
 
 var Logger *zap.Logger
 
-func IntializeLogger(cfg LoggerConfig) error {
+func IntializeLogger(cfg LoggerConfig) {
 	var err error
 	Logger, err = zap.NewProductionConfig().Build()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	return nil
 }

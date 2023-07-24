@@ -32,7 +32,7 @@ func (h *PersonHandler) Add(ctx *gin.Context) {
 	}
 	id, err := h.service.NewPerson(ctx, req.Name)
 	if err != nil {
-		ctx.JSON(http.StatusNotModified,
+		ctx.JSON(http.StatusInternalServerError,
 			handlers.ErrorResponce{Message: "Failed to add a new person to database", Error: err})
 		return
 	}
