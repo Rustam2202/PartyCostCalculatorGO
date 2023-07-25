@@ -6,8 +6,8 @@ definitions:
         default: 987654321
         type: integer
       round_rate:
-        default: 1
-        type: number
+        default: 2
+        type: integer
     type: object
   domain.Event:
     properties:
@@ -135,6 +135,7 @@ definitions:
     properties:
       all_persons_count:
         default: 3
+        description: AllPeronsCount exist persons mutiply them factors
         type: integer
       average_spent:
         default: 33.33
@@ -146,17 +147,21 @@ definitions:
         default: Some Event name
         type: string
       owes:
-        additionalProperties:
-          additionalProperties:
-            type: number
-          type: object
-        type: object
+        $ref: '#/definitions/service.debtors'
       round_rate:
-        default: 0.01
-        type: number
+        default: 2
+        type: integer
       total_spent:
         default: 100
         type: number
+    type: object
+  service.debtors:
+    additionalProperties:
+      $ref: '#/definitions/service.recepients'
+    type: object
+  service.recepients:
+    additionalProperties:
+      type: number
     type: object
 info:
   contact: {}

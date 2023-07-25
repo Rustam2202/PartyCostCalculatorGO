@@ -118,7 +118,7 @@ func TestRun(t *testing.T) {
 		c.fillMock()
 		result, err := c.serv.CalculateEvent(c.ctx, 1, c.testCase.RoundRate)
 		//	fmt.Println(result.Owes, c.testCase.exp.owes)
-		c.assertCheck(t, &result, err)
+		c.assertCheck(t, result, err)
 	}
 }
 

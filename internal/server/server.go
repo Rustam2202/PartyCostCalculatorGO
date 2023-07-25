@@ -51,20 +51,26 @@ func (s *Server) Start() {
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 
+	// persons := router.Group("/persons")
+	// persons.POST("", s.personHandler.Add)
+	// persons.GET("/:id", s.personHandler.Get)
+	// persons.PUT("", s.personHandler.Update)
+	// persons.DELETE("/:id", s.personHandler.Delete)
+
 	router.POST("/person", s.personHandler.Add)
-	router.GET("/person", s.personHandler.Get)
+	router.GET("/person/:id", s.personHandler.Get)
 	router.PUT("/person", s.personHandler.Update)
-	router.DELETE("/person", s.personHandler.Delete)
+	router.DELETE("/person/:id", s.personHandler.Delete)
 
 	router.POST("/event", s.eventHandler.Add)
-	router.GET("/event", s.eventHandler.Get)
+	router.GET("/event/:id", s.eventHandler.Get)
 	router.PUT("/event", s.eventHandler.Update)
-	router.DELETE("/event", s.eventHandler.Delete)
+	router.DELETE("/event/:id", s.eventHandler.Delete)
 
 	router.POST("/persEvents", s.persEventsHandler.Add)
-	router.GET("/persEvents", s.persEventsHandler.Get)
+	router.GET("/persEvents/:event_id", s.persEventsHandler.Get)
 	router.PUT("/persEvents", s.persEventsHandler.Update)
-	router.DELETE("/persEvents", s.persEventsHandler.Delete)
+	router.DELETE("/persEvents/:id", s.persEventsHandler.Delete)
 
 	router.GET("/calcEvent", s.calcHandler.GetEvent)
 

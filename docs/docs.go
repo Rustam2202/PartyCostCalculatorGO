@@ -595,8 +595,8 @@ const docTemplate = `{
                     "default": 987654321
                 },
                 "round_rate": {
-                    "type": "number",
-                    "default": 1
+                    "type": "integer",
+                    "default": 2
                 }
             }
         },
@@ -780,6 +780,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "all_persons_count": {
+                    "description": "AllPeronsCount exist persons mutiply them factors",
                     "type": "integer",
                     "default": 3
                 },
@@ -796,22 +797,28 @@ const docTemplate = `{
                     "default": "Some Event name"
                 },
                 "owes": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
-                        }
-                    }
+                    "$ref": "#/definitions/service.debtors"
                 },
                 "round_rate": {
-                    "type": "number",
-                    "default": 0.01
+                    "type": "integer",
+                    "default": 2
                 },
                 "total_spent": {
                     "type": "number",
                     "default": 100
                 }
+            }
+        },
+        "service.debtors": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/service.recepients"
+            }
+        },
+        "service.recepients": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "number"
             }
         }
     }

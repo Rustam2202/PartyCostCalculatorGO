@@ -19,7 +19,7 @@ import (
 // @Failure		500		{object}	handlers.ErrorResponce
 // @Router			/persEvents/{event_id} [get]
 func (h *PersEventsHandler) Get(ctx *gin.Context) {
-	req := ctx.Param("person_id")
+	req := ctx.Param("event_id")
 	perId, err := strconv.ParseInt(req, 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest,

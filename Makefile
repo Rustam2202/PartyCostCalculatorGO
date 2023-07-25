@@ -13,7 +13,7 @@ compose:
 	docker-compose up
 
 test:
-	go test ./... -cover
+	go test ./... -cover -coverprofile=coverage.out
 test-cover-report:
 	go tool cover -html=coverage.out
 
