@@ -15,6 +15,7 @@ compose:
 test:
 	go test ./... -cover -coverprofile=coverage.out
 test-cover-report:
+	make test
 	go tool cover -html=coverage.out
 
 swag:

@@ -45,7 +45,7 @@ func NewCalcService(ps *PersonService, es *EventService, pes *PersonsEventsServi
 }
 
 func (s *CalcService) createEventData(ctx context.Context, eventId int64, RoundRate int32) (*EventData, []balance, error) {
-	var result *EventData
+	var result EventData
 	perEvsArr, err := s.PersonsEventsService.GetByEventId(ctx, eventId)
 	if err != nil {
 		return nil, nil, err
@@ -78,7 +78,7 @@ func (s *CalcService) createEventData(ctx context.Context, eventId int64, RoundR
 			return false
 		}
 	})
-	return result, balances, nil
+	return &result, balances, nil
 }
 
 func (r *EventData) calculateBalances(bls []balance) {
