@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"party-calc/internal/domain"
-	pb "party-calc/internal/grpc/proto"
+	pb "party-calc/internal/service-grpc/proto"
 )
 
 type PersonRepository interface {

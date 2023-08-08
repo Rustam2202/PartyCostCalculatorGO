@@ -3,10 +3,9 @@ package grpc
 import (
 	"context"
 	"log"
-	pb "party-calc/internal/grpc/proto"
+	pb "party-calc/internal/service-grpc/proto"
 
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 
 )
 
@@ -23,5 +22,4 @@ func client() {
 	c := pb.NewPersonClient(conn)
 	c.AddPerson(context.Background(),&pb.Name{})
 
-	proto.Marshal()
 }

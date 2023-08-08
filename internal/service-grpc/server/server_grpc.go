@@ -3,7 +3,7 @@ package grpc
 import (
 	"log"
 	"net"
-	pb "party-calc/internal/grpc/proto"
+	pb "party-calc/internal/service-grpc/proto"
 
 	"google.golang.org/grpc"
 )
