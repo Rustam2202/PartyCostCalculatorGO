@@ -2,7 +2,7 @@ package calculation
 
 import (
 	"net/http"
-	"party-calc/internal/server/handlers"
+	"party-calc/internal/server/http/handlers"
 	"party-calc/internal/service"
 
 	"github.com/gin-gonic/gin"

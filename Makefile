@@ -22,3 +22,8 @@ swag:
 	swag init -g ./internal/server/server.go
 lint:
 	golangci-lint run
+	
+kafka-producer-run:
+	go run ./internal/grpc/producer .
+proto:
+	protoc --go_out=./internal/server/grpc/ --go-grpc_out=./internal/server/grpc/ ./protobuf/service.proto

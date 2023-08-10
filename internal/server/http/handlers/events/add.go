@@ -3,7 +3,7 @@ package events
 import (
 	"net/http"
 	"party-calc/internal/domain"
-	"party-calc/internal/server/handlers"
+	"party-calc/internal/server/http/handlers"
 	"time"
 
 	"github.com/gin-gonic/gin"

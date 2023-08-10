@@ -1,14 +1,14 @@
-package server
+package http
 
 import (
 	"fmt"
 
 	"party-calc/docs"
 	"party-calc/internal/logger"
-	"party-calc/internal/server/handlers/calculation"
-	"party-calc/internal/server/handlers/events"
-	"party-calc/internal/server/handlers/persons"
-	personsevents "party-calc/internal/server/handlers/persons_events"
+	"party-calc/internal/server/http/handlers/calculation"
+	"party-calc/internal/server/http/handlers/events"
+	"party-calc/internal/server/http/handlers/persons"
+	personsevents "party-calc/internal/server/http/handlers/persons_events"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

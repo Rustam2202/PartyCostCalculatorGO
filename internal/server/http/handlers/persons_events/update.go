@@ -2,7 +2,7 @@ package personsevents
 
 import (
 	"net/http"
-	"party-calc/internal/server/handlers"
+	"party-calc/internal/server/http/handlers"
 
 	"github.com/gin-gonic/gin"
 )

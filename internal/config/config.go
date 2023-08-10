@@ -5,13 +5,13 @@ import (
 	"log"
 	"party-calc/internal/database"
 	"party-calc/internal/logger"
-	"party-calc/internal/server"
+	"party-calc/internal/server/http"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	ServerConfig   server.ServerConfig
+	ServerConfig   http.ServerConfig
 	DatabaseConfig database.DatabaseConfig
 	LoggerConfig   logger.LoggerConfig
 }

@@ -1,0 +1,107 @@
+syntax = "proto3";
+package proto;
+option go_package = "./proto";
+
+service PersonService {
+    rpc addPerson(PersonCreate)returns(Id);
+    rpc getPerson(Id)returns(Person);
+    rpc updatePerson(PersonUpdate)returns(Empty);
+    rpc deletePerson(Id)returns(Empty);
+}
+
+service EventService {
+    rpc addEvent(EventCreate)returns(Id);
+    rpc getEvent(Id)returns(Event);
+    rpc updateEvent(EventUpdate)returns(Empty);
+    rpc deleteEvent(Id)returns(Empty);
+}
+
+service PersonsEventsService {
+    rpc addPersonToPersonsEvent(PersonEventCreate)returns(Id);
+    rpc getByPersonId(Id)returns(PersonEvent);
+    rpc getByEventId(Id)returns(PersonEvent);
+    rpc updatePersonsEvents(PersonEventUpdate)returns(Empty);
+    rpc deletePersonsEvents(Id)returns(Empty);
+}
+
+service Calculation {
+    rpc getCalculatedEvent(CalculatedEventGet)returns(EventData);
+}
+
+message Empty{}
+message Id {
+    int64 id = 1;
+}
+message Error {
+    string error = 1;
+}
+
+message Person {
+    int64 id = 1;
+    string name = 2;
+    repeated Event events = 3;
+}
+message Event {
+    int64 id = 1;
+    string name = 2;
+    string date = 3;
+    repeated Person persons = 4;
+}
+message PersonEvent {
+    int64 id = 1;
+    int64 personId = 2;
+    int64 eventId = 3;
+    float spent = 4;
+    int32 factor = 5;
+    Person person = 6;
+    Event event = 7;
+}
+message Recepients {
+    map<string,float> recepients = 1;
+}
+message EventData {
+    string event_name = 1;
+    string date = 2;
+    float average_spent = 3;
+    float total_spent = 4;
+    int32 persons_count = 5;
+    int32 round_rate = 6;
+    map<string, Recepients> debetors = 7;
+}
+
+message PersonCreate {
+    string name = 1;
+}
+message PersonUpdate {
+    int64 id = 1;
+    string name = 2;
+}
+
+message EventCreate {
+    string name = 1;
+    string date = 2;
+}
+message EventUpdate {
+    int64 id = 1;
+    string name = 2;
+    string date = 3;
+}
+
+message PersonEventCreate {
+    int64 person_id = 1;
+    int64 event_id = 2;
+    double spent = 3;
+    int32 factor = 4;
+}
+message PersonEventUpdate {
+    int64 id = 1;
+    int64 person_id = 2;
+    int64 event_id = 3;
+    double spent = 4;
+    int32 factor = 5;
+}
+
+message CalculatedEventGet {
+    int64 event_id = 1;
+    int32 round_rate = 2;
+}
