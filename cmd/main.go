@@ -5,11 +5,18 @@ import (
 	"party-calc/internal/database"
 	"party-calc/internal/logger"
 	"party-calc/internal/repository"
+	"party-calc/internal/server/grpc"
 	"party-calc/internal/server/http"
-	"party-calc/internal/server/http/handlers/calculation"
-	"party-calc/internal/server/http/handlers/events"
-	"party-calc/internal/server/http/handlers/persons"
-	personsevents "party-calc/internal/server/http/handlers/persons_events"
+	http_calc "party-calc/internal/server/http/handlers/calculation"
+	http_ev "party-calc/internal/server/http/handlers/events"
+	http_per "party-calc/internal/server/http/handlers/persons"
+	http_per_ev "party-calc/internal/server/http/handlers/persons_events"
+
+	grpc_calc "party-calc/internal/server/grpc/server/handlers/calculation"
+	grpc_ev "party-calc/internal/server/grpc/server/handlers/event"
+	grpc_per "party-calc/internal/server/grpc/server/handlers/person"
+	grpc_per_ev "party-calc/internal/server/grpc/server/handlers/person_event"
+
 	"party-calc/internal/service"
 )
 
@@ -30,11 +37,19 @@ func main() {
 	persEventService := service.NewPersonsEventsService(persEventsRepo)
 	calcService := service.NewCalcService(personService, eventService, persEventService)
 
-	personHandler := persons.NewPersonHandler(personService)
-	eventHandler := events.NewEventHandler(eventService)
-	persEventHandler := personsevents.NewPersEventsHandler(persEventService)
-	calcHandler := calculation.NewCalcHandler(calcService)
+	personHTTPHandler := http_per.NewPersonHandler(personService)
+	eventHTTPHandler := http_ev.NewEventHandler(eventService)
+	personEventHTTPHandler := http_per_ev.NewPersEventsHandler(persEventService)
+	calcHTTPHandler := http_calc.NewCalcHandler(calcService)
 
-	srv := http.NewServer(cfg.ServerConfig, personHandler, eventHandler, persEventHandler, calcHandler)
-	srv.Start()
+	personGRPCHandler := grpc_per.NewPersonHandler(personService)
+	eventGRPCHandler := grpc_ev.NewEventHandler(eventService)
+	personEventGRPCHandler := grpc_per_ev.NewPersonEventHandler(persEventService)
+	calcGRPCHandler := grpc_calc.NewCalcHandler(calcService)
+
+	httpServer := http.NewServer(cfg.ServerConfig, personHTTPHandler, eventHTTPHandler, personEventHTTPHandler, calcHTTPHandler)
+	go httpServer.Start()
+
+	grpcServer := grpc.NewServer(personGRPCHandler, eventGRPCHandler, personEventGRPCHandler, calcGRPCHandler)
+	grpcServer.Start()
 }

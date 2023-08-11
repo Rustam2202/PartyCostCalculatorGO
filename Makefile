@@ -4,6 +4,11 @@ run:
 	go run ./cmd/main.go 
 exe:
 	./bin/party-calc
+	
+run-grpc:
+	go run ./internal/server/grpc/server/server.go
+run-grpcui:
+	grpcui -plaintext localhost:50051
 
 build-docker:
 	docker build --tag party-calc .

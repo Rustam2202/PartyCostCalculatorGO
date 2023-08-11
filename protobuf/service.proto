@@ -3,24 +3,24 @@ package proto;
 option go_package = "./proto";
 
 service PersonService {
-    rpc addPerson(PersonCreate)returns(Id);
+    rpc addPerson(PersonCreateRequest)returns(Id);
     rpc getPerson(Id)returns(Person);
-    rpc updatePerson(PersonUpdate)returns(Empty);
+    rpc updatePerson(PersonUpdateRequest)returns(Empty);
     rpc deletePerson(Id)returns(Empty);
 }
 
 service EventService {
-    rpc addEvent(EventCreate)returns(Id);
+    rpc addEvent(EventCreateRequest)returns(Id);
     rpc getEvent(Id)returns(Event);
     rpc updateEvent(EventUpdate)returns(Empty);
     rpc deleteEvent(Id)returns(Empty);
 }
 
 service PersonsEventsService {
-    rpc addPersonToPersonsEvent(PersonEventCreate)returns(Id);
-    rpc getByPersonId(Id)returns(PersonEvent);
-    rpc getByEventId(Id)returns(PersonEvent);
-    rpc updatePersonsEvents(PersonEventUpdate)returns(Empty);
+    rpc addPersonToPersonsEvent(PersonEventCreateRequest)returns(Id);
+    rpc getByPersonId(Id)returns(PersonEventsGetResponse);
+    rpc getByEventId(Id)returns(PersonEventsGetResponse);
+    rpc updatePersonsEvents(PersonEventUpdateRequest)returns(Empty);
     rpc deletePersonsEvents(Id)returns(Empty);
 }
 
@@ -69,15 +69,18 @@ message EventData {
     map<string, Recepients> debetors = 7;
 }
 
-message PersonCreate {
+message PersonCreateRequest {
     string name = 1;
 }
-message PersonUpdate {
+message PersonCreateResponce {
+    int64 id = 1;    
+}
+message PersonUpdateRequest {
     int64 id = 1;
     string name = 2;
 }
 
-message EventCreate {
+message EventCreateRequest {
     string name = 1;
     string date = 2;
 }
@@ -87,18 +90,21 @@ message EventUpdate {
     string date = 3;
 }
 
-message PersonEventCreate {
+message PersonEventCreateRequest {
     int64 person_id = 1;
     int64 event_id = 2;
     double spent = 3;
     int32 factor = 4;
 }
-message PersonEventUpdate {
+message PersonEventUpdateRequest {
     int64 id = 1;
     int64 person_id = 2;
     int64 event_id = 3;
     double spent = 4;
     int32 factor = 5;
+}
+message PersonEventsGetResponse {
+    repeated PersonEvent persons_events = 1;
 }
 
 message CalculatedEventGet {

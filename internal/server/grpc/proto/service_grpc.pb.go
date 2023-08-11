@@ -29,9 +29,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PersonServiceClient interface {
-	AddPerson(ctx context.Context, in *PersonCreate, opts ...grpc.CallOption) (*Id, error)
+	AddPerson(ctx context.Context, in *PersonCreateRequest, opts ...grpc.CallOption) (*Id, error)
 	GetPerson(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Person, error)
-	UpdatePerson(ctx context.Context, in *PersonUpdate, opts ...grpc.CallOption) (*Empty, error)
+	UpdatePerson(ctx context.Context, in *PersonUpdateRequest, opts ...grpc.CallOption) (*Empty, error)
 	DeletePerson(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -43,7 +43,7 @@ func NewPersonServiceClient(cc grpc.ClientConnInterface) PersonServiceClient {
 	return &personServiceClient{cc}
 }
 
-func (c *personServiceClient) AddPerson(ctx context.Context, in *PersonCreate, opts ...grpc.CallOption) (*Id, error) {
+func (c *personServiceClient) AddPerson(ctx context.Context, in *PersonCreateRequest, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
 	err := c.cc.Invoke(ctx, PersonService_AddPerson_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -61,7 +61,7 @@ func (c *personServiceClient) GetPerson(ctx context.Context, in *Id, opts ...grp
 	return out, nil
 }
 
-func (c *personServiceClient) UpdatePerson(ctx context.Context, in *PersonUpdate, opts ...grpc.CallOption) (*Empty, error) {
+func (c *personServiceClient) UpdatePerson(ctx context.Context, in *PersonUpdateRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, PersonService_UpdatePerson_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -83,9 +83,9 @@ func (c *personServiceClient) DeletePerson(ctx context.Context, in *Id, opts ...
 // All implementations must embed UnimplementedPersonServiceServer
 // for forward compatibility
 type PersonServiceServer interface {
-	AddPerson(context.Context, *PersonCreate) (*Id, error)
+	AddPerson(context.Context, *PersonCreateRequest) (*Id, error)
 	GetPerson(context.Context, *Id) (*Person, error)
-	UpdatePerson(context.Context, *PersonUpdate) (*Empty, error)
+	UpdatePerson(context.Context, *PersonUpdateRequest) (*Empty, error)
 	DeletePerson(context.Context, *Id) (*Empty, error)
 	mustEmbedUnimplementedPersonServiceServer()
 }
@@ -94,13 +94,13 @@ type PersonServiceServer interface {
 type UnimplementedPersonServiceServer struct {
 }
 
-func (UnimplementedPersonServiceServer) AddPerson(context.Context, *PersonCreate) (*Id, error) {
+func (UnimplementedPersonServiceServer) AddPerson(context.Context, *PersonCreateRequest) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddPerson not implemented")
 }
 func (UnimplementedPersonServiceServer) GetPerson(context.Context, *Id) (*Person, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPerson not implemented")
 }
-func (UnimplementedPersonServiceServer) UpdatePerson(context.Context, *PersonUpdate) (*Empty, error) {
+func (UnimplementedPersonServiceServer) UpdatePerson(context.Context, *PersonUpdateRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePerson not implemented")
 }
 func (UnimplementedPersonServiceServer) DeletePerson(context.Context, *Id) (*Empty, error) {
@@ -120,7 +120,7 @@ func RegisterPersonServiceServer(s grpc.ServiceRegistrar, srv PersonServiceServe
 }
 
 func _PersonService_AddPerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PersonCreate)
+	in := new(PersonCreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func _PersonService_AddPerson_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: PersonService_AddPerson_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PersonServiceServer).AddPerson(ctx, req.(*PersonCreate))
+		return srv.(PersonServiceServer).AddPerson(ctx, req.(*PersonCreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -156,7 +156,7 @@ func _PersonService_GetPerson_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _PersonService_UpdatePerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PersonUpdate)
+	in := new(PersonUpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func _PersonService_UpdatePerson_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: PersonService_UpdatePerson_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PersonServiceServer).UpdatePerson(ctx, req.(*PersonUpdate))
+		return srv.(PersonServiceServer).UpdatePerson(ctx, req.(*PersonUpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -230,7 +230,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EventServiceClient interface {
-	AddEvent(ctx context.Context, in *EventCreate, opts ...grpc.CallOption) (*Id, error)
+	AddEvent(ctx context.Context, in *EventCreateRequest, opts ...grpc.CallOption) (*Id, error)
 	GetEvent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Event, error)
 	UpdateEvent(ctx context.Context, in *EventUpdate, opts ...grpc.CallOption) (*Empty, error)
 	DeleteEvent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error)
@@ -244,7 +244,7 @@ func NewEventServiceClient(cc grpc.ClientConnInterface) EventServiceClient {
 	return &eventServiceClient{cc}
 }
 
-func (c *eventServiceClient) AddEvent(ctx context.Context, in *EventCreate, opts ...grpc.CallOption) (*Id, error) {
+func (c *eventServiceClient) AddEvent(ctx context.Context, in *EventCreateRequest, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
 	err := c.cc.Invoke(ctx, EventService_AddEvent_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -284,7 +284,7 @@ func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *Id, opts ...gr
 // All implementations must embed UnimplementedEventServiceServer
 // for forward compatibility
 type EventServiceServer interface {
-	AddEvent(context.Context, *EventCreate) (*Id, error)
+	AddEvent(context.Context, *EventCreateRequest) (*Id, error)
 	GetEvent(context.Context, *Id) (*Event, error)
 	UpdateEvent(context.Context, *EventUpdate) (*Empty, error)
 	DeleteEvent(context.Context, *Id) (*Empty, error)
@@ -295,7 +295,7 @@ type EventServiceServer interface {
 type UnimplementedEventServiceServer struct {
 }
 
-func (UnimplementedEventServiceServer) AddEvent(context.Context, *EventCreate) (*Id, error) {
+func (UnimplementedEventServiceServer) AddEvent(context.Context, *EventCreateRequest) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddEvent not implemented")
 }
 func (UnimplementedEventServiceServer) GetEvent(context.Context, *Id) (*Event, error) {
@@ -321,7 +321,7 @@ func RegisterEventServiceServer(s grpc.ServiceRegistrar, srv EventServiceServer)
 }
 
 func _EventService_AddEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EventCreate)
+	in := new(EventCreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -333,7 +333,7 @@ func _EventService_AddEvent_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: EventService_AddEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EventServiceServer).AddEvent(ctx, req.(*EventCreate))
+		return srv.(EventServiceServer).AddEvent(ctx, req.(*EventCreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -432,10 +432,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PersonsEventsServiceClient interface {
-	AddPersonToPersonsEvent(ctx context.Context, in *PersonEventCreate, opts ...grpc.CallOption) (*Id, error)
-	GetByPersonId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEvent, error)
-	GetByEventId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEvent, error)
-	UpdatePersonsEvents(ctx context.Context, in *PersonEventUpdate, opts ...grpc.CallOption) (*Empty, error)
+	AddPersonToPersonsEvent(ctx context.Context, in *PersonEventCreateRequest, opts ...grpc.CallOption) (*Id, error)
+	GetByPersonId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEventsGetResponse, error)
+	GetByEventId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEventsGetResponse, error)
+	UpdatePersonsEvents(ctx context.Context, in *PersonEventUpdateRequest, opts ...grpc.CallOption) (*Empty, error)
 	DeletePersonsEvents(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -447,7 +447,7 @@ func NewPersonsEventsServiceClient(cc grpc.ClientConnInterface) PersonsEventsSer
 	return &personsEventsServiceClient{cc}
 }
 
-func (c *personsEventsServiceClient) AddPersonToPersonsEvent(ctx context.Context, in *PersonEventCreate, opts ...grpc.CallOption) (*Id, error) {
+func (c *personsEventsServiceClient) AddPersonToPersonsEvent(ctx context.Context, in *PersonEventCreateRequest, opts ...grpc.CallOption) (*Id, error) {
 	out := new(Id)
 	err := c.cc.Invoke(ctx, PersonsEventsService_AddPersonToPersonsEvent_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -456,8 +456,8 @@ func (c *personsEventsServiceClient) AddPersonToPersonsEvent(ctx context.Context
 	return out, nil
 }
 
-func (c *personsEventsServiceClient) GetByPersonId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEvent, error) {
-	out := new(PersonEvent)
+func (c *personsEventsServiceClient) GetByPersonId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEventsGetResponse, error) {
+	out := new(PersonEventsGetResponse)
 	err := c.cc.Invoke(ctx, PersonsEventsService_GetByPersonId_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -465,8 +465,8 @@ func (c *personsEventsServiceClient) GetByPersonId(ctx context.Context, in *Id, 
 	return out, nil
 }
 
-func (c *personsEventsServiceClient) GetByEventId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEvent, error) {
-	out := new(PersonEvent)
+func (c *personsEventsServiceClient) GetByEventId(ctx context.Context, in *Id, opts ...grpc.CallOption) (*PersonEventsGetResponse, error) {
+	out := new(PersonEventsGetResponse)
 	err := c.cc.Invoke(ctx, PersonsEventsService_GetByEventId_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -474,7 +474,7 @@ func (c *personsEventsServiceClient) GetByEventId(ctx context.Context, in *Id, o
 	return out, nil
 }
 
-func (c *personsEventsServiceClient) UpdatePersonsEvents(ctx context.Context, in *PersonEventUpdate, opts ...grpc.CallOption) (*Empty, error) {
+func (c *personsEventsServiceClient) UpdatePersonsEvents(ctx context.Context, in *PersonEventUpdateRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, PersonsEventsService_UpdatePersonsEvents_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -496,10 +496,10 @@ func (c *personsEventsServiceClient) DeletePersonsEvents(ctx context.Context, in
 // All implementations must embed UnimplementedPersonsEventsServiceServer
 // for forward compatibility
 type PersonsEventsServiceServer interface {
-	AddPersonToPersonsEvent(context.Context, *PersonEventCreate) (*Id, error)
-	GetByPersonId(context.Context, *Id) (*PersonEvent, error)
-	GetByEventId(context.Context, *Id) (*PersonEvent, error)
-	UpdatePersonsEvents(context.Context, *PersonEventUpdate) (*Empty, error)
+	AddPersonToPersonsEvent(context.Context, *PersonEventCreateRequest) (*Id, error)
+	GetByPersonId(context.Context, *Id) (*PersonEventsGetResponse, error)
+	GetByEventId(context.Context, *Id) (*PersonEventsGetResponse, error)
+	UpdatePersonsEvents(context.Context, *PersonEventUpdateRequest) (*Empty, error)
 	DeletePersonsEvents(context.Context, *Id) (*Empty, error)
 	mustEmbedUnimplementedPersonsEventsServiceServer()
 }
@@ -508,16 +508,16 @@ type PersonsEventsServiceServer interface {
 type UnimplementedPersonsEventsServiceServer struct {
 }
 
-func (UnimplementedPersonsEventsServiceServer) AddPersonToPersonsEvent(context.Context, *PersonEventCreate) (*Id, error) {
+func (UnimplementedPersonsEventsServiceServer) AddPersonToPersonsEvent(context.Context, *PersonEventCreateRequest) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddPersonToPersonsEvent not implemented")
 }
-func (UnimplementedPersonsEventsServiceServer) GetByPersonId(context.Context, *Id) (*PersonEvent, error) {
+func (UnimplementedPersonsEventsServiceServer) GetByPersonId(context.Context, *Id) (*PersonEventsGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByPersonId not implemented")
 }
-func (UnimplementedPersonsEventsServiceServer) GetByEventId(context.Context, *Id) (*PersonEvent, error) {
+func (UnimplementedPersonsEventsServiceServer) GetByEventId(context.Context, *Id) (*PersonEventsGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByEventId not implemented")
 }
-func (UnimplementedPersonsEventsServiceServer) UpdatePersonsEvents(context.Context, *PersonEventUpdate) (*Empty, error) {
+func (UnimplementedPersonsEventsServiceServer) UpdatePersonsEvents(context.Context, *PersonEventUpdateRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePersonsEvents not implemented")
 }
 func (UnimplementedPersonsEventsServiceServer) DeletePersonsEvents(context.Context, *Id) (*Empty, error) {
@@ -537,7 +537,7 @@ func RegisterPersonsEventsServiceServer(s grpc.ServiceRegistrar, srv PersonsEven
 }
 
 func _PersonsEventsService_AddPersonToPersonsEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PersonEventCreate)
+	in := new(PersonEventCreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -549,7 +549,7 @@ func _PersonsEventsService_AddPersonToPersonsEvent_Handler(srv interface{}, ctx 
 		FullMethod: PersonsEventsService_AddPersonToPersonsEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PersonsEventsServiceServer).AddPersonToPersonsEvent(ctx, req.(*PersonEventCreate))
+		return srv.(PersonsEventsServiceServer).AddPersonToPersonsEvent(ctx, req.(*PersonEventCreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -591,7 +591,7 @@ func _PersonsEventsService_GetByEventId_Handler(srv interface{}, ctx context.Con
 }
 
 func _PersonsEventsService_UpdatePersonsEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PersonEventUpdate)
+	in := new(PersonEventUpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -603,7 +603,7 @@ func _PersonsEventsService_UpdatePersonsEvents_Handler(srv interface{}, ctx cont
 		FullMethod: PersonsEventsService_UpdatePersonsEvents_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PersonsEventsServiceServer).UpdatePersonsEvents(ctx, req.(*PersonEventUpdate))
+		return srv.(PersonsEventsServiceServer).UpdatePersonsEvents(ctx, req.(*PersonEventUpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

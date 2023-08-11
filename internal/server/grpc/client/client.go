@@ -9,19 +9,22 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	address = "localhost:50051"
-)
+type Clent struct {
+}
 
 func main() {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
 
-	client := pb.NewPersonServiceClient(conn)
-	response, err := client.AddPerson(context.Background(), &pb.PersonCreate{Name: "Person"})
+	personClient := pb.NewPersonServiceClient(conn)
+	// eventClient := pb.NewEventServiceClient(conn)
+	// personEventsClient := pb.NewPersonsEventsServiceClient(conn)
+	// calculationClient := pb.NewCalculationClient(conn)
+
+	response, err := personClient.AddPerson(context.Background(), &pb.PersonCreateRequest{Name: "Person"})
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

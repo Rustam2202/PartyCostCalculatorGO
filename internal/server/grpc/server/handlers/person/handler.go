@@ -1,16 +1,22 @@
-package main
+package person
 
 import (
 	"context"
 	"party-calc/internal/server/grpc/proto"
+	pb "party-calc/internal/server/grpc/proto"
 	"party-calc/internal/service"
 )
 
 type PersonHandler struct {
-	service service.PersonService
+	pb.PersonServiceServer
+	service *service.PersonService
 }
 
-func (h *PersonHandler) AddPerson(ctx context.Context, pb *proto.PersonCreate) (*proto.Id, error) {
+func NewPersonHandler(s *service.PersonService) *PersonHandler {
+	return &PersonHandler{service: s}
+}
+
+func (h *PersonHandler) AddPerson(ctx context.Context, pb *proto.PersonCreateRequest) (*proto.Id, error) {
 	id, err := h.service.NewPerson(ctx, pb.Name)
 	if err != nil {
 		return nil, err
@@ -38,7 +44,7 @@ func (h *PersonHandler) GetPerson(ctx context.Context, pb *proto.Id) (*proto.Per
 	return result, nil
 }
 
-func (h *PersonHandler) UpdatePerson(ctx context.Context, pb *proto.PersonUpdate) (*proto.Empty, error) {
+func (h *PersonHandler) UpdatePerson(ctx context.Context, pb *proto.PersonUpdateRequest) (*proto.Empty, error) {
 	err := h.service.UpdatePerson(ctx, pb.Id, pb.Name)
 	if err != nil {
 		return nil, err
