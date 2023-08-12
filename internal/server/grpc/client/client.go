@@ -9,7 +9,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Clent struct {
+type Client struct {
+	
 }
 
 func main() {

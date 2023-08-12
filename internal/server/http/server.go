@@ -51,12 +51,6 @@ func (s *Server) Start() {
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 
-	// persons := router.Group("/persons")
-	// persons.POST("", s.personHandler.Add)
-	// persons.GET("/:id", s.personHandler.Get)
-	// persons.PUT("", s.personHandler.Update)
-	// persons.DELETE("/:id", s.personHandler.Delete)
-
 	router.POST("/person", s.personHandler.Add)
 	router.GET("/person/:id", s.personHandler.Get)
 	router.PUT("/person", s.personHandler.Update)

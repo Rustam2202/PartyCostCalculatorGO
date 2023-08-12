@@ -17,6 +17,7 @@ import (
 	grpc_per "party-calc/internal/server/grpc/server/handlers/person"
 	grpc_per_ev "party-calc/internal/server/grpc/server/handlers/person_event"
 
+	"party-calc/internal/kafka/consumer"
 	"party-calc/internal/service"
 )
 
@@ -49,6 +50,10 @@ func main() {
 
 	httpServer := http.NewServer(cfg.ServerConfig, personHTTPHandler, eventHTTPHandler, personEventHTTPHandler, calcHTTPHandler)
 	go httpServer.Start()
+
+	services := service.NewServices(personsRepo, eventsRepo, persEventsRepo)
+	kafkaConsumer := consumer.NewKafkaConsumer(cfg.KafkaConfig, services)
+	kafkaConsumer.RunKafkaConsumer()
 
 	grpcServer := grpc.NewServer(personGRPCHandler, eventGRPCHandler, personEventGRPCHandler, calcGRPCHandler)
 	grpcServer.Start()

@@ -8,6 +8,8 @@ DatabaseConfig:
   user: postgres
   password: password
   dbname: partycalc
+KafkaConfig:
+  brokers: localhost:9092
 
 LoggerConfig:
   encoding: json

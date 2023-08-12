@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"party-calc/internal/database"
+	"party-calc/internal/kafka"
 	"party-calc/internal/logger"
 	"party-calc/internal/server/http"
 
@@ -14,6 +15,7 @@ type Config struct {
 	ServerConfig   http.ServerConfig
 	DatabaseConfig database.DatabaseConfig
 	LoggerConfig   logger.LoggerConfig
+	KafkaConfig    kafka.KafkaConfig
 }
 
 func LoadConfig() *Config {
