@@ -1,7 +1,6 @@
-package grpc
+package serverkafka
 
 type ServerGrpcConfig struct {
 	Network string
-	Host    string
-	Port    int
+	Port int
 }

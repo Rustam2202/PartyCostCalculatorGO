@@ -6,16 +6,18 @@ import (
 	"party-calc/internal/database"
 	"party-calc/internal/kafka"
 	"party-calc/internal/logger"
+	"party-calc/internal/server/grpc"
 	"party-calc/internal/server/http"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	ServerConfig   http.ServerConfig
-	DatabaseConfig database.DatabaseConfig
-	LoggerConfig   logger.LoggerConfig
-	KafkaConfig    kafka.KafkaConfig
+	ServerConfig     http.ServerConfig
+	ServerGrpcConfig grpc.ServerGrpcConfig
+	DatabaseConfig   database.DatabaseConfig
+	LoggerConfig     logger.LoggerConfig
+	KafkaConfig      kafka.KafkaConfig
 }
 
 func LoadConfig() *Config {

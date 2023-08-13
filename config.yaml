@@ -1,6 +1,10 @@
 ServerConfig:
   host: localhost
   port: 8080
+ServerGRPCConfig:
+  network: "tcp"
+  host: localhost
+  port: 50051
   
 DatabaseConfig:
   host: localhost
@@ -8,6 +12,7 @@ DatabaseConfig:
   user: postgres
   password: password
   dbname: partycalc
+
 KafkaConfig:
   brokers: localhost:9092
 

@@ -2,10 +2,13 @@ package consumer
 
 import (
 	"context"
+	"party-calc/internal/server/grpc/proto"
 	"party-calc/internal/service"
 
-	"github.com/segmentio/kafka-go"
 	k "party-calc/internal/kafka"
+
+	pm "github.com/golang/protobuf/proto"
+	"github.com/segmentio/kafka-go"
 )
 
 type KafkaConsumer struct {
@@ -30,7 +33,9 @@ func (r *KafkaConsumer) RunPersonCreateReader(ctx context.Context) {
 		if err != nil {
 			break
 		}
-		r.services.PersonService.NewPerson(ctx, string(msg.Value))
+		personCreate := proto.PersonCreateRequest{}
+		pm.Unmarshal(msg.Value, &personCreate)
+		r.services.PersonService.NewPerson(ctx, personCreate.Name)
 	}
 }
 

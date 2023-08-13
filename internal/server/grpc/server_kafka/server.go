@@ -1,0 +1,63 @@
+package serverkafka
+
+import (
+	"fmt"
+	"net"
+	"party-calc/internal/logger"
+	pb "party-calc/internal/server/grpc/proto"
+
+	g "party-calc/internal/server/grpc"
+	"party-calc/internal/server/grpc/server_kafka/handlers/calculation"
+	"party-calc/internal/server/grpc/server_kafka/handlers/event"
+	"party-calc/internal/server/grpc/server_kafka/handlers/person"
+	personevent "party-calc/internal/server/grpc/server_kafka/handlers/person_event"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+)
+
+type Server struct {
+	cfg                 *g.ServerGrpcConfig
+	personHandler       *person.PersonHandler
+	eventHandler        *event.EventHandler
+	personsEventHandler *personevent.PersonEventHandler
+	calcHandler         *calculation.CalcHandler
+}
+
+func NewServer(
+	cfg *g.ServerGrpcConfig,
+	ph *person.PersonHandler,
+	eh *event.EventHandler,
+	peh *personevent.PersonEventHandler,
+	ch *calculation.CalcHandler,
+) *Server {
+	return &Server{
+		cfg:                 cfg,
+		personHandler:       ph,
+		eventHandler:        eh,
+		personsEventHandler: peh,
+		calcHandler:         ch,
+	}
+}
+
+func (s *Server) Start() {
+	lis, err := net.Listen(s.cfg.Network, fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))
+	if err != nil {
+		logger.Logger.Error("Failed to listen", zap.Error(err))
+		return
+	}
+
+	srv := grpc.NewServer()
+	reflection.Register(srv)
+
+	pb.RegisterPersonServiceServer(srv, s.personHandler)
+	pb.RegisterEventServiceServer(srv, s.eventHandler)
+	pb.RegisterPersonsEventsServiceServer(srv, s.personsEventHandler)
+	pb.RegisterCalculationServer(srv, s.calcHandler)
+
+	if err := srv.Serve(lis); err != nil {
+		logger.Logger.Error("Failed to serve", zap.Error(err))
+		return
+	}
+}

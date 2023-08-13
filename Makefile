@@ -5,17 +5,17 @@ run:
 exe:
 	./bin/party-calc
 	
-run-grpc:
+grpc-run:
 	go run ./internal/server/grpc/server/server.go
-run-grpcui:
+grpcui-run:
 	grpcui -plaintext localhost:50051
 
-build-docker:
+docker-build:
 	docker build --tag party-calc .
-run-docker:
+docker-run:
 	docker run -p 8080:8080 party-calc
-compose:
-	docker-compose up
+compose-build:
+	docker-compose up --build app
 
 test:
 	go test ./... -cover -coverprofile=coverage.out
