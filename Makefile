@@ -28,7 +28,10 @@ swag:
 lint:
 	golangci-lint run
 	
-kafka-producer-run:
-	go run ./internal/grpc/producer .
+kafka-run:
+	cd ~/dev/kafka/
+	bin/zookeeper-server-start.sh config/zookeeper.properties
+	bin/kafka-server-start.sh config/server0.properties
+	
 proto:
 	protoc --go_out=./internal/server/grpc/ --go-grpc_out=./internal/server/grpc/ ./protobuf/service.proto

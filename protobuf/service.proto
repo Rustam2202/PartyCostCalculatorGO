@@ -3,25 +3,25 @@ package proto;
 option go_package = "./proto";
 
 service PersonService {
-    rpc addPerson(PersonCreateRequest)returns(Id);
+    rpc addPerson(PersonCreateRequest)returns(Response);
     rpc getPerson(Id)returns(Person);
-    rpc updatePerson(PersonUpdateRequest)returns(Empty);
-    rpc deletePerson(Id)returns(Empty);
+    rpc updatePerson(PersonUpdateRequest)returns(Response);
+    rpc deletePerson(Id)returns(Response);
 }
 
 service EventService {
-    rpc addEvent(EventCreateRequest)returns(Id);
+    rpc addEvent(EventCreateRequest)returns(Response);
     rpc getEvent(Id)returns(Event);
-    rpc updateEvent(EventUpdate)returns(Empty);
-    rpc deleteEvent(Id)returns(Empty);
+    rpc updateEvent(EventUpdate)returns(Response);
+    rpc deleteEvent(Id)returns(Response);
 }
 
 service PersonsEventsService {
-    rpc addPersonToPersonsEvent(PersonEventCreateRequest)returns(Id);
+    rpc addPersonToPersonsEvent(PersonEventCreateRequest)returns(Response);
     rpc getByPersonId(Id)returns(PersonEventsGetResponse);
     rpc getByEventId(Id)returns(PersonEventsGetResponse);
-    rpc updatePersonsEvents(PersonEventUpdateRequest)returns(Empty);
-    rpc deletePersonsEvents(Id)returns(Empty);
+    rpc updatePersonsEvents(PersonEventUpdateRequest)returns(Response);
+    rpc deletePersonsEvents(Id)returns(Response);
 }
 
 service Calculation {
@@ -32,8 +32,8 @@ message Empty{}
 message Id {
     int64 id = 1;
 }
-message Error {
-    string error = 1;
+message Response {
+    string response = 1;
 }
 
 message Person {

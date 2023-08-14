@@ -62,15 +62,15 @@ func main() {
 	// go httpServer.Start()
 
 	kafkaConsumer := consumer.NewKafkaConsumer(cfg.KafkaConfig, services)
-	kafkaProduer := producer.NewKafkaProducer(cfg.KafkaConfig)
+	kafkaProducer := producer.NewKafkaProducer(cfg.KafkaConfig)
 	kafkaConsumer.RunKafkaConsumer()
 
 	//grpcServer := grpc.NewServer(personGRPCHandler, eventGRPCHandler, personEventGRPCHandler, calcGRPCHandler)
 	//grpcServer.Start()
 
-	personGRPCKafkaHandler := grpc_kafka_per.NewPersonHandler(personService)
-	eventGRPCKafkaHandler := grpc_kafka_ev.NewEventHandler(eventService)
-	personEventGRPCKafkaHandler := grpc_kafka_per_ev.NewPersonEventHandler(persEventService)
+	personGRPCKafkaHandler := grpc_kafka_per.NewPersonHandler(personService, kafkaProducer)
+	eventGRPCKafkaHandler := grpc_kafka_ev.NewEventHandler(eventService,kafkaProducer)
+	personEventGRPCKafkaHandler := grpc_kafka_per_ev.NewPersonEventHandler(persEventService,kafkaProducer)
 	calcGRPCKafkaHandler := grpc_kafka_calc.NewCalcHandler(calcService)
 
 	grpsKafkaServer := serverkafka.NewServer(&cfg.ServerGrpcConfig, personGRPCKafkaHandler,

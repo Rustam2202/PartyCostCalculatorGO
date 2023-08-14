@@ -59,5 +59,7 @@ func (s *Server) Start() {
 	if err := srv.Serve(lis); err != nil {
 		logger.Logger.Error("Failed to serve", zap.Error(err))
 		return
+	} else {
+		logger.Logger.Info("GRPC server with Kafka started")
 	}
 }

@@ -14,13 +14,10 @@ type KafkaProducer struct {
 
 func NewKafkaProducer(cfg k.KafkaConfig) *KafkaProducer {
 	config := kafka.WriterConfig{Brokers: cfg.Brokers}
-	// for _, broker := range cfg.Brokers {
-	// 	config.Brokers = append(config.Brokers, broker)
-	// }
 	return &KafkaProducer{cfg: &config}
 }
 
-func (w *KafkaProducer) WriteMessage(topic string, msg []byte) {
+func (w *KafkaProducer) WriteMessage(topic string, msg []byte) error {
 	writer := kafka.NewWriter(*w.cfg)
 	m := kafka.Message{
 		Topic: topic,
@@ -28,6 +25,7 @@ func (w *KafkaProducer) WriteMessage(topic string, msg []byte) {
 	}
 	err := writer.WriteMessages(context.Background(), m)
 	if err != nil {
-
+		return err
 	}
+	return nil
 }
