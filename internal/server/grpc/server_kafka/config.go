@@ -1,6 +1,7 @@
 package serverkafka
 
-type ServerGrpcConfig struct {
+type ServerGrpcKafkaConfig struct {
 	Network string
-	Port int
+	Host    string
+	Port    int
 }

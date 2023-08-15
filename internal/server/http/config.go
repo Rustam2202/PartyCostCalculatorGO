@@ -1,6 +1,6 @@
 package http
 
-type ServerConfig struct {
+type ServerHTTPConfig struct {
 	Host string
 	Port int
 }

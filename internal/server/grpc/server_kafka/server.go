@@ -6,7 +6,6 @@ import (
 	"party-calc/internal/logger"
 	pb "party-calc/internal/server/grpc/proto"
 
-	g "party-calc/internal/server/grpc"
 	"party-calc/internal/server/grpc/server_kafka/handlers/calculation"
 	"party-calc/internal/server/grpc/server_kafka/handlers/event"
 	"party-calc/internal/server/grpc/server_kafka/handlers/person"
@@ -18,7 +17,7 @@ import (
 )
 
 type Server struct {
-	cfg                 *g.ServerGrpcConfig
+	cfg                 *ServerGrpcKafkaConfig
 	personHandler       *person.PersonHandler
 	eventHandler        *event.EventHandler
 	personsEventHandler *personevent.PersonEventHandler
@@ -26,7 +25,7 @@ type Server struct {
 }
 
 func NewServer(
-	cfg *g.ServerGrpcConfig,
+	cfg *ServerGrpcKafkaConfig,
 	ph *person.PersonHandler,
 	eh *event.EventHandler,
 	peh *personevent.PersonEventHandler,

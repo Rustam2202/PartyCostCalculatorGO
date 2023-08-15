@@ -1,4 +1,4 @@
-package grpc
+package server
 
 import (
 	"net"
@@ -16,6 +16,7 @@ import (
 )
 
 type Server struct {
+	cfg                 *ServerGrpcConfig
 	personHandler       *person.PersonHandler
 	eventHandler        *event.EventHandler
 	personsEventHandler *personevent.PersonEventHandler
@@ -23,12 +24,14 @@ type Server struct {
 }
 
 func NewServer(
+	cfg *ServerGrpcConfig,
 	ph *person.PersonHandler,
 	eh *event.EventHandler,
 	peh *personevent.PersonEventHandler,
 	ch *calculation.CalcHandler,
 ) *Server {
 	return &Server{
+		cfg:                 cfg,
 		personHandler:       ph,
 		eventHandler:        eh,
 		personsEventHandler: peh,

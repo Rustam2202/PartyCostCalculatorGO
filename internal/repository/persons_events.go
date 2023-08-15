@@ -82,7 +82,7 @@ func (r *PersEventsRepository) GetByEventId(ctx context.Context, eventId int64) 
 	var rows pgx.Rows
 	var err error
 	rows, err = r.Db.DBPGX.Query(ctx,
-		`SELECT * FROM persons_events WHERE event_id=$1`, eventId)
+		`SELECT id, person_id, event_id, spent, factor FROM persons_events WHERE event_id=$1`, eventId)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ import (
 )
 
 type Server struct {
-	cfg               *ServerConfig
+	cfg               *ServerHTTPConfig
 	personHandler     persons.PersonHandler
 	eventHandler      events.EventHandler
 	persEventsHandler personsevents.PersEventsHandler
@@ -26,7 +26,7 @@ type Server struct {
 }
 
 func NewServer(
-	cfg ServerConfig,
+	cfg ServerHTTPConfig,
 	ph *persons.PersonHandler,
 	eh *events.EventHandler,
 	peh *personsevents.PersEventsHandler,

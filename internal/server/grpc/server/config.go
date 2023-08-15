@@ -1,4 +1,4 @@
-package grpc
+package server
 
 type ServerGrpcConfig struct {
 	Network string

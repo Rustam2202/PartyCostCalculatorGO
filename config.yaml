@@ -1,10 +1,14 @@
-ServerConfig:
+ServerHTTPConfig:
   host: localhost
   port: 8080
 ServerGRPCConfig:
   network: "tcp"
   host: localhost
   port: 50051
+ServerGRPCKafkaConfig:
+  network: "tcp"
+  host: localhost
+  port: 50052
   
 DatabaseConfig:
   host: localhost

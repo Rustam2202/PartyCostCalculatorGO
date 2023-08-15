@@ -9,6 +9,7 @@ grpc-run:
 	go run ./internal/server/grpc/server/server.go
 grpcui-run:
 	grpcui -plaintext localhost:50051
+	grpcui -plaintext localhost:50052
 
 docker-build:
 	docker build --tag party-calc .
@@ -24,14 +25,14 @@ test-cover-report:
 	go tool cover -html=coverage.out
 
 swag:
-	swag init -g ./internal/server/server.go
+	swag init -g ./internal/server/http/server.go
 lint:
 	golangci-lint run
 	
 kafka-run:
 	cd ~/dev/kafka/
-	bin/zookeeper-server-start.sh config/zookeeper.properties
-	bin/kafka-server-start.sh config/server0.properties
+	bin/windows/zookeeper-server-start.bat config/zookeeper.properties
+	bin/windows/kafka-server-start.bat config/server0.properties
 	
 proto:
 	protoc --go_out=./internal/server/grpc/ --go-grpc_out=./internal/server/grpc/ ./protobuf/service.proto
