@@ -5,8 +5,8 @@ import (
 	"party-calc/internal/server/grpc/proto"
 )
 
-func (h *PersonEventHandler) GetByPersonId(ctx context.Context, pb *proto.Id) (*proto.PersonEventsGetResponse, error) {
-	perEv, err := h.service.GetByPersonId(ctx, pb.Id)
+func (h *PersonEventHandler) GetByEventId(ctx context.Context, pb *proto.Id) (*proto.PersonEventsGetResponse, error) {
+	perEv, err := h.service.GetByEventId(ctx, pb.Id)
 	if err != nil {
 		return &proto.PersonEventsGetResponse{}, err
 	}

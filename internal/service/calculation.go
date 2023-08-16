@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"sort"
 	"time"
 
@@ -49,6 +50,9 @@ func (s *CalcService) createEventData(ctx context.Context, eventId int64, RoundR
 	perEvsArr, err := s.PersonsEventsService.GetByEventId(ctx, eventId)
 	if err != nil {
 		return nil, nil, err
+	}
+	if len(perEvsArr) < 3 {
+		return nil, nil, errors.New("persons count less then 3")
 	}
 	result.Name = perEvsArr[0].Event.Name
 	result.Date = perEvsArr[0].Event.Date

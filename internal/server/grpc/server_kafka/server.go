@@ -26,17 +26,14 @@ type Server struct {
 
 func NewServer(
 	cfg *ServerGrpcKafkaConfig,
-	ph *person.PersonHandler,
-	eh *event.EventHandler,
-	peh *personevent.PersonEventHandler,
-	ch *calculation.CalcHandler,
+	handlers *GRPCKafkaHandlers,
 ) *Server {
 	return &Server{
 		cfg:                 cfg,
-		personHandler:       ph,
-		eventHandler:        eh,
-		personsEventHandler: peh,
-		calcHandler:         ch,
+		personHandler:       handlers.PersonHandler,
+		eventHandler:        handlers.EventHandler,
+		personsEventHandler: handlers.PersEventsHandler,
+		calcHandler:         handlers.CalcHandler,
 	}
 }
 

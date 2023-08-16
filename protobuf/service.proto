@@ -18,7 +18,6 @@ service EventService {
 
 service PersonsEventsService {
     rpc addPersonToPersonsEvent(PersonEventCreateRequest)returns(Response);
-    rpc getByPersonId(Id)returns(PersonEventsGetResponse);
     rpc getByEventId(Id)returns(PersonEventsGetResponse);
     rpc updatePersonsEvents(PersonEventUpdateRequest)returns(Response);
     rpc deletePersonsEvents(Id)returns(Response);

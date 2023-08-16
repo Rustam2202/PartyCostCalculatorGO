@@ -27,17 +27,14 @@ type Server struct {
 
 func NewServer(
 	cfg ServerHTTPConfig,
-	ph *persons.PersonHandler,
-	eh *events.EventHandler,
-	peh *personsevents.PersEventsHandler,
-	ch *calculation.CalcHandler,
+	handlers *HTTPHandlers,
 ) *Server {
 	return &Server{
 		cfg:               &cfg,
-		personHandler:     *ph,
-		eventHandler:      *eh,
-		persEventsHandler: *peh,
-		calcHandler:       *ch,
+		personHandler:     *handlers.PersonHandler,
+		eventHandler:      *handlers.EventHandler,
+		persEventsHandler: *handlers.PersEventsHandler,
+		calcHandler:       *handlers.CalcHandler,
 	}
 }
 

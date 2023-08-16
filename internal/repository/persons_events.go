@@ -40,25 +40,29 @@ func (r *PersEventsRepository) fillPersonAndEventsArrayForGet(ctx context.Contex
 		if err != nil {
 			return nil, err
 		}
+		result = append(result, perEv)
+	}
+	for i := 0; i < len(result); i++ {
 		var per domain.Person
-		err = r.Db.DBPGX.QueryRow(ctx,
-			`SELECT * FROM persons WHERE id=$1`, perEv.PersonId).
+		err := r.Db.DBPGX.QueryRow(ctx,
+			`SELECT * FROM persons WHERE id=$1`, result[i].PersonId).
 			Scan(&per.Id, &per.Name)
 		if err != nil {
 			logger.Logger.Error("Failed Scan data from 'persons' by id: ", zap.Error(err))
 			return nil, err
 		}
-		perEv.Person = per
+		result[i].Person = per
+	}
+	for i := 0; i < len(result); i++ {
 		var ev domain.Event
-		err = r.Db.DBPGX.QueryRow(ctx,
-			`SELECT id, name, date FROM events WHERE id=$1`, perEv.EventId).
+		err := r.Db.DBPGX.QueryRow(ctx,
+			`SELECT id, name, date FROM events WHERE id=$1`, result[i].EventId).
 			Scan(&ev.Id, &ev.Name, &ev.Date)
 		if err != nil {
 			logger.Logger.Error("Failed Scan data from 'events' by id: ", zap.Error(err))
 			return nil, err
 		}
-		perEv.Event = ev
-		result = append(result, perEv)
+		result[i].Event = ev
 	}
 	return result, nil
 }

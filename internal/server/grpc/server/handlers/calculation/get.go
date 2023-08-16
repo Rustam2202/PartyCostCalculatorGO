@@ -20,11 +20,10 @@ func (h *CalcHandler) GetCalculatedEvent(ctx context.Context, pb *proto.Calculat
 		Debetors:     make(map[string]*proto.Recepients),
 	}
 	for debetor, recepients := range eventData.Owes {
-		r := proto.Recepients{}
+		result.Debetors[debetor] = &proto.Recepients{Recepients: make(map[string]float32)}
 		for recepient, debt := range recepients {
-			r.Recepients[recepient] = float32(debt.Ceil().InexactFloat64())
+			result.Debetors[debetor].Recepients[recepient] = float32(debt.Ceil().InexactFloat64())
 		}
-		result.Debetors[debetor].Recepients = r.Recepients
 	}
 	return &result, nil
 }
