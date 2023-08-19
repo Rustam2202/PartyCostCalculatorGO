@@ -54,17 +54,15 @@ func TestGetPersonsEventsByPersonId(t *testing.T) {
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
 			AddRow(int64(1), "Person 1"))
-
-	mock.ExpectQuery("SELECT id, name, date FROM events").
-		WithArgs(int64(4)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
-			AddRows([]any{int64(4), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
-
 	mock.ExpectQuery("SELECT (.+) FROM persons").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
 			AddRow(int64(1), "Person 1"))
 
+	mock.ExpectQuery("SELECT id, name, date FROM events").
+		WithArgs(int64(4)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
+			AddRows([]any{int64(4), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
 	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs(int64(6)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
@@ -119,24 +117,25 @@ func TestGetPersonsEventsByEventId(t *testing.T) {
 		WithArgs(int64(4)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
 			AddRow(int64(4), "Person 4"))
-	mock.ExpectQuery("SELECT id, name, date FROM events").
-		WithArgs(int64(1)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
-			AddRows([]any{int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
-
 	mock.ExpectQuery("SELECT (.+) FROM persons").
 		WithArgs(int64(6)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
 			AddRow(int64(6), "Person 6"))
+	mock.ExpectQuery("SELECT (.+) FROM persons").
+		WithArgs(int64(8)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
+			AddRow(int64(8), "Person 8"))
+
 	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
 			AddRows([]any{int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
 
-	mock.ExpectQuery("SELECT (.+) FROM persons").
-		WithArgs(int64(8)).
-		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
-			AddRow(int64(8), "Person 8"))
+	mock.ExpectQuery("SELECT id, name, date FROM events").
+		WithArgs(int64(1)).
+		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).
+			AddRows([]any{int64(1), "New Year", time.Date(2021, 12, 31, 23, 59, 59, 0, time.Local)}))
+
 	mock.ExpectQuery("SELECT id, name, date FROM events").
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "Name", "Date"}).

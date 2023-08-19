@@ -61,12 +61,14 @@ func (c *calculationTestCases) fillMock() {
 		WithArgs(int64(1)).
 		WillReturnRows(pgxmock.NewRows([]string{"Id", "PersonId", "EventId", "Spent", "Factor"}).
 			AddRows(personsRows...))
-
-	// persons + events mock
+	// persons mock
 	for _, p := range c.testCase.persons {
 		c.mock.ExpectQuery("SELECT (.+) FROM persons").WithArgs(p.Id).
 			WillReturnRows(pgxmock.NewRows([]string{"Id", "Name"}).
 				AddRow(p.Id, p.Name))
+	}
+	// events mock
+	for _, p := range c.testCase.persons {
 		for _, e := range p.Events {
 			c.mock.ExpectQuery("SELECT id, name, date FROM events").
 				WithArgs(e.Id).

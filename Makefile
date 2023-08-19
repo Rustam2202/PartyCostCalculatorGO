@@ -17,7 +17,7 @@ docker-build:
 docker-run:
 	docker run -p 8080:8080 party-calc
 compose:
-	docker-compose up
+	docker-compose up -d
 
 test:
 	go test ./... -cover -coverprofile=coverage.out
@@ -30,11 +30,11 @@ swag:
 lint:
 	golangci-lint run
 
-zookeeper-run:
-	bin/windows/zookeeper-server-start.bat config/zookeeper.properties
-kafka-run:
-	make zookeeper-run
-	bin/windows/kafka-server-start.bat config/server0.properties
+# zookeeper-run:
+# 	bin/windows/zookeeper-server-start.bat config/zookeeper.properties
+# kafka-run:
+# 	make zookeeper-run
+# 	bin/windows/kafka-server-start.bat config/server0.properties
 	
 proto:
 	protoc --go_out=./internal/server/grpc/ --go-grpc_out=./internal/server/grpc/ ./protobuf/service.proto
