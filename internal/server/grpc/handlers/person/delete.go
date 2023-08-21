@@ -2,9 +2,10 @@ package person
 
 import (
 	"context"
+	k "party-calc/internal/kafka"
 	"party-calc/internal/server/grpc/proto"
 
-	pm "github.com/golang/protobuf/proto"
+	pm "google.golang.org/protobuf/proto"
 )
 
 func (h *PersonHandler) DeletePerson(ctx context.Context, pb *proto.Id) (*proto.Response, error) {
@@ -12,7 +13,7 @@ func (h *PersonHandler) DeletePerson(ctx context.Context, pb *proto.Id) (*proto.
 	if err != nil {
 		return &proto.Response{Response: "Failed to add Person-delete-request to kafka"}, err
 	}
-	err = h.producer.WriteMessage("person-delete", msg)
+	err = h.producer.WriteMessage(ctx, k.PersonDelete, msg)
 	if err != nil {
 		return &proto.Response{Response: "Failed to add Person-delete-request to kafka"}, err
 	}

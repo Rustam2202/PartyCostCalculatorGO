@@ -6,8 +6,7 @@ import (
 	"party-calc/internal/database"
 	"party-calc/internal/kafka"
 	"party-calc/internal/logger"
-	"party-calc/internal/server/grpc/server"
-	serverkafka "party-calc/internal/server/grpc/server_kafka"
+	serverkafka "party-calc/internal/server/grpc"
 	"party-calc/internal/server/http"
 
 	"github.com/spf13/viper"
@@ -15,7 +14,6 @@ import (
 
 type Config struct {
 	ServerHTTPConfig      http.ServerHTTPConfig
-	ServerGrpcConfig      server.ServerGrpcConfig
 	ServerGrpcKafkaConfig serverkafka.ServerGrpcKafkaConfig
 	DatabaseConfig        database.DatabaseConfig
 	LoggerConfig          logger.LoggerConfig

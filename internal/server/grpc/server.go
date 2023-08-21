@@ -1,4 +1,4 @@
-package serverkafka
+package grpc
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 	"party-calc/internal/logger"
 	pb "party-calc/internal/server/grpc/proto"
 
-	"party-calc/internal/server/grpc/server_kafka/handlers/calculation"
-	"party-calc/internal/server/grpc/server_kafka/handlers/event"
-	"party-calc/internal/server/grpc/server_kafka/handlers/person"
-	personevent "party-calc/internal/server/grpc/server_kafka/handlers/person_event"
+	"party-calc/internal/server/grpc/handlers/calculation"
+	"party-calc/internal/server/grpc/handlers/event"
+	"party-calc/internal/server/grpc/handlers/person"
+	personevent "party-calc/internal/server/grpc/handlers/person_event"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

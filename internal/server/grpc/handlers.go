@@ -1,11 +1,11 @@
-package serverkafka
+package grpc
 
 import (
 	"party-calc/internal/kafka/producer"
-	"party-calc/internal/server/grpc/server_kafka/handlers/calculation"
-	"party-calc/internal/server/grpc/server_kafka/handlers/event"
-	"party-calc/internal/server/grpc/server_kafka/handlers/person"
-	personevent "party-calc/internal/server/grpc/server_kafka/handlers/person_event"
+	"party-calc/internal/server/grpc/handlers/calculation"
+	"party-calc/internal/server/grpc/handlers/event"
+	"party-calc/internal/server/grpc/handlers/person"
+	personevent "party-calc/internal/server/grpc/handlers/person_event"
 	"party-calc/internal/service"
 )
 

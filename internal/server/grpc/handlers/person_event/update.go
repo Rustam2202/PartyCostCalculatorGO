@@ -2,9 +2,10 @@ package personevent
 
 import (
 	"context"
+	k "party-calc/internal/kafka"
 	"party-calc/internal/server/grpc/proto"
 
-	pm "github.com/golang/protobuf/proto"
+	pm "google.golang.org/protobuf/proto"
 )
 
 func (h *PersonEventHandler) UpdatePersonsEvents(ctx context.Context, pb *proto.PersonEventUpdateRequest) (*proto.Response, error) {
@@ -12,7 +13,7 @@ func (h *PersonEventHandler) UpdatePersonsEvents(ctx context.Context, pb *proto.
 	if err != nil {
 		return &proto.Response{Response: "Failed to add PersonEvent-update-request to kafka"}, err
 	}
-	err = h.producer.WriteMessage("person-event-update", msg)
+	err = h.producer.WriteMessage(ctx, k.PersonEventUpdate, msg)
 	if err != nil {
 		return &proto.Response{Response: "Failed to add PersonEvent-update-request to kafka"}, err
 	}

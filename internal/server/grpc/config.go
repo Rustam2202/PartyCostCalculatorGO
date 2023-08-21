@@ -1,6 +1,6 @@
-package server
+package grpc
 
-type ServerGrpcConfig struct {
+type ServerGrpcKafkaConfig struct {
 	Network string
 	Host    string
 	Port    int

@@ -5,13 +5,6 @@ run:
 exe:
 	./bin/party-calc
 	
-grpc-run:
-	go run ./internal/server/grpc/server/server.go
-grpcui-run:
-	grpcui -plaintext localhost:50051
-grpcui-kafka-run:
-	grpcui -plaintext localhost:50052
-
 docker-build:
 	docker build --tag party-calc .
 docker-run:
@@ -25,6 +18,8 @@ test-cover-report:
 	make test
 	go tool cover -html=coverage.out
 
+grpcui-run:
+	grpcui -plaintext localhost:50051
 swag:
 	swag init -g ./internal/server/http/server.go
 lint:

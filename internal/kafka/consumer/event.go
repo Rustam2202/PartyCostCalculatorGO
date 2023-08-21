@@ -2,18 +2,19 @@ package consumer
 
 import (
 	"context"
+	k "party-calc/internal/kafka"
 	"party-calc/internal/logger"
 	"party-calc/internal/server/grpc/proto"
 	"time"
 
-	pm "github.com/golang/protobuf/proto"
+	pm "google.golang.org/protobuf/proto"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 )
 
 func (r *KafkaConsumer) RunEventCreateReader(ctx context.Context) {
 	cfg := *r.cfg
-	cfg.Topic = "event-create"
+	cfg.Topic = k.EventCreate
 	reader := kafka.NewReader(cfg)
 	for {
 		msg, err := reader.ReadMessage(ctx)
@@ -46,7 +47,7 @@ func (r *KafkaConsumer) RunEventCreateReader(ctx context.Context) {
 
 func (r *KafkaConsumer) RunEventUpdateReader(ctx context.Context) {
 	cfg := *r.cfg
-	cfg.Topic = "event-update"
+	cfg.Topic = k.EventUpdate
 	reader := kafka.NewReader(cfg)
 	for {
 		msg, err := reader.ReadMessage(ctx)
@@ -79,7 +80,7 @@ func (r *KafkaConsumer) RunEventUpdateReader(ctx context.Context) {
 
 func (r *KafkaConsumer) RunEventDeleteReader(ctx context.Context) {
 	cfg := *r.cfg
-	cfg.Topic = "event-delete"
+	cfg.Topic = k.EventDelete
 	reader := kafka.NewReader(cfg)
 	for {
 		msg, err := reader.ReadMessage(ctx)

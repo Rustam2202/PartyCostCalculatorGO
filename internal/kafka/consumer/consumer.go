@@ -2,9 +2,8 @@ package consumer
 
 import (
 	"context"
-	"party-calc/internal/service"
-
 	k "party-calc/internal/kafka"
+	"party-calc/internal/service"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -16,10 +15,8 @@ type KafkaConsumer struct {
 
 func NewKafkaConsumer(cfg k.KafkaConfig, s *service.Services) *KafkaConsumer {
 	config := kafka.ReaderConfig{}
-	for _, broker := range cfg.Brokers {
-		config.Brokers = append(config.Brokers, broker)
-	}
-	config.GroupID = "group"
+	config.Brokers = cfg.Brokers
+	config.GroupID = cfg.Group
 	return &KafkaConsumer{services: s, cfg: &config}
 }
 

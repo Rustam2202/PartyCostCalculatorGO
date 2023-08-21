@@ -7,8 +7,7 @@ import (
 	"party-calc/internal/kafka/producer"
 	"party-calc/internal/logger"
 	"party-calc/internal/repository"
-	grpc "party-calc/internal/server/grpc/server"
-	serverkafka "party-calc/internal/server/grpc/server_kafka"
+	serverkafka "party-calc/internal/server/grpc"
 	"party-calc/internal/server/http"
 	"party-calc/internal/service"
 )
@@ -29,9 +28,6 @@ func main() {
 
 	httpServer := http.NewServer(cfg.ServerHTTPConfig, http.NewHTTPHandlers(services))
 	go httpServer.Start()
-
-	grpcServer := grpc.NewServer(&cfg.ServerGrpcConfig, *grpc.NewGRPCHandlers(services))
-	go grpcServer.Start()
 
 	kafkaConsumer := consumer.NewKafkaConsumer(cfg.KafkaConfig, services)
 	go kafkaConsumer.RunKafkaConsumer()

@@ -17,13 +17,13 @@ func NewKafkaProducer(cfg k.KafkaConfig) *KafkaProducer {
 	return &KafkaProducer{cfg: &config}
 }
 
-func (w *KafkaProducer) WriteMessage(topic string, msg []byte) error {
+func (w *KafkaProducer) WriteMessage(ctx context.Context, topic string, msg []byte) error {
 	writer := kafka.NewWriter(*w.cfg)
 	m := kafka.Message{
 		Topic: topic,
 		Value: msg,
 	}
-	err := writer.WriteMessages(context.Background(), m)
+	err := writer.WriteMessages(ctx, m)
 	if err != nil {
 		return err
 	}

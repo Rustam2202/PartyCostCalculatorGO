@@ -1,17 +1,13 @@
 ServerHTTPConfig:
   host: localhost
   port: 8080
-ServerGRPCConfig:
-  network: "tcp"
-  host: localhost
-  port: 50051
 ServerGRPCKafkaConfig:
   network: "tcp"
   host: localhost
   port: 50052
   
 DatabaseConfig:
-  host: db
+  host: localhost
   port: 5432
   user: postgres
   password: password
@@ -19,6 +15,7 @@ DatabaseConfig:
 
 KafkaConfig:
   brokers: localhost:9092
+  group: "group"
 
 LoggerConfig:
   encoding: json

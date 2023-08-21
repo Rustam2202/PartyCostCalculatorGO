@@ -2,9 +2,10 @@ package event
 
 import (
 	"context"
+	k "party-calc/internal/kafka"
 	"party-calc/internal/server/grpc/proto"
 
-	pm "github.com/golang/protobuf/proto"
+	pm "google.golang.org/protobuf/proto"
 )
 
 func (h *EventHandler) AddEvent(ctx context.Context, pb *proto.EventCreateRequest) (*proto.Response, error) {
@@ -12,7 +13,7 @@ func (h *EventHandler) AddEvent(ctx context.Context, pb *proto.EventCreateReques
 	if err != nil {
 		return &proto.Response{Response: "Failed to add Event-create-request to kafka"}, err
 	}
-	err = h.producer.WriteMessage("event-create", msg)
+	err = h.producer.WriteMessage(ctx, k.EventCreate, msg)
 	if err != nil {
 		return &proto.Response{Response: "Failed to add Event-create-request to kafka"}, err
 	}
