@@ -14,6 +14,7 @@ import (
 
 func (r *KafkaConsumer) RunPersonCreateReader(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
+	var isCtxDone bool = false
 	for {
 		func() {
 			defer func() {
@@ -21,17 +22,20 @@ func (r *KafkaConsumer) RunPersonCreateReader(ctx context.Context, wg *sync.Wait
 					logger.Logger.Error("Panic occurred: ", zap.Any("panic in person craete consumer", r))
 				}
 			}()
-
 			cfg := *r.cfg
 			cfg.Topic = k.PersonCreate
 			reader := kafka.NewReader(cfg)
 			logger.Logger.Info("person-create reader created")
 			go func() {
-				<-ctx.Done()
+				_, isCtxDone = <-ctx.Done()
 				logger.Logger.Info("person-create reader closing ...")
 				reader.Close()
+				// return
 			}()
 			for {
+				if !isCtxDone {
+					break
+				}
 				msg, err := reader.ReadMessage(ctx)
 				if err != nil {
 					logger.Logger.Error("Failed to read message: ", zap.Error(err))
@@ -48,6 +52,9 @@ func (r *KafkaConsumer) RunPersonCreateReader(ctx context.Context, wg *sync.Wait
 				}
 			}
 		}()
+		if !isCtxDone {
+			break
+		}
 	}
 }
 

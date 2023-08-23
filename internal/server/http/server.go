@@ -1,11 +1,13 @@
 package http
 
 import (
+	//"context"
 	"context"
 	"fmt"
 	"net/http"
 	"sync"
-	"time"
+
+	//"time"
 
 	"party-calc/docs"
 	"party-calc/internal/logger"
@@ -27,7 +29,7 @@ type Server struct {
 	eventHandler      events.EventHandler
 	persEventsHandler personsevents.PersEventsHandler
 	calcHandler       calculation.CalcHandler
-	httpServer        *http.Server
+	HttpServer        *http.Server
 }
 
 func NewServer(
@@ -47,54 +49,69 @@ func NewServer(
 // @version		1.0
 // @description	This is a sample app server.
 // @BasePath		/
-func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) {
+func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) { //
+	//defer wg.Done()
 	router := gin.Default()
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 
-	router.POST("/person", s.personHandler.Add)
-	router.GET("/person/:id", s.personHandler.Get)
-	router.PUT("/person", s.personHandler.Update)
-	router.DELETE("/person/:id", s.personHandler.Delete)
+	{
+		router.POST("/person", s.personHandler.Add)
+		router.GET("/person/:id", s.personHandler.Get)
+		router.PUT("/person", s.personHandler.Update)
+		router.DELETE("/person/:id", s.personHandler.Delete)
 
-	router.POST("/event", s.eventHandler.Add)
-	router.GET("/event/:id", s.eventHandler.Get)
-	router.PUT("/event", s.eventHandler.Update)
-	router.DELETE("/event/:id", s.eventHandler.Delete)
+		router.POST("/event", s.eventHandler.Add)
+		router.GET("/event/:id", s.eventHandler.Get)
+		router.PUT("/event", s.eventHandler.Update)
+		router.DELETE("/event/:id", s.eventHandler.Delete)
 
-	router.POST("/persEvents", s.persEventsHandler.Add)
-	router.GET("/persEvents/:event_id", s.persEventsHandler.Get)
-	router.PUT("/persEvents", s.persEventsHandler.Update)
-	router.DELETE("/persEvents/:id", s.persEventsHandler.Delete)
+		router.POST("/persEvents", s.persEventsHandler.Add)
+		router.GET("/persEvents/:event_id", s.persEventsHandler.Get)
+		router.PUT("/persEvents", s.persEventsHandler.Update)
+		router.DELETE("/persEvents/:id", s.persEventsHandler.Delete)
 
-	router.GET("/calcEvent", s.calcHandler.GetEvent)
+		router.GET("/calcEvent", s.calcHandler.GetEvent)
 
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
-	s.httpServer = &http.Server{
+	s.HttpServer = &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port),
 		Handler: router,
 	}
 
-	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err := s.httpServer.ListenAndServe()
+		logger.Logger.Info("Starting HTTP server ...")
+		err := s.HttpServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			logger.Logger.Error("HTTP server error:", zap.Error(err))
+			logger.Logger.Error("Failed to start HTTP server", zap.Error(err))
 		}
 	}()
-
 	<-ctx.Done()
+	logger.Logger.Info("Shutting down HTTP server ...")
+	s.HttpServer.Shutdown(context.Background())
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
+	// wg.Add(1)
+	// go func() {
+	// 	defer wg.Done()
+	// 	err := s.httpServer.ListenAndServe()
+	// 	if err != nil && err != http.ErrServerClosed {
+	// 		logger.Logger.Error("HTTP server error:", zap.Error(err))
+	// 	}
+	// }()
 
-	err := s.httpServer.Shutdown(shutdownCtx)
-	if err != nil {
-		logger.Logger.Error("HTTP server shutdown error:", zap.Error(err))
-	}
-	logger.Logger.Error("Server couldn`t start:", zap.Error(err))
+	//<-ctx.Done()
+	// shutdownCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	// defer cancel()
+	// shutdownCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	// defer cancel()
+	// logger.Logger.Info("Shutting down HTTP server ...")
+	// err = s.httpServer.Shutdown(shutdownCtx)
+	// if err != nil {
+	// 	logger.Logger.Error("HTTP server shutdown error:", zap.Error(err))
+	// }
 
 	// err := router.Run(fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))
 	// if err != nil {

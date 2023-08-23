@@ -41,7 +41,6 @@ func NewServer(
 
 func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
-
 	lis, err := net.Listen(s.cfg.Network, fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))
 	if err != nil {
 		logger.Logger.Error("Failed to listen", zap.Error(err))
@@ -57,14 +56,14 @@ func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) {
 	pb.RegisterCalculationServer(srv, s.calcHandler)
 
 	go func() {
-		<-ctx.Done()
-		logger.Logger.Info("Shutting down GRPC server ...")
-		srv.GracefulStop()
+		logger.Logger.Info("Starting GRPC server ...")
+		if err := srv.Serve(lis); err != nil {
+			logger.Logger.Error("Failed to start GRPC server", zap.Error(err))
+			return
+		}
 	}()
 
-	logger.Logger.Info("Starting GRPC server ...")
-	if err := srv.Serve(lis); err != nil {
-		logger.Logger.Error("Failed to serve", zap.Error(err))
-		return
-	}
+	<-ctx.Done()
+	logger.Logger.Info("Shutting down GRPC server ...")
+	srv.GracefulStop()
 }
