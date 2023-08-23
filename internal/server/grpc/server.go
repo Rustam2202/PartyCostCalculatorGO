@@ -1,10 +1,12 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"party-calc/internal/logger"
 	pb "party-calc/internal/server/grpc/proto"
+	"sync"
 
 	"party-calc/internal/server/grpc/handlers/calculation"
 	"party-calc/internal/server/grpc/handlers/event"
@@ -37,7 +39,9 @@ func NewServer(
 	}
 }
 
-func (s *Server) Start() {
+func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	lis, err := net.Listen(s.cfg.Network, fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))
 	if err != nil {
 		logger.Logger.Error("Failed to listen", zap.Error(err))
@@ -52,10 +56,15 @@ func (s *Server) Start() {
 	pb.RegisterPersonsEventsServiceServer(srv, s.personsEventHandler)
 	pb.RegisterCalculationServer(srv, s.calcHandler)
 
+	go func() {
+		<-ctx.Done()
+		logger.Logger.Info("Shutting down GRPC server ...")
+		srv.GracefulStop()
+	}()
+
+	logger.Logger.Info("Starting GRPC server ...")
 	if err := srv.Serve(lis); err != nil {
 		logger.Logger.Error("Failed to serve", zap.Error(err))
 		return
-	} else {
-		logger.Logger.Info("GRPC server with Kafka started")
 	}
 }

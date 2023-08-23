@@ -4,7 +4,7 @@ ServerHTTPConfig:
 ServerGRPCKafkaConfig:
   network: "tcp"
   host: localhost
-  port: 50052
+  port: 50051
   
 DatabaseConfig:
   host: localhost

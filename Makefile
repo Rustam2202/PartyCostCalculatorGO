@@ -26,10 +26,12 @@ lint:
 	golangci-lint run
 
 # zookeeper-run:
+# 	bin/zookeeper-server-start.sh config/zookeeper.properties
 # 	bin/windows/zookeeper-server-start.bat config/zookeeper.properties
 # kafka-run:
-# 	make zookeeper-run
-# 	bin/windows/kafka-server-start.bat config/server0.properties
+# 	bin/kafka-server-start.sh config/server.properties
+# 	bin/windows/kafka-server-start.bat config/server.properties
+
 	
 proto:
 	protoc --go_out=./internal/server/grpc/ --go-grpc_out=./internal/server/grpc/ ./protobuf/service.proto

@@ -4,6 +4,7 @@ import (
 	"context"
 	k "party-calc/internal/kafka"
 	"party-calc/internal/service"
+	"sync"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -20,15 +21,14 @@ func NewKafkaConsumer(cfg k.KafkaConfig, s *service.Services) *KafkaConsumer {
 	return &KafkaConsumer{services: s, cfg: &config}
 }
 
-func (r *KafkaConsumer) RunKafkaConsumer() {
-	ctx := context.Background()
-	go r.RunPersonCreateReader(ctx)
-	go r.RunPersonUpdateReader(ctx)
-	go r.RunPersonDeleteReader(ctx)
-	go r.RunEventCreateReader(ctx)
-	go r.RunEventUpdateReader(ctx)
-	go r.RunEventDeleteReader(ctx)
-	go r.RunPersonEventCreateReader(ctx)
-	go r.RunPersonEventUpdateReader(ctx)
-	go r.RunPersonEventDeleteReader(ctx)
+func (r *KafkaConsumer) RunKafkaConsumer(ctx context.Context, wg *sync.WaitGroup) {
+	go r.RunPersonCreateReader(ctx, wg)
+	// go r.RunPersonUpdateReader(ctx)
+	// go r.RunPersonDeleteReader(ctx)
+	// go r.RunEventCreateReader(ctx)
+	// go r.RunEventUpdateReader(ctx)
+	// go r.RunEventDeleteReader(ctx)
+	// go r.RunPersonEventCreateReader(ctx)
+	// go r.RunPersonEventUpdateReader(ctx)
+	// go r.RunPersonEventDeleteReader(ctx)
 }
