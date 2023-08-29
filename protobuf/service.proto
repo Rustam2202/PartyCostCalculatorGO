@@ -3,30 +3,35 @@ package proto;
 option go_package = "./proto";
 
 service PersonService {
-    rpc addPerson(PersonCreateRequest)returns(Response);
-    rpc getPerson(Id)returns(Person);
-    rpc updatePerson(PersonUpdateRequest)returns(Response);
-    rpc deletePerson(Id)returns(Response);
+    rpc create(PersonCreateRequest)returns(Response);
+    rpc get(Id)returns(Person);
+    rpc update(PersonUpdateRequest)returns(Response);
+    rpc delete(Id)returns(Response);
 }
 
 service EventService {
-    rpc addEvent(EventCreateRequest)returns(Response);
-    rpc getEvent(Id)returns(Event);
-    rpc updateEvent(EventUpdate)returns(Response);
-    rpc deleteEvent(Id)returns(Response);
+    rpc create(EventCreateRequest)returns(Response);
+    rpc get(Id)returns(Event);
+    rpc update(EventUpdateRequest)returns(Response);
+    rpc delete(Id)returns(Response);
 }
 
 service PersonsEventsService {
-    rpc addPersonToPersonsEvent(PersonEventCreateRequest)returns(Response);
-    rpc getByEventId(Id)returns(PersonEventsGetResponse);
-    rpc updatePersonsEvents(PersonEventUpdateRequest)returns(Response);
-    rpc deletePersonsEvents(Id)returns(Response);
+    rpc create(PersonEventCreateRequest)returns(Response);
+    rpc get(Id)returns(PersonEvent);
+    rpc getByPersonId(Id)returns(PersonEventsGetResponse);
+    rpc update(PersonEventUpdateRequest)returns(Response);
+    rpc delete(Id)returns(Response);
 }
 
 service Calculation {
-    rpc getCalculatedEvent(CalculatedEventGet)returns(EventData);
+    rpc get(CalculatedEventGet)returns(EventData);
 }
 
+enum Code {
+    OK = 0;
+    
+}
 message Empty{}
 message Id {
     int64 id = 1;
@@ -83,7 +88,7 @@ message EventCreateRequest {
     string name = 1;
     string date = 2;
 }
-message EventUpdate {
+message EventUpdateRequest {
     int64 id = 1;
     string name = 2;
     string date = 3;

@@ -5,7 +5,7 @@ import (
 	"party-calc/internal/server/grpc/proto"
 )
 
-func (h *PersonHandler) GetPerson(ctx context.Context, pb *proto.Id) (*proto.Person, error) {
+func (h *PersonHandler) Get(ctx context.Context, pb *proto.Id) (*proto.Person, error) {
 	person, err := h.service.GetPersonById(ctx, pb.Id)
 	if err != nil {
 		return &proto.Person{}, err

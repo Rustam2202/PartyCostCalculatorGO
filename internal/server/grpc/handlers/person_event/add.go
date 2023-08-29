@@ -8,7 +8,7 @@ import (
 	pm "google.golang.org/protobuf/proto"
 )
 
-func (h *PersonEventHandler) AddPersonToPersonsEvent(ctx context.Context, pb *proto.PersonEventCreateRequest) (*proto.Response, error) {
+func (h *PersonEventHandler) Create(ctx context.Context, pb *proto.PersonEventCreateRequest) (*proto.Response, error) {
 	msg, err := pm.Marshal(pb)
 	if err != nil {
 		return &proto.Response{Response: "Failed to add PersonEvent-create-request to kafka"}, err

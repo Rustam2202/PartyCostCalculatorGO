@@ -8,9 +8,9 @@ exe:
 docker-build:
 	docker build --tag party-calc .
 docker-run:
-	docker run -p 8080:8080 party-calc
+	docker run -p 8080:8080 -e DB_HOST=127.0.0.1 -e DB_PORT=5432 -e DB_USER="postgres" -e DB_PASSWORD="password" -e DB_NAME="partycalc"  party-calc
 compose:
-	docker-compose up -d
+	docker-compose up 
 
 test:
 	go test ./... -cover -coverprofile=coverage.out

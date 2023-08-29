@@ -7,6 +7,7 @@ import (
 
 type PersonsEventsRepository interface {
 	Create(ctx context.Context, pe *domain.PersonsAndEvents) error
+	Get(ctx context.Context, personId int64) (*domain.PersonsAndEvents, error)
 	GetByPersonId(ctx context.Context, id int64) ([]domain.PersonsAndEvents, error)
 	GetByEventId(ctx context.Context, id int64) ([]domain.PersonsAndEvents, error)
 	Update(ctx context.Context, pe *domain.PersonsAndEvents) error
@@ -34,6 +35,14 @@ func (p *PersonsEventsService) AddPersonToPersEvent(ctx context.Context,
 		return 0, err
 	}
 	return perEv.Id, nil
+}
+
+func (p *PersonsEventsService) Get(ctx context.Context, id int64) (*domain.PersonsAndEvents, error) {
+	result, err := p.repo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (p *PersonsEventsService) GetByPersonId(ctx context.Context, id int64) ([]domain.PersonsAndEvents, error) {

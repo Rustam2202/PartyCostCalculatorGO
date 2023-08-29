@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"party-calc/internal/config"
@@ -42,14 +41,13 @@ func main() {
 	wg.Add(1)
 	go httpServer.Start(ctx, wg)
 
-	kafkaConsumer := consumer.NewKafkaConsumer(cfg.KafkaConfig, services)
-	wg.Add(1)
-	go kafkaConsumer.RunKafkaConsumer(ctx, wg)
-
 	kafkaProducer := producer.NewKafkaProducer(cfg.KafkaConfig)
 	grpcServer := grpc.NewServer(&cfg.ServerGrpcKafkaConfig, grpc.NewGRPCKafkaHandlers(services, kafkaProducer))
 	wg.Add(1)
 	go grpcServer.Start(ctx, wg)
+
+	kafkaConsumer := consumer.NewKafkaConsumer(cfg.KafkaConfig, services)
+	kafkaConsumer.RunKafkaConsumer(ctx, wg)
 
 	wg.Wait()
 }

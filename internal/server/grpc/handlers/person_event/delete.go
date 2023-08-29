@@ -8,7 +8,7 @@ import (
 	pm "google.golang.org/protobuf/proto"
 )
 
-func (h *PersonEventHandler) DeletePersonsEvents(ctx context.Context, pb *proto.Id) (*proto.Response, error) {
+func (h *PersonEventHandler) Delete(ctx context.Context, pb *proto.Id) (*proto.Response, error) {
 	msg, err := pm.Marshal(pb)
 	if err != nil {
 		return &proto.Response{Response: "Failed to add PersonEvent-delete-request to kafka"}, err

@@ -118,6 +118,7 @@ party-calc/internal/repository/persons_events.go:105.16,108.3 2 0
 party-calc/internal/repository/persons_events.go:112.76,115.16 2 1
 party-calc/internal/repository/persons_events.go:119.2,119.12 1 1
 party-calc/internal/repository/persons_events.go:115.16,118.3 2 0
+party-calc/internal/service/services.go:10.98,21.2 5 0
 party-calc/internal/service/calculation.go:40.98,46.2 1 1
 party-calc/internal/service/calculation.go:48.123,51.16 3 1
 party-calc/internal/service/calculation.go:54.2,54.24 1 1
@@ -203,4 +204,3 @@ party-calc/internal/service/persons_events.go:64.16,66.3 1 0
 party-calc/internal/service/persons_events.go:70.76,72.16 2 1
 party-calc/internal/service/persons_events.go:75.2,75.12 1 1
 party-calc/internal/service/persons_events.go:72.16,74.3 1 0
-party-calc/internal/service/services.go:10.98,21.2 5 0

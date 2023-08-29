@@ -32,6 +32,31 @@ func (r *PersEventsRepository) Create(ctx context.Context, pe *domain.PersonsAnd
 	return nil
 }
 
+func (r *PersEventsRepository) Get(ctx context.Context, id int64) (*domain.PersonsAndEvents, error) {
+	var result domain.PersonsAndEvents
+	var per domain.Person
+	var ev domain.Event
+	err := r.Db.DBPGX.QueryRow(ctx,
+		`SELECT id, person_id, event_id, spent, factor FROM persons_events WHERE id=$1`, id).
+		Scan(&result.Id, &result.PersonId, &result.EventId, &result.Spent, &result.Factor)
+	if err != nil {
+		return nil, err
+	}
+	err = r.Db.DBPGX.QueryRow(ctx,
+		`SELECT * FROM persons WHERE id=$1`, result.PersonId).Scan(&per.Id, &per.Name)
+	if err != nil {
+		return nil, err
+	}
+	result.Person = per
+	err = r.Db.DBPGX.QueryRow(ctx,
+		`SELECT * FROM events WHERE id=$1`, result.EventId).Scan(&ev.Id, &ev.Name, &ev.Date)
+	if err != nil {
+		return nil, err
+	}
+	result.Event = ev
+	return &result, nil
+}
+
 func (r *PersEventsRepository) fillPersonAndEventsArrayForGet(ctx context.Context, rows pgx.Rows) ([]domain.PersonsAndEvents, error) {
 	var result []domain.PersonsAndEvents
 	for rows.Next() {

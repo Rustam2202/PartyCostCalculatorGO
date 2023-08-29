@@ -56,6 +56,8 @@ func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) { //
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 
 	{
+		router.GET("/", func(ctx *gin.Context) { ctx.String(http.StatusOK, "Hello world from http server") })
+
 		router.POST("/person", s.personHandler.Add)
 		router.GET("/person/:id", s.personHandler.Get)
 		router.PUT("/person", s.personHandler.Update)
@@ -91,7 +93,9 @@ func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) { //
 	}()
 	<-ctx.Done()
 	logger.Logger.Info("Shutting down HTTP server ...")
-	s.HttpServer.Shutdown(context.Background())
+	if err := s.HttpServer.Shutdown(context.Background()); err != nil {
+		logger.Logger.Error("Failed to shutdown HTTP server", zap.Error(err))
+	}
 
 	// wg.Add(1)
 	// go func() {

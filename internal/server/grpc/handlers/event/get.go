@@ -5,7 +5,7 @@ import (
 	"party-calc/internal/server/grpc/proto"
 )
 
-func (h *EventHandler) GetEvent(ctx context.Context, pb *proto.Id) (*proto.Event, error) {
+func (h *EventHandler) Get(ctx context.Context, pb *proto.Id) (*proto.Event, error) {
 	event, err := h.service.GetEventById(ctx, pb.Id)
 	if err != nil {
 		return nil, err
