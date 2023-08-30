@@ -37,12 +37,4 @@ func (r *KafkaConsumer) RunKafkaConsumer(ctx context.Context, wg *sync.WaitGroup
 		wg.Add(1)
 		go r.RunReader(ctx, wg, k, v)
 	}
-
-	//wg.Add(1)
-	// go r.RunReader(ctx, wg, k.PersonCreate, r.personCreateServe)
-	// wg.Add(1)
-	// go r.RunReader(ctx, wg, k.PersonUpdate, r.PersonUpdateServe)
-	// wg.Add(1)
-	// r.RunReader(ctx, wg, k.PersonDelete, r.personDeleteServe)
-
 }

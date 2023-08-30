@@ -3,10 +3,8 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"party-calc/internal/logger"
 	"sync"
-	"time"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -27,6 +25,7 @@ func (r *KafkaConsumer) RunReader(ctx context.Context, wg *sync.WaitGroup,
 			cfg := *r.cfg
 			cfg.Topic = topic
 			reader := kafka.NewReader(cfg)
+			defer reader.Close()
 			logger.Logger.Info(fmt.Sprintf("%s reader created", topic))
 			go func() {
 				<-ctx.Done()
@@ -43,13 +42,6 @@ func (r *KafkaConsumer) RunReader(ctx context.Context, wg *sync.WaitGroup,
 						logger.Logger.Error("Failed to read message: ", zap.Error(err))
 						continue
 					}
-
-					rand.Seed(time.Now().UnixNano())
-					randInt := rand.Intn(2)
-					if randInt == 1 {
-						panic("")
-					}
-
 					if err = serve(ctx, msg); err != nil {
 						continue
 					}
