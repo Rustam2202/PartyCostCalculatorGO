@@ -1,26 +1,25 @@
 package http
 
 import (
-	//"context"
 	"context"
 	"fmt"
 	"net/http"
 	"sync"
-
-	//"time"
+	"time"
 
 	"party-calc/docs"
 	"party-calc/internal/logger"
 	"party-calc/internal/server/http/handlers/calculation"
 	"party-calc/internal/server/http/handlers/events"
+	"party-calc/internal/server/http/handlers/metrics"
 	"party-calc/internal/server/http/handlers/persons"
 	personsevents "party-calc/internal/server/http/handlers/persons_events"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
-
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 )
 
 type Server struct {
@@ -32,10 +31,7 @@ type Server struct {
 	HttpServer        *http.Server
 }
 
-func NewServer(
-	cfg ServerHTTPConfig,
-	handlers *HTTPHandlers,
-) *Server {
+func NewServer(cfg ServerHTTPConfig, handlers *HTTPHandlers) *Server {
 	return &Server{
 		cfg:               &cfg,
 		personHandler:     *handlers.PersonHandler,
@@ -56,7 +52,12 @@ func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) { //
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 
 	{
-		router.GET("/", func(ctx *gin.Context) { ctx.String(http.StatusOK, "Hello world from http server") })
+		router.GET("/", func(ctx *gin.Context) {
+			ctx.String(http.StatusOK, "Hello world from Party Calc http server")
+		})
+
+		router.Use(metrics.RecordMetrics())
+		router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 		router.POST("/person", s.personHandler.Add)
 		router.GET("/person/:id", s.personHandler.Get)
@@ -92,34 +93,11 @@ func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) { //
 		}
 	}()
 	<-ctx.Done()
+
+	shutdownCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
 	logger.Logger.Info("Shutting down HTTP server ...")
-	if err := s.HttpServer.Shutdown(context.Background()); err != nil {
+	if err := s.HttpServer.Shutdown(shutdownCtx); err != nil {
 		logger.Logger.Error("Failed to shutdown HTTP server", zap.Error(err))
 	}
-
-	// wg.Add(1)
-	// go func() {
-	// 	defer wg.Done()
-	// 	err := s.httpServer.ListenAndServe()
-	// 	if err != nil && err != http.ErrServerClosed {
-	// 		logger.Logger.Error("HTTP server error:", zap.Error(err))
-	// 	}
-	// }()
-
-	//<-ctx.Done()
-	// shutdownCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
-	// defer cancel()
-	// shutdownCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	// defer cancel()
-	// logger.Logger.Info("Shutting down HTTP server ...")
-	// err = s.httpServer.Shutdown(shutdownCtx)
-	// if err != nil {
-	// 	logger.Logger.Error("HTTP server shutdown error:", zap.Error(err))
-	// }
-
-	// err := router.Run(fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port))
-	// if err != nil {
-	// 	logger.Logger.Error("Server couldn`t start:", zap.Error(err))
-	// 	return
-	// }
 }
