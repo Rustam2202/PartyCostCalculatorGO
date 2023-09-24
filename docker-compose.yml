@@ -1,21 +1,40 @@
 version: '3'
 
 services:
-  app:
-    build: .
-    ports: 
-      - 8080:8080
+
+  debug:
+    container_name: Party-calc-debugger
+    build: 
+      context: .
+      dockerfile: Dockerfile.debug
+    ports:
+      - 8083:8080
       - 50051:50051
-    expose:
-      - 8080
+      - 4040:4000
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: password
-      DB_NAME: partycalc
+      - kafka
+
+  # app:
+  #   build: .
+  #   build:
+  #      context: .
+  #      dockerfile: dockerfile
+  #   ports: 
+  #     - 8080:8080
+  #     - 50051:50051
+  #   expose:
+  #     - 8080
+  #   depends_on:
+  #     - db
+  #     - kafka
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_USER: postgres
+  #     DB_PASSWORD: password
+  #     DB_NAME: partycalc
+      
   db:
     restart: always
     image: postgres
@@ -25,3 +44,26 @@ services:
       POSTGRES_DB: partycalc
     ports:
       - "5436:5432"
+
+  zookeeper:
+    container_name: Zookeeper
+    image: wurstmeister/zookeeper
+    restart: always
+    ports:
+      - 2181:2181
+
+  kafka:
+    container_name: Kafka
+    image: wurstmeister/kafka
+    restart: always
+    ports:
+      - 9092:9092
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CREATE_TOPICS=device-create
+      - KAFKA_CREATE_TOPICS=device-update
+      - KAFKA_CREATE_TOPICS=device-delete
+      - KAFKA_CREATE_TOPICS=event-create
+    depends_on:
+      - zookeeper

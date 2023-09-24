@@ -14,16 +14,16 @@ type AddEventRequest struct {
 	Date string `json:"date" default:"2020-12-31"`
 }
 
-// @Summary		Add a event
-// @Description	Add a new event to database
-// @Tags			Event
-// @Accept			json
-// @Produce		json
-// @Param			request	body		AddEventRequest	true	"Add Event Request"
-// @Success		201		{object}	domain.Event
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/event [post]
+//	@Summary		Add a event
+//	@Description	Add a new event to database
+//	@Tags			Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		AddEventRequest	true	"Add Event Request"
+//	@Success		201		{object}	domain.Event
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Failure		500		{object}	handlers.ErrorResponce
+//	@Router			/event [post]
 func (h *EventHandler) Add(ctx *gin.Context) {
 	var req AddEventRequest
 	err := ctx.ShouldBindJSON(&req)

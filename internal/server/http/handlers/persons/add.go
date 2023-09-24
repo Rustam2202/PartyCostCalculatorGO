@@ -12,16 +12,16 @@ type AddPersonRequest struct {
 	Name string `json:"name" default:"Some Person name"`
 }
 
-// @Summary		Add a person
-// @Description	Add a new person to database
-// @Tags			Person
-// @Accept			json
-// @Produce		json
-// @Param			request	body		AddPersonRequest	true	"Add Person Request"
-// @Success		201 {object} domain.Person
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/person [post]
+//	@Summary		Add a person
+//	@Description	Add a new person to database
+//	@Tags			Person
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		AddPersonRequest	true	"Add Person Request"
+//	@Success		201		{object}	domain.Person
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Failure		500		{object}	handlers.ErrorResponce
+//	@Router			/person [post]
 func (h *PersonHandler) Add(ctx *gin.Context) {
 	var req AddPersonRequest
 	err := ctx.ShouldBindJSON(&req)

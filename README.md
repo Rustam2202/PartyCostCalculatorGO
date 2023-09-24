@@ -1,21 +1,51 @@
-<html>
 
-<head>
-    <h2>Party Cost Calculator</h2>
-    This application distributs debts between the participants of the join event with uneven expenses.
-</head>
+# Party Cost Calculator
 
-<body>
-    <div>
-        <h4>Why it's needed</h4>
-        <a>
-            If you are celebrating a common event (for example, a corporate party or New Year's Eve) with your friends
-            or colleagues, then spending money on food, drinks, etc. is inevitable. Each of the participants may buy
-            something specific and spend some amount or may not spend at all. After the event, it can be quite difficult to calculate who owes whom so that in the end everyone spends the same
-            amount. This application should help to cope with this.
-        </a>
-    </div>
- <body>
+Server application for manage event data and persons spent money. 
+
+## API Reference
+https://rustam2202.github.io/DeviceManager/
+
+## Run Locally
+
+Config parameters in ```cmd/config.yaml``` and start servers:
+
+```bash
+  make run
+```
+
+## Up in docker
+
+```bash
+  make compose
+```
+
+## Running Tests
+
+To run tests and generate HTML coverage report 
+
+```bash
+  make test-cover-report
+```
 
 
-</html>
+## Tech Stack
+
+- [Gin-Gonic](https://github.com/gin-gonic/gin)
+- [Viper](github.com/spf13/viper)
+- [Zap Logger](https://github.com/uber-go/zap)
+- PostgreSQL
+- [PGX](github.com/jackc/pgx)
+- [Mock Tests](github.com/pashagolub/pgxmock)
+- [Kafka](https://github.com/segmentio/kafka-go)
+- [Docker Compose](https://docs.docker.com/compose)
+- REST-API
+- [gRPC](https://github.com/grpc/grpc-go)
+- [ProtoBuf](https://github.com/protocolbuffers/protobuf-go)
+- [Swagger](https://github.com/swaggo/swag)
+- Graceful Shutdown
+- Panic Recovery
+
+
+## Roadmap
+- Fix docker debugger

@@ -10,7 +10,7 @@ docker-build:
 docker-run:
 	docker run -p 8080:8080 -e DB_HOST=127.0.0.1 -e DB_PORT=5432 -e DB_USER="postgres" -e DB_PASSWORD="password" -e DB_NAME="partycalc"  party-calc
 compose:
-	docker-compose up 
+	docker-compose up -d --build
 
 test:
 	go test ./... -cover -coverprofile=coverage.out
@@ -21,7 +21,10 @@ test-cover-report:
 grpcui-run:
 	grpcui -plaintext localhost:50051
 swag:
+	swag fmt
 	swag init -g ./internal/server/http/server.go
+	npx @redocly/cli build-docs ./docs/swagger.json -o ./docs/swagger.html
+
 lint:
 	golangci-lint run
 

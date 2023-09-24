@@ -8,16 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary		Delete a event
-// @Description	Delete a event from database
-// @Tags			Event
-// @Accept			json
-// @Produce		json
-// @Param			id     path    int     true        "Event Id"
-// @Success		200
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/event/{id} [delete]
+//	@Summary		Delete a event
+//	@Description	Delete a event from database
+//	@Tags			Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path	int	true	"Event Id"
+//	@Success		200
+//	@Failure		400	{object}	handlers.ErrorResponce
+//	@Failure		500	{object}	handlers.ErrorResponce
+//	@Router			/event/{id} [delete]
 func (h *EventHandler) Delete(ctx *gin.Context) {
 	req := ctx.Param("id")
 	id, err := strconv.ParseInt(req, 10, 64)

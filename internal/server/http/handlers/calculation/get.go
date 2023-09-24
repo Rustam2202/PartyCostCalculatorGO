@@ -21,16 +21,16 @@ type CalculateRequest struct {
 	RoundRate int32 `json:"round_rate" default:"2"`
 }
 
-// @Summary		Calculate event data by Id
-// @Description
-// @Tags			Calculate
-// @Accept			json
-// @Produce		json
-// @Param			request	body		CalculateRequest	true	"Calculate Event Request"
-// @Success		200		{object}	service.EventData
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/calcEvent [get]
+//	@Summary	Calculate event data by Id
+//	@Description
+//	@Tags		Calculate
+//	@Accept		json
+//	@Produce	json
+//	@Param		request	body		CalculateRequest	true	"Calculate Event Request"
+//	@Success	200		{object}	service.EventData
+//	@Failure	400		{object}	handlers.ErrorResponce
+//	@Failure	500		{object}	handlers.ErrorResponce
+//	@Router		/calcEvent [get]
 func (s *CalcHandler) GetEvent(ctx *gin.Context) {
 	var req CalculateRequest
 	err := ctx.ShouldBindJSON(&req)

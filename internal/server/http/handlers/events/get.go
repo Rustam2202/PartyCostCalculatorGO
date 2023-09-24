@@ -8,16 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary		Get a event
-// @Description	Get a event from database
-// @Tags			Event
-// @Accept			json
-// @Produce		json
-// @Param			id     path    int     true        "Event Id"
-// @Success		200		{object}	domain.Event
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/event/{id} [get]
+//	@Summary		Get a event
+//	@Description	Get a event from database
+//	@Tags			Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Event Id"
+//	@Success		200	{object}	domain.Event
+//	@Failure		400	{object}	handlers.ErrorResponce
+//	@Failure		500	{object}	handlers.ErrorResponce
+//	@Router			/event/{id} [get]
 func (h *EventHandler) Get(ctx *gin.Context) {
 	req := ctx.Param("id")
 	id, err := strconv.ParseInt(req, 10, 64)

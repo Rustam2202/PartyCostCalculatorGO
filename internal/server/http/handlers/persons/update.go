@@ -12,16 +12,16 @@ type UpdatePersonRequest struct {
 	Name string `json:"name" default:"Some Person name"`
 }
 
-// @Summary		Update a person
-// @Description	Update a person in database
-// @Tags			Person
-// @Accept			json
-// @Produce		json
-// @Param			request	body		UpdatePersonRequest	true	"Update Person Request"
-// @Success		200		{object}	UpdatePersonRequest
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/person [put]
+//	@Summary		Update a person
+//	@Description	Update a person in database
+//	@Tags			Person
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		UpdatePersonRequest	true	"Update Person Request"
+//	@Success		200		{object}	UpdatePersonRequest
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Failure		500		{object}	handlers.ErrorResponce
+//	@Router			/person [put]
 func (h *PersonHandler) Update(ctx *gin.Context) {
 	var req UpdatePersonRequest
 	err := ctx.ShouldBindJSON(&req)

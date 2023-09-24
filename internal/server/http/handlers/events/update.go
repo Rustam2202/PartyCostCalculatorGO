@@ -14,16 +14,16 @@ type UpdateEventRequest struct {
 	Date string `json:"date" default:"2020-11-30"`
 }
 
-// @Summary		Update a event
-// @Description	Update a event in database
-// @Tags			Event
-// @Accept			json
-// @Produce		json
-// @Param			request	body		UpdateEventRequest	true	"Update Event Request"
-// @Success		200		{object}	UpdateEventRequest
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/event [put]
+//	@Summary		Update a event
+//	@Description	Update a event in database
+//	@Tags			Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		UpdateEventRequest	true	"Update Event Request"
+//	@Success		200		{object}	UpdateEventRequest
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Failure		500		{object}	handlers.ErrorResponce
+//	@Router			/event [put]
 func (h *EventHandler) Update(ctx *gin.Context) {
 	var req UpdateEventRequest
 	err := ctx.ShouldBindJSON(&req)

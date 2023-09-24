@@ -15,16 +15,16 @@ type UpdatePersonEventRequest struct {
 	Factor int     `json:"factor" default:"1"`
 }
 
-// @Summary		Update a person-event
-// @Description	Update a record of peson-event data
-// @Tags			Person-Event
-// @Accept			json
-// @Produce		json
-// @Param			request	body		UpdatePersonEventRequest	true	"Update Person-Event Request"
-// @Success		200		{object}	UpdatePersonEventRequest
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/persEvents [put]
+//	@Summary		Update a person-event
+//	@Description	Update a record of peson-event data
+//	@Tags			Person-Event
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		UpdatePersonEventRequest	true	"Update Person-Event Request"
+//	@Success		200		{object}	UpdatePersonEventRequest
+//	@Failure		400		{object}	handlers.ErrorResponce
+//	@Failure		500		{object}	handlers.ErrorResponce
+//	@Router			/persEvents [put]
 func (h *PersEventsHandler) Update(ctx *gin.Context) {
 	var req UpdatePersonEventRequest
 	err := ctx.ShouldBindJSON(&req)

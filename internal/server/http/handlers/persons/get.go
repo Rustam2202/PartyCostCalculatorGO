@@ -8,16 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary		Get a person
-// @Description	Get a person from database
-// @Tags			Person
-// @Accept			json
-// @Produce		json
-// @Param		id     path    int     true        "Person Id"
-// @Success		200		{object}	domain.Person
-// @Failure		400		{object}	handlers.ErrorResponce
-// @Failure		500		{object}	handlers.ErrorResponce
-// @Router			/person/{id} [get]
+//	@Summary		Get a person
+//	@Description	Get a person from database
+//	@Tags			Person
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Person Id"
+//	@Success		200	{object}	domain.Person
+//	@Failure		400	{object}	handlers.ErrorResponce
+//	@Failure		500	{object}	handlers.ErrorResponce
+//	@Router			/person/{id} [get]
 func (h *PersonHandler) Get(ctx *gin.Context) {
 	req := ctx.Param("id")
 	id, err := strconv.ParseInt(req, 10, 64)

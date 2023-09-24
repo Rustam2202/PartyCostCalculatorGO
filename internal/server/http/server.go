@@ -41,10 +41,10 @@ func NewServer(cfg ServerHTTPConfig, handlers *HTTPHandlers) *Server {
 	}
 }
 
-// @title			Party Cost Calculator API
-// @version		1.0
-// @description	This is a sample app server.
-// @BasePath		/
+//	@title			Party Cost Calculator API
+//	@version		1.0
+//	@description	This is a sample app server.
+//	@BasePath		/
 func (s *Server) Start(ctx context.Context, wg *sync.WaitGroup) { //
 	//defer wg.Done()
 	router := gin.Default()
