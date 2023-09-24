@@ -3,8 +3,8 @@
 
 Server application for manage event data and persons spent money. 
 
-## API Reference
-https://rustam2202.github.io/DeviceManager/
+## API Specification
+https://rustam2202.github.io/PartyCostCalculatorGO/
 
 ## Run Locally
 
