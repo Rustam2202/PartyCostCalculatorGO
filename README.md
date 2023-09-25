@@ -14,11 +14,11 @@ Config parameters in ```cmd/config.yaml``` and start servers:
   make run
 ```
 
-## Up in docker
+<!-- ## Up in docker
 
 ```bash
   make compose
-```
+``` -->
 
 ## Running Tests
 
@@ -38,14 +38,16 @@ To run tests and generate HTML coverage report
 - [PGX](github.com/jackc/pgx)
 - [Mock Tests](github.com/pashagolub/pgxmock)
 - [Kafka](https://github.com/segmentio/kafka-go)
-- [Docker Compose](https://docs.docker.com/compose)
+<!-- - [Docker Compose](https://docs.docker.com/compose) -->
 - REST-API
 - [gRPC](https://github.com/grpc/grpc-go)
 - [ProtoBuf](https://github.com/protocolbuffers/protobuf-go)
 - [Swagger](https://github.com/swaggo/swag)
 - Graceful Shutdown
 - Panic Recovery
+- [Prometheus](github.com/prometheus/client_golang/prometheus)
 
 
 ## Roadmap
-- Fix docker debugger
+- Fix docker-compose
+- More tests 

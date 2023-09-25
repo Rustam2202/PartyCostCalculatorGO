@@ -4,6 +4,7 @@ import (
 	"context"
 	"party-calc/internal/database"
 	"party-calc/internal/domain"
+	"party-calc/internal/logger"
 	"testing"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 
 func TestCreatePerson(t *testing.T) {
 	var ctx context.Context = context.TODO()
+	logger.IntializeLogger(logger.LoggerConfig{})
 	mock, err := pgxmock.NewConn()
 	if err != nil {
 		t.Fatal(err)
@@ -21,16 +23,25 @@ func TestCreatePerson(t *testing.T) {
 
 	repo := NewPersonRepository(&database.DataBase{DBPGX: mock})
 
-	mock.ExpectQuery("INSERT INTO persons").
-		WithArgs("John Doe").
-		WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)))
+	{
+		mock.ExpectQuery("INSERT INTO persons").
+			WithArgs("John Doe").
+			WillReturnRows(pgxmock.NewRows([]string{"Id"}).AddRow(int64(1)))
 
-	person := &domain.Person{Name: "John Doe"}
-	err = repo.Create(ctx, person)
+		person := &domain.Person{Name: "John Doe"}
+		err = repo.Create(ctx, person)
 
-	assert.NoError(t, err)
-	assert.NoError(t, mock.ExpectationsWereMet())
-	assert.EqualValues(t, 1, person.Id)
+		assert.NoError(t, err)
+		assert.NoError(t, mock.ExpectationsWereMet())
+		assert.EqualValues(t, 1, person.Id)
+	}
+	{
+		mock.ExpectQuery("INSERT INTO persons").
+			WithArgs("John Doe").
+			WillReturnError(pgxmock.ErrCancelled)
+		err := repo.Create(ctx, &domain.Person{Name: "John Doe"})
+		assert.Error(t, err)
+	}
 }
 
 func TestGetPersonById(t *testing.T) {
